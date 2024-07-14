@@ -1,0 +1,23 @@
+.cabecera {
+  display: flex;
+  align-items: center;
+  padding-bottom: 60px;
+}
+    
+.cabecera img {
+  margin-right: 10px;
+}
+
+.cabecera input {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.tabla {
+  padding-bottom: 100px;
+}
+
+.botonera button {
+  margin-right: 15px;
+}
