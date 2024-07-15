@@ -41,7 +41,7 @@
     </table>
   </div>
   <div class="botonera">
-    <button id="cargar_usuario">Agregar Cliente</button>
+    <button onclick="window.location.href='cargar_usuario_views.php'" id="cargar_usuario">Agregar Cliente</button>
     <button id="cargar_pago">Renovar Pago</button>
     <button id="bajar_usuario">Inabilitar Cliente</button>
   </div>
