@@ -10,7 +10,7 @@
   <body>
 
     <script>
-      window.location.href = 'views/fichaje_views.php';
+      window.location.href = 'views/fichaje_view.php';
     </script>
 
   </body>

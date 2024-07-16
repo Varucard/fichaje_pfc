@@ -1,6 +1,3 @@
-<?php
-  require_once '../controllers/fichaje_controller.php';
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -16,6 +13,7 @@
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Fichaje Fight Club Palillo</h1>
     <input type="text" id="busqueda_fichaje" placeholder="Buscar fichaje">
+    <input type="text" id="busqueda_usuario" placeholder="Buscar Usuario">
   </div>
   <div class="tabla">
     <h3>Ultimos fichajes</h3>
@@ -41,9 +39,8 @@
     </table>
   </div>
   <div class="botonera">
-    <button onclick="window.location.href='cargar_usuario_views.php'" id="cargar_usuario">Agregar Cliente</button>
-    <button id="cargar_pago">Renovar Pago</button>
-    <button id="bajar_usuario">Inabilitar Cliente</button>
+    <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_usuario">Agregar Cliente</button>
   </div>
+  <script src="../public/js/busqueda_usuario.js"></script>
 </body>
 </html>

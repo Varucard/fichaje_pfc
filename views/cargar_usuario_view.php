@@ -13,21 +13,24 @@
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Agregar nuevo cliente</h1>
   </div>
-    <form action="../controllers/cargar_usuario.php" method="post" class="form-container">
+    <form action="../controllers/usuarios_controller.php" method="post" class="form-container">
       <div class="form-group">
         <label for="rfid">N° de llavero:</label>
-        <input type="text" id="rfid" name="rfid"><br>
+        <input type="text" id="rfid" name="rfid" required><br>
 
         <label for="dni">N° de DNI:</label>
-        <input type="int" id="dni" name="dni"><br>
+        <input type="int" id="dni" name="dni" required><br>
+
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" name="name" required><br>
       </div>
 
       <div class="form-group">
-        <label for="name">Nombre:</label>
-        <input type="text" id="name" name="name"><br>
-        
         <label for="surname">Apellido:</label>
         <input type="text" id="surname" name="surname"><br>
+
+        <label for="birth_day">Fecha de nacimiento:</label>
+        <input type="date" id="birth_day" name="birth_day"><br>
       </div>
 
       <div class="form-group">
@@ -39,7 +42,7 @@
       </div>
 
       <input type="submit" value="Cargar Cliente">
-      <button type="button" onclick="window.location.href='fichaje_views.php'">Volver</button>
+      <button type="button" onclick="window.location.href='fichaje_view.php'">Volver</button>
     </form>
   </div>
 </body>

@@ -11,58 +11,54 @@ class Pagos {
     $this->pdo = $this->database->getConnection();
   }
 
-  public function getPago(string $dni) {
+  public function getPagoActualByUser(int $id_user) {
+    try {
+      $stmt = $this->pdo->prepare("SELECT * FROM `payment` WHERE `id_user` = :id_user ORDER BY `discharge_date` DESC LIMIT 1");
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+      $stmt->execute();
+  
+      return $stmt->fetch(PDO::FETCH_ASSOC);
+
+  } catch (PDOException $e) {
+      echo "Error en la consulta: " . $e->getMessage();
+  }
+  }
+
+  public function getPagosByUser(int $id_user) {
     try {
       // Preparar la consulta SQL
-      $stmt = $this->pdo->query("SELECT * FROM `users` WHERE `dni` = $dni");
+      $stmt = $this->pdo->query("SELECT * FROM `payment` WHERE `id_user` = :id_user");
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+      $stmt->execute();
   
-      // Obtengo el Usuario
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      return $stmt->fetch(PDO::FETCH_ASSOC);
   
     } catch (PDOException $e) {
       echo "Error en la consulta: " . $e->getMessage();
     }
   }
 
-  public function getUsers() {
-    try {
-      // Preparar la consulta SQL
-      $stmt = $this->pdo->query("SELECT * FROM `users`");
-  
-      // Obtengo los Usuarios
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
-  
-    } catch (PDOException $e) {
-      echo "Error en la consulta: " . $e->getMessage();
-    }
-  }
+  public function cargarPago(array $payment) {
 
-  public function cargarUsuario(array $user) {
-    $rfid = $user[0];
-    $dni = $user[1];
-    $name = $user[2];
-    $surname = $user[3] ?? NULL;
-    $email = $user[4] ?? NULL;
-    $phone_number = $user[5] ?? NULL;
+    $id_user = $payment[0];
+    $fecha_pago = $payment[1];
+    $fecha_renovacion = $payment[2];
 
     try {
       // Preparar la consulta SQL
-      $stmt = $this->pdo->prepare("INSERT INTO `users`(`rfid`, `dni`, `name`, `surname`, `email`, `phone_number`) VALUES (:rfid, :dni, :name, :surname, :email, :phone_number)");
+      $stmt = $this->pdo->prepare("INSERT INTO `payments`(`id_user`, `discharge_date`, `date_of_renovation`) VALUES (:id_user, :discharge_date, :date_of_renovation)");
 
       // Enlazar los parámetros
-      $stmt->bindParam(':rfid', $rfid, PDO::PARAM_STR);
-      $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
-      $stmt->bindParam(':name', $name, PDO::PARAM_STR);
-      $stmt->bindParam(':surname', $surname, PDO::PARAM_STR);
-      $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-      $stmt->bindParam(':phone_number', $phone_number, PDO::PARAM_STR);
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_STR);
+      $stmt->bindParam(':discharge_date', $fecha_pago, PDO::PARAM_STR);
+      $stmt->bindParam(':date_of_renovation', $fecha_renovacion, PDO::PARAM_STR);
 
       // Ejecutar la consulta
       return $stmt->execute();
 
     } catch (PDOException $e) {
-      // echo "Error en la consulta: " . $e->getMessage();
-      return false;
+      echo "Error en la consulta: " . $e->getMessage();
+      // return false;
     }
 }
 
