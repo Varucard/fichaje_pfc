@@ -28,16 +28,19 @@ class User {
   public function getUserByRFID(string $rfid) {
     try {
       // Preparar la consulta SQL
-      $stmt = $this->pdo->query("SELECT * FROM `users` WHERE `rfid` = $rfid");
-  
-      // Obtengo el Usuario
+      $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `rfid` = :rfid");
+      $stmt->bindParam(':rfid', $rfid, PDO::PARAM_STR);
+      $stmt->execute();
+      
+      // Obtener el Usuario
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
-  
+        
     } catch (PDOException $e) {
       // echo "Error en la consulta: " . $e->getMessage();
       return false;
     }
   }
+
 
   public function getUserByName(string $name) {
     try {
@@ -98,9 +101,48 @@ class User {
       // echo "Error en la consulta: " . $e->getMessage();
       return false;
     }
-}
+  }
 
+  public function actualizarUsuario($datos) {
+    try {
+        $stmt = $this->pdo->prepare("UPDATE users SET name = :name, surname = :surname, birth_day = :birth_day, rfid = :rfid, dni = :dni, email = :email, phone_number = :phone WHERE id_user = :id");
+        $stmt->bindParam(':name', $datos['name'], PDO::PARAM_STR);
+        $stmt->bindParam(':surname', $datos['surname'], PDO::PARAM_STR);
+        $stmt->bindParam(':birth_day', $datos['birth_day'], PDO::PARAM_STR);
+        $stmt->bindParam(':rfid', $datos['rfid'], PDO::PARAM_STR);
+        $stmt->bindParam(':dni', $datos['dni'], PDO::PARAM_STR);
+        $stmt->bindParam(':email', $datos['email'], PDO::PARAM_STR);
+        $stmt->bindParam(':phone', $datos['phone_number'], PDO::PARAM_STR);
+        $stmt->bindParam(':id', $datos['id'], PDO::PARAM_INT);
 
+        return $stmt->execute();
+    } catch (PDOException $e) {
+        echo "Error en la consulta: " . $e->getMessage();
+        return false;
+    }
+  }
+
+  public function activarUsuario($dni) {
+    try {
+      $stmt = $this->pdo->prepare("UPDATE users SET asset = 1 WHERE dni = :dni");
+      $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
+      return $stmt->execute();
+    } catch (PDOException $e) {
+      // echo "Error en la consulta: " . $e->getMessage();
+      return false;
+    }
+  }
+
+  public function desactivarUsuario($dni) {
+    try {
+      $stmt = $this->pdo->prepare("UPDATE users SET asset = 0 WHERE dni = :dni");
+      $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
+      return $stmt->execute();
+    } catch (PDOException $e) {
+      // echo "Error en la consulta: " . $e->getMessage();
+      return false;
+    }
+  }
 }
 
 ?>

@@ -13,7 +13,7 @@
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Fichaje Fight Club Palillo</h1>
     <input type="text" id="busqueda_fichaje" placeholder="Buscar fichaje">
-    <input type="text" id="busqueda_usuario" placeholder="Buscar Usuario">
+    <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente">
   </div>
   <div class="tabla">
     <h3>Ultimos fichajes</h3>

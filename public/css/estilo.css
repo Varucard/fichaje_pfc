@@ -12,13 +12,18 @@
   justify-content: flex-end;
   margin-top: 10px;
 }
+.cabecera button {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
 
 /* Estilos De la Tabla Fichajes*/
 .tabla {
   padding-bottom: 100px;
 }
 
-/* Estilos Botones Ficahje Views*/
+/* Estilos Botones Fichje Views*/
 .botonera button {
   margin-right: 15px;
 }
@@ -50,4 +55,14 @@
   .form-group {
       flex: 1 1 100%;
   }
+}
+
+/* Estilos vista Busqueda Usuario*/
+.button_small {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+/* Ajustar el tamaño del ícono dentro del botón */
+button .fas {
+  font-size: 12px;
 }

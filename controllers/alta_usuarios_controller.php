@@ -5,7 +5,7 @@ require_once 'pagos_controller.php';
 
 $user = new User();
 
-// Datos para cargar el usuario
+global $user;
 
 // Valido que lo indispensable me llegue
 if (empty($_POST['rfid']) || empty($_POST['dni']) || empty($_POST['name'])) {
@@ -18,8 +18,6 @@ if ($user->getUserByDNI($_POST['dni'])) {
   echo "<script>alert('El usuario ya se encuentra registrado'); window.location.href = '../views/cargar_usuario_views.php';</script>";
   exit; 
 }
-
-// if ()
 
 // Si todo va bien guardo al Usuario
 $nuevoUsuario = [

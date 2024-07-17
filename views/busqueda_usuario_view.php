@@ -1,8 +1,21 @@
 <?php
-// Decodificar los resultados de la URL
+session_start();
+require_once '../models/user_model.php';
+
+$user = new User();
+
+// Inicializar resultados vacíos
 $resultados = [];
-if (isset($_GET['resultados'])) {
-    $resultados = json_decode(urldecode($_GET['resultados']), true);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $dni = isset($_POST['dni']) ? $_POST['dni'] : '';
+    $resultados = $user->getUserByDNI($dni);
+    $_SESSION['resultados_busqueda'] = $resultados; // Almacenar resultados en la sesión
+}
+
+// Si no hay resultados en la sesión, intentar recuperarlos del POST
+if (empty($resultados) && isset($_SESSION['resultados_busqueda'])) {
+    $resultados = $_SESSION['resultados_busqueda'];
 }
 ?>
 <!DOCTYPE html>
@@ -14,12 +27,15 @@ if (isset($_GET['resultados'])) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resultados de Búsqueda - Palillo Fight Club</title>
+  <title>Búsqueda de Usuarios - Palillo Fight Club</title>  
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
-    <h1 style="margin-right: 50px;">Resultados de Búsqueda</h1>
+    <h1 style="margin-right: 50px;">Búsqueda de Usuarios</h1>
+    <form action="" method="post"> <!-- Formulario para enviar la búsqueda -->
+      <input type="text" id="busqueda_usuario" name="dni" placeholder="Buscar Cliente">
+    </form>
   </div>
   
   <div class="tabla">
@@ -29,21 +45,29 @@ if (isset($_GET['resultados'])) {
       <table>
         <thead>
           <tr>
+            <th>RFID</th>
             <th>DNI</th>
             <th>Nombre</th>
             <th>Apellido</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           <?php foreach ($resultados as $usuario) { ?>
             <tr>
+              <td><?php echo htmlspecialchars($usuario['rfid'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td><?php echo htmlspecialchars($usuario['dni'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td><?php echo htmlspecialchars($usuario['name'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td><?php echo htmlspecialchars($usuario['surname'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td>
-                <button onclick="window.location.href='usuario_view.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
+                <button class="button_small" onclick="window.location.href='usuario_view.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
                   <i class="fas fa-user"></i>
                 </button>
+                <?php if ($usuario['asset'] == 1) { ?>
+                  <button class="button_small" onclick="window.location.href='../controllers/baja_usuarios_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                <?php } ?>
               </td>
             </tr>
           <?php } ?>
@@ -51,7 +75,7 @@ if (isset($_GET['resultados'])) {
       </table>
     <?php } ?>
   </div>
-  
+
   <div class="botonera">
     <button onclick="window.location.href='../index.php'">Volver</button>
   </div>

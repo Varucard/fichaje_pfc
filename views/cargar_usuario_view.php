@@ -13,7 +13,7 @@
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Agregar nuevo cliente</h1>
   </div>
-    <form action="../controllers/usuarios_controller.php" method="post" class="form-container">
+    <form action="../controllers/alta_usuarios_controller.php" method="post" class="form-container">
       <div class="form-group">
         <label for="rfid">N° de llavero:</label>
         <input type="text" id="rfid" name="rfid" required><br>
@@ -37,7 +37,7 @@
         <label for="email">Email:</label>
         <input type="email" id="email" name="email"><br>
 
-        <label for="email">Telefono:</label>
+        <label for="email">Teléfono:</label>
         <input type="int" id="phone" name="phone">
       </div>
 
