@@ -28,12 +28,13 @@ if (isset($_GET['busqueda']) && isset($_GET['tipo_busqueda'])) {
     echo "<script>alert('No se encontraron resultados'); window.location.href = '../index.php';</script>";
     exit;
   } else {
-    // Redirige a la vista de resultados
-    header('Location: ../views/busqueda_usuario_view.php?resultados=' . urlencode(json_encode($resultados)));
+    // Almacena los resultados en la sesión y redirige a la vista de búsqueda
+    session_start();
+    $_SESSION['resultados_busqueda'] = $resultados;
+    header('Location: ../views/busqueda_usuario_view.php');
     exit;
   }
 } else {
   echo "<script>alert('Ocurrio un error, por favor, probar nuevamente'); window.location.href = '../index.php';</script>";
   exit; 
 }
-?>

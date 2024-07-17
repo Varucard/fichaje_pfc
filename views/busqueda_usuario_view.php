@@ -7,15 +7,23 @@ $user = new User();
 // Inicializar resultados vacíos
 $resultados = [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Verifica si se ha realizado una acción reciente (dar de baja/activar)
+if (isset($_GET['reload'])) {
+  // Recuperar los resultados anteriores de la sesión
+  if (isset($_SESSION['resultados_busqueda'])) {
+    $resultados = $_SESSION['resultados_busqueda'];
+  }
+} else {
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dni = isset($_POST['dni']) ? $_POST['dni'] : '';
     $resultados = $user->getUserByDNI($dni);
     $_SESSION['resultados_busqueda'] = $resultados; // Almacenar resultados en la sesión
-}
+  }
 
-// Si no hay resultados en la sesión, intentar recuperarlos del POST
-if (empty($resultados) && isset($_SESSION['resultados_busqueda'])) {
+  // Si no hay resultados en la sesión, intentar recuperarlos del POST
+  if (empty($resultados) && isset($_SESSION['resultados_busqueda'])) {
     $resultados = $_SESSION['resultados_busqueda'];
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -33,9 +41,7 @@ if (empty($resultados) && isset($_SESSION['resultados_busqueda'])) {
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Búsqueda de Usuarios</h1>
-    <form action="" method="post"> <!-- Formulario para enviar la búsqueda -->
-      <input type="text" id="busqueda_usuario" name="dni" placeholder="Buscar Cliente">
-    </form>
+    <input type="text" id="busqueda_usuario" name="dni" placeholder="Buscar Cliente">
   </div>
   
   <div class="tabla">
@@ -79,5 +85,7 @@ if (empty($resultados) && isset($_SESSION['resultados_busqueda'])) {
   <div class="botonera">
     <button onclick="window.location.href='../index.php'">Volver</button>
   </div>
+
+  <script src="../public/js/busqueda_usuario.js"></script>
 </body>
 </html>
