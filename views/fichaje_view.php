@@ -24,6 +24,9 @@ foreach ($ultimosFichajes as $fichaje) {
   $fichajesConPago[] = $fichaje;
 }
 
+// Limitar los fichajes a los 10 registros más recientes e invertir el orden
+$fichajesConPago = array_slice($fichajesConPago, 0, 10);
+$fichajesConPago = array_reverse($fichajesConPago);
 ?>
 
 <!DOCTYPE html>
@@ -31,45 +34,21 @@ foreach ($ultimosFichajes as $fichaje) {
 <head>
   <link rel="shortcut icon" href="../public/img/ico_logo.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="../public/css/estilo.css">
-
-  <style>
-    /* Estilos personalizados para DataTables */
-    #tabla-fichajes_wrapper {
-      background-color: #333; /* Fondo oscuro */
-      color: #fff; /* Texto blanco */
-      border: 1px solid #444; /* Borde oscuro */
-    }
-    #tabla-fichajes th, #tabla-fichajes td {
-      border-color: #444; /* Borde oscuro para celdas */
-      background-color: #222; /* Fondo oscuro para celdas */
-      color: #fff; /* Texto blanco para celdas */
-    }
-    #tabla-fichajes_filter input[type="search"] {
-      background-color: #555; /* Fondo del campo de búsqueda */
-      color: #fff; /* Texto blanco */
-      border: 1px solid #666; /* Borde oscuro */
-    }
-  </style>
-  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palillo Fight Club</title>
-
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Fichaje Fight Club Palillo</h1>
+    <input type="text" id="busqueda_fichaje" placeholder="Buscar Fichaje" onkeyup="buscarFichaje()">
     <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente">
   </div>
   <div class="tabla">
     <h2>Últimos fichajes</h2>
-    <table id="tabla-fichajes" class="display water-table">
+    <table id="tabla-fichajes" class="water-table">
       <thead>
         <tr>
           <th>N° de Llavero</th>
@@ -100,21 +79,7 @@ foreach ($ultimosFichajes as $fichaje) {
   <div class="botonera">
     <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_usuario">Agregar Cliente</button>
   </div>
-  <script>
-    $(document).ready(function() {
-      $('#tabla-fichajes').DataTable({
-        "paging": false,
-        "info": false,
-        "searching": true,
-        "language": {
-          "search": "Buscar fichaje:",
-          "zeroRecords": "No se encontraron registros",
-          "infoEmpty": "Mostrando 0 a 0 de 0 registros",
-          "infoFiltered": "(filtrado de _MAX_ registros en total)"
-        }
-      });
-    });
-  </script>
   <script src="../public/js/busqueda_usuario.js"></script>
+  <script src="../public/js/busqueda_fichaje.js"></script>
 </body>
 </html>

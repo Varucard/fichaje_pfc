@@ -71,3 +71,18 @@ button .fas {
 .cerca-de-vencer {
   color: red;
 }
+
+/* Estilos para la tabla de fichajes */
+.detalle-usuario table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.detalle-usuario th, .detalle-usuario td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+.detalle-usuario th {
+  background-color: #f2f2f2;
+}
