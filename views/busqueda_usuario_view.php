@@ -62,7 +62,7 @@ if (isset($_GET['reload'])) {
           <?php foreach ($resultados as $usuario) { ?>
             <tr>
               <td><?php echo htmlspecialchars($usuario['rfid'], ENT_QUOTES, 'UTF-8'); ?></td>
-              <td><?php echo htmlspecialchars($usuario['dni'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td style="color:red"><?php echo htmlspecialchars($usuario['dni'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td><?php echo htmlspecialchars($usuario['name'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td><?php echo htmlspecialchars($usuario['surname'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td>
@@ -73,6 +73,9 @@ if (isset($_GET['reload'])) {
                   <button class="button_small" onclick="window.location.href='../controllers/baja_usuarios_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
                     <i class="fas fa-trash"></i>
                   </button>
+                <?php } ?>
+                <?php if ($usuario['asset'] == 0) { ?>
+                  <td style="color:red">Usuario inactivo</td>
                 <?php } ?>
               </td>
             </tr>

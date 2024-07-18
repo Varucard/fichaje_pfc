@@ -66,3 +66,8 @@
 button .fas {
   font-size: 12px;
 }
+
+/* Estilo por estado de la cuota*/
+.cerca-de-vencer {
+  color: red;
+}

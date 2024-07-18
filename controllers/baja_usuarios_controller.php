@@ -16,7 +16,7 @@ if ($user->desactivarUsuario($dni)) {
       }
     }
   }
-  echo "<script>alert('Usuario desactivado exitosamente'); window.location.href = '../views/busqueda_usuario_view.php';</script>";
+  echo "<script>alert('Usuario desactivado exitosamente'); window.location.href = '../views/usuario_view.php?dni=$dni';</script>";
 } else {
   echo "<script>alert('Ocurrió un error al desactivar el usuario'); window.location.href = '../views/usuario_view.php?dni=$dni';</script>";
 }

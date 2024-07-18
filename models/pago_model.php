@@ -24,19 +24,29 @@ class Pagos {
   }
   }
 
-  public function getPagosByUser(int $id_user) {
+  public function getPagosByUser($id_user) {
     try {
       // Preparar la consulta SQL
-      $stmt = $this->pdo->query("SELECT * FROM `payment` WHERE `id_user` = :id_user");
+      $stmt = $this->pdo->prepare("SELECT id_payment, discharge_date, date_of_renovation FROM payments WHERE id_user = :id_user");
       $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
       $stmt->execute();
-  
-      return $stmt->fetch(PDO::FETCH_ASSOC);
-  
+      
+      // Fetch all results
+      $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      
+      if ($result === false) {
+          return [];
+      }
+      
+      return $result;
+        
     } catch (PDOException $e) {
       echo "Error en la consulta: " . $e->getMessage();
+      return [];
     }
   }
+
+
 
   public function cargarPago(array $payment) {
 

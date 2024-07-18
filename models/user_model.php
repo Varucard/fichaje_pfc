@@ -11,6 +11,20 @@ class User {
     $this->pdo = $this->database->getConnection();
   }
 
+  public function getUserByID(string $id_user) {
+    try {
+      // Preparar la consulta SQL
+      $stmt = $this->pdo->query("SELECT * FROM `users` WHERE `id_user` = $id_user");
+  
+      // Obtengo el Usuario
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  
+    } catch (PDOException $e) {
+      // echo "Error en la consulta: " . $e->getMessage();
+      return false;
+    }
+  }
+
   public function getUserByDNI(string $dni) {
     try {
       // Preparar la consulta SQL

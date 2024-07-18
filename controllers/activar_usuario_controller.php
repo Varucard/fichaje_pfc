@@ -16,7 +16,7 @@ if ($user->activarUsuario($dni)) {
       }
     }
   }
-  echo "<script>alert('Usuario reactivado exitosamente'); window.location.href = '../views/busqueda_usuario_view.php';</script>";
+  echo "<script>alert('Usuario reactivado exitosamente'); window.location.href = '../views/usuario_view.php?dni=$dni';</script>";
 } else {
   echo "<script>alert('Ocurrió un error al reactivar el usuario'); window.location.href = '../views/usuario_view.php?dni=$dni';</script>";
 }
