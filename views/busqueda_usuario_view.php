@@ -30,9 +30,8 @@ if (isset($_GET['reload'])) {
 <html lang="es">
 <head>
   <link rel="shortcut icon" href="../public/img/ico_logo.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+  <link rel="stylesheet" href="../public/css/water.css">
   <link rel="stylesheet" href="../public/css/estilo.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Búsqueda de Usuarios - Palillo Fight Club</title>  
@@ -88,6 +87,8 @@ if (isset($_GET['reload'])) {
   <div class="botonera">
     <button onclick="window.location.href='../index.php'">Volver</button>
   </div>
+
+  <script src="../public/js/icons.js"></script>
 
   <script src="../public/js/busqueda_usuario.js"></script>
 </body>

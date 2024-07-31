@@ -19,13 +19,20 @@
 }
 
 /* Estilos De la Tabla Fichajes*/
-.tabla {
+.tabla th, .tabla td{
   padding-bottom: 100px;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+.tabla th {
+  background-color: black;
 }
 
-/* Estilos Botones Fichje Views*/
+/* Estilos Botones Fichaje Views*/
 .botonera button {
   margin-right: 15px;
+  margin-top: 15px;
 }
 
 /* Estilos Alta Fomulario*/
@@ -62,7 +69,7 @@
   padding: 5px 10px;
   font-size: 14px;
 }
-/* Ajustar el tamaño del ícono dentro del botón */
+/* Ajustar el tamaño del ícono dentro del botón vista Busqueda Usuario*/
 button .fas {
   font-size: 12px;
 }
@@ -72,7 +79,7 @@ button .fas {
   color: red;
 }
 
-/* Estilos para la tabla de fichajes */
+/* Estilos para la tabla de Pagos vista de Usuarios */
 .detalle-usuario table {
   width: 100%;
   border-collapse: collapse;
@@ -84,5 +91,5 @@ button .fas {
   text-align: center;
 }
 .detalle-usuario th {
-  background-color: #f2f2f2;
+  background-color: black;
 }

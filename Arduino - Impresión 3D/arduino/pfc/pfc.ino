@@ -19,7 +19,7 @@ const int buzzerPin = 3;
 
 // Configuración del lector RFID
 #define RST_PIN         9  // Configurable, ver el esquema de pines
-#define SS_PIN          53 // Configurable, ver el esquema de pines
+#define SS_PIN          8 // Configurable, ver el esquema de pines
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Crear instancia del MFRC522
 
 // Datos de configuración de Internet y MySQL

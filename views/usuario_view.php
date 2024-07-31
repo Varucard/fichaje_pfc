@@ -23,9 +23,9 @@ $pago = array_reverse($pago);
 <html lang="es">
 <head>
   <link rel="shortcut icon" href="../public/img/ico_logo.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+  <link rel="stylesheet" href="../public/css/water.css">
   <link rel="stylesheet" href="../public/css/estilo.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="../public/css/min.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detalles del Cliente</title>
@@ -100,6 +100,7 @@ $pago = array_reverse($pago);
       <?php if ($usuario[0]['asset'] == 1) { ?>
         <button onclick="window.location.href='../controllers/nuevo_pago_controller.php?id_user=<?php echo $usuario[0]['id_user']; ?>'" id="cargar_pago">Renovar pago</button>
       <?php } ?>
+      <button onclick="window.location.href='../views/fichaje_view.php'">Inicio</button>
       <table id="pagos-table">
         <thead>
           <tr>

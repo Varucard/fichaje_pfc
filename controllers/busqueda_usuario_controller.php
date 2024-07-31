@@ -12,9 +12,6 @@ if (isset($_GET['busqueda']) && isset($_GET['tipo_busqueda'])) {
     case 'dni':
       $resultados = $userModel->getUserByDni($busqueda);
       break;
-    case 'rfid':
-      $resultados = $userModel->getUserByRfid($busqueda);
-      break;
     case 'name':
       $resultados = $userModel->getUserByName($busqueda);
       break;

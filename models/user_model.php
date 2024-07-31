@@ -136,6 +136,17 @@ class User {
     }
   }
 
+  public function desetearRFID($dni) {
+    try {
+      $stmt = $this->pdo->prepare("UPDATE users SET rfid = 'SIN LLAVERO' WHERE dni = :dni");
+      $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
+      return $stmt->execute();
+    } catch (PDOException $e) {
+      // echo "Error en la consulta: " . $e->getMessage();
+      return false;
+    }
+  }
+
   public function activarUsuario($dni) {
     try {
       $stmt = $this->pdo->prepare("UPDATE users SET asset = 1 WHERE dni = :dni");
