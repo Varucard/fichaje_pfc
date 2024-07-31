@@ -168,6 +168,31 @@ class User {
       return false;
     }
   }
+
+  public function getUsersFestejados($date) {
+    try {
+        // Preparar la consulta SQL para obtener usuarios con cumpleaños en la fecha dada (mes y día)
+        $stmt = $this->pdo->prepare("
+            SELECT id_user, name, surname
+            FROM users
+            WHERE DATE_FORMAT(birth_day, '%m-%d') = DATE_FORMAT(?, '%m-%d')
+        ");
+        
+        // Establecer el parámetro de la consulta
+        $stmt->execute([$date]);
+        
+        // Obtener el resultado
+        $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Devolver el array de usuarios
+        return $usuarios;
+    } catch (PDOException $e) {
+        // Manejar la excepción
+        echo "Error en la consulta: " . $e->getMessage();
+        return [];
+    }
+  }
+
 }
 
 ?>
