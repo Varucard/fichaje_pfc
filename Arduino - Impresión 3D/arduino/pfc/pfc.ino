@@ -15,11 +15,11 @@ const int ledAmarillo = 6;
 const int ledAzul = 7;
 
 // Configuración del buzzer
-const int buzzerPin = 3;
+const int buzzerPin = 2;
 
 // Configuración del lector RFID
 #define RST_PIN         9  // Configurable, ver el esquema de pines
-#define SS_PIN          8 // Configurable, ver el esquema de pines
+#define SS_PIN          53 // Configurable, ver el esquema de pines
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Crear instancia del MFRC522
 
 // Datos de configuración de Internet y MySQL
@@ -40,6 +40,8 @@ unsigned long lastMessageTime = 0;  // Último tiempo en que se mostró el mensa
 const unsigned long messageInterval = 10000;  // Intervalo para mostrar el mensaje de bienvenida en milisegundos
 
 void setup() {
+  Serial.begin(9600);
+
   // Iniciar la pantalla LCD
   lcd.init();
   lcd.backlight();
@@ -57,7 +59,7 @@ void setup() {
   digitalWrite(ledAzul, LOW);
 
   // Emitir pitido inicial largo
-  beep(100);
+  beep(1000);
 
   // Mostrar mensaje inicial
   lcd.setCursor(0, 0);
@@ -159,22 +161,17 @@ void loop() {
     // Conectar a MySQL
     if (conn.connect(server_addr, port, user, password)) {
       // Consulta SQL para verificar si el UID existe
-      String query = "SELECT name, surname FROM pfc.users WHERE rfid='" + uid + "'";
-      
-      // Imprimir la consulta SQL en el monitor serial
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(query);
-
+      String query = "SELECT id_user, name, surname FROM pfc.users WHERE rfid='" + uid + "'";
       cursor->execute(query.c_str());
-      
+
       // Obtener el resultado de la consulta
       column_names *cols = cursor->get_columns();
       row_values *row = NULL;
       if ((row = cursor->get_next_row()) != NULL) {
-        // UID encontrado, mostrar nombre y apellido
-        String nombre = row->values[0];
-        String apellido = row->values[1];
+        // UID encontrado, obtener id_user, nombre y apellido
+        int userId = atoi(row->values[0]);
+        String nombre = row->values[1];
+        String apellido = row->values[2];
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("Bienvenido/a!");
@@ -182,8 +179,61 @@ void loop() {
         lcd.print(nombre);
         lcd.setCursor(0, 2);
         lcd.print(apellido);
-        lcd.setCursor(0, 3);
-        lcd.print("Disfrute su clase!");
+        delay(2000);
+
+        // Consultar la fecha de renovación más actual
+        String paymentQuery = "SELECT date_of_renovation FROM pfc.payments WHERE id_user=" + String(userId) + " ORDER BY date_of_renovation DESC LIMIT 1";
+        cursor->execute(paymentQuery.c_str());
+
+        // Obtener la fecha de renovación
+        column_names *paymentCols = cursor->get_columns();
+        row_values *paymentRow = cursor->get_next_row();
+        if (paymentRow != NULL) {
+          String renovationDateStr = paymentRow->values[0];
+
+          // Obtener la fecha actual desde MySQL
+          String currentDateQuery = "SELECT NOW()";
+          cursor->execute(currentDateQuery.c_str());
+          column_names *currentDateCols = cursor->get_columns();
+          row_values *currentDateRow = cursor->get_next_row();
+          String currentDateStr = currentDateRow->values[0];
+
+          Serial.println(currentDateStr);
+          Serial.println(renovationDateStr);
+          
+          // Comparar las fechas (suponiendo que ambas fechas están en formato YYYY-MM-DD)
+          if (currentDateStr <= renovationDateStr) {
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Por favor");
+            lcd.setCursor(0, 1);
+            lcd.print("Abone la cuota!");
+            lcd.setCursor(0, 3);
+            lcd.print("Gracias! PFC");
+            beep(600);
+            beep(600);
+            beep(600);
+          } else {
+            lcd.setCursor(0, 3);
+            lcd.print("Disfrute su clase!");
+          }
+        } else {
+          // Si no se encuentra una fecha de renovación
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print("Error en pago");
+          lcd.setCursor(0, 1);
+          lcd.print("verifique datos");
+          lcd.setCursor(0, 2);
+          lcd.print("Contactar Admin");
+          lcd.setCursor(0, 3);
+          lcd.print("Gracias! PFC");
+        }
+
+        // Registrar la fichada en la tabla incomes
+        String insertQuery = "INSERT INTO pfc.incomes (id_user, addmission_date) VALUES (" + String(userId) + ", NOW())";
+        cursor->execute(insertQuery.c_str());
+
         beep(200);
       } else {
         // UID no encontrado

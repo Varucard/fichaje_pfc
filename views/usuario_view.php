@@ -46,7 +46,6 @@ $pago = array_reverse($pago);
     <?php } ?>
   </div>
 
-
   <div class="detalle-usuario">
 
     <?php if ($usuario && $usuario[0]['asset'] == 0) { ?>
@@ -56,7 +55,7 @@ $pago = array_reverse($pago);
     <?php if ($usuario): ?>
       <!-- Formulario para los datos del usuario -->
       <form id="form-datos-usuario" action="../controllers/actualizar_usuarios_controller.php" method="post" class="form-container">
-        <input type="hidden" name="id" value="<?php echo htmlspecialchars($usuario[0]['id_user']); ?>">
+        <input type="hidden" name="id" id="id" value="<?php echo htmlspecialchars($usuario[0]['id_user']); ?>">
 
         <div class="form-group">
           <label for="rfid">N° de llavero:</label>
@@ -67,8 +66,6 @@ $pago = array_reverse($pago);
 
           <label for="name">Nombre:</label>
           <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($usuario[0]['name']); ?>">
-
-          <input type="hidden" name="id" value="<?php echo htmlspecialchars($usuario[0]['id_user']); ?>">
 
           <?php if ($usuario && $usuario[0]['asset'] == 1) { ?>
             <button type="submit">Actualizar Usuario</button>
@@ -99,6 +96,7 @@ $pago = array_reverse($pago);
       <h2 style="margin-right: 50px;">Historial de Pagos</h2>
       <?php if ($usuario[0]['asset'] == 1) { ?>
         <button onclick="window.location.href='../controllers/nuevo_pago_controller.php?id_user=<?php echo $usuario[0]['id_user']; ?>'" id="cargar_pago">Renovar pago</button>
+        <button id="cargar_pago_manual">Pago manual</button>
       <?php } ?>
       <button onclick="window.location.href='../views/fichaje_view.php'">Inicio</button>
       <table id="pagos-table">
@@ -122,5 +120,8 @@ $pago = array_reverse($pago);
       <p>No se encontraron datos para este usuario.</p>
     <?php endif; ?>
   </div>
+
+  <!-- Incluir el script externo -->
+  <script src="../public/js/pago_manual.js"></script>
 </body>
 </html>

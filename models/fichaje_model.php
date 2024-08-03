@@ -52,6 +52,28 @@ class Fichajes {
       return null;
     }
   }
+
+  public function guardarFichada($id_user, $addmission_date) {
+    try {      
+      // Consulta SQL para insertar la fichada en la tabla incomes
+      $sql = "INSERT INTO incomes (id_user, addmission_date) VALUES (:id_user, :addmission_date)";
+      $stmt = $this->pdo->prepare($sql);
+      
+      // Bind de los parámetros
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_STR);
+      $stmt->bindParam(':addmission_date', $addmission_date, PDO::PARAM_STR);
+      
+      // Ejecutar la consulta
+      $stmt->execute();
+      
+      // Retornar verdadero si la inserción fue exitosa
+      return true;
+    } catch (PDOException $e) {
+      // Manejo de errores
+      $error = $e->getMessage();
+      return $error;
+  }
+}
 }
 
 ?>

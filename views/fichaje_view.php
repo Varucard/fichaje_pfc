@@ -17,7 +17,10 @@
     <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente">
   </div>
   <div class="tabla">
-    <h2>Últimos fichajes</h2>
+    <div class="cabecera_tabla">
+      <h2>Últimos fichajes</h2>
+      <button id="fichaje_manual">Registrar Fichada</button>
+    </div>
     <table id="tabla-fichajes" class="water-table">
       <thead>
         <tr>
@@ -48,6 +51,7 @@
   <script src="../public/js/busqueda_usuario.js"></script>
   <script src="../public/js/busqueda_fichaje.js"></script>
   <script src="../public/js/ultimos_fichajes.js"></script>
+  <script src="../public/js/fichaje_manual.js"></script>
   <script src="../public/js/festejados.js"></script>
 </body>
 </html>

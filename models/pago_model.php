@@ -13,15 +13,15 @@ class Pagos {
 
   public function getPagoActualByUser(int $id_user) {
     try {
-      $stmt = $this->pdo->prepare("SELECT * FROM `payment` WHERE `id_user` = :id_user ORDER BY `discharge_date` DESC LIMIT 1");
+      $stmt = $this->pdo->prepare("SELECT * FROM `payments` WHERE `id_user` = :id_user ORDER BY `discharge_date` DESC LIMIT 1");
       $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
       $stmt->execute();
   
       return $stmt->fetch(PDO::FETCH_ASSOC);
 
-  } catch (PDOException $e) {
+    } catch (PDOException $e) {
       echo "Error en la consulta: " . $e->getMessage();
-  }
+    }
   }
 
   public function getPagosByUser($id_user) {
@@ -35,7 +35,7 @@ class Pagos {
       $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
       
       if ($result === false) {
-          return [];
+        return [];
       }
       
       return $result;
@@ -45,8 +45,6 @@ class Pagos {
       return [];
     }
   }
-
-
 
   public function cargarPago(array $payment) {
 
@@ -70,9 +68,7 @@ class Pagos {
       echo "Error en la consulta: " . $e->getMessage();
       // return false;
     }
-}
-
-
+  }
 }
 
 ?>

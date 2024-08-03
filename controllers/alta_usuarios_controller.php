@@ -51,11 +51,16 @@ if ($user->cargarUsuario($nuevoUsuario)) {
 
   $usuario = $user->getUserByDNI($_POST['dni']);
 
-  if (nuevo_pago($usuario[0]['id_user'])) {
-    echo "<script>alert('Usuario cargado exitosamente'); window.location.href = '../views/usuario_view.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
-    exit; 
+  if ($_POST['pago'] == 'TRUE') {
+    if (nuevo_pago($usuario[0]['id_user'])) {
+      echo "<script>alert('Usuario cargado exitosamente con Pago'); window.location.href = '../views/usuario_view.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
+      exit; 
+    } else {
+      echo "<script>alert('Ocurrio un error con la fecha de pago'); window.location.href = '../index.php';</script>";
+    }
   } else {
-    echo "<script>alert('Ocurrio un error con la fecha de pago'); window.location.href = '../index.php';</script>";
+    echo "<script>alert('Usuario cargado exitosamente sin Pago'); window.location.href = '../views/usuario_view.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
+    exit;
   }
 } else {
   echo "<script>alert('Ocurrio un error, por favor voler a cargar el usuario'); window.location.href = '../index.php';</script>";

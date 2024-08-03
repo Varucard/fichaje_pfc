@@ -55,7 +55,6 @@ class User {
     }
   }
 
-
   public function getUserByName(string $name) {
     try {
       $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `name` LIKE :name");

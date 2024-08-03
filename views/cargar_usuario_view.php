@@ -23,6 +23,9 @@
 
         <label for="name">Nombre:</label>
         <input type="text" id="name" name="name" required><br>
+
+        <label class="exceptuado" for="pago">¿Agregar Usuario con pago?</label>
+        <input class="exceptuado" type="checkbox" id="pago" name="pago" value="TRUE">
       </div>
 
       <div class="form-group">

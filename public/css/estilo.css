@@ -18,6 +18,19 @@
   margin-top: 10px;
 }
 
+/* Estilos para la cabecera de la tabla de fichajes */
+.cabecera_tabla {
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+}  
+.cabecera_tabla button {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
 /* Estilos De la Tabla Fichajes*/
 .tabla th, .tabla td{
   padding-bottom: 100px;
@@ -92,4 +105,11 @@ button .fas {
 }
 .detalle-usuario th {
   background-color: black;
+}
+
+/* Estilo para cuando exceptuar algo */
+.exceptuado {
+  color: red;
+  padding: 0px;
+  width: 100%;
 }
