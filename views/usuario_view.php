@@ -109,8 +109,8 @@ $pago = array_reverse($pago);
         <tbody>
           <?php foreach ($pago as $p): ?>
             <tr>
-              <td><?php echo htmlspecialchars($p['discharge_date']); ?></td>
-              <td><?php echo htmlspecialchars($p['date_of_renovation']); ?></td>
+            <td><?php echo date('d-m-Y', strtotime($p['discharge_date'])); ?></td>
+            <td><?php echo date('d-m-Y', strtotime($p['date_of_renovation'])); ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

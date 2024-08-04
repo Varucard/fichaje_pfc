@@ -1,3 +1,11 @@
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const day = ('0' + date.getDate()).slice(-2);
+  const month = ('0' + (date.getMonth() + 1)).slice(-2);
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
 function actualizarFichajes() {
   fetch('../controllers/ultimos_fichajes_controller.php')
     .then(response => response.json())
@@ -11,8 +19,8 @@ function actualizarFichajes() {
           <td>${fichaje.rfid}</td>
           <td class="${fichaje.pago_cerca ? 'cerca-de-vencer' : ''}">${fichaje.dni}</td>
           <td>${fichaje.alumno}</td>
-          <td>${fichaje.addmission_date}</td>
-          <td class="${fichaje.pago_cerca ? 'cerca-de-vencer' : ''}">${fichaje.date_of_renovation}</td>
+          <td>${formatDate(fichaje.addmission_date)}</td>
+          <td class="${fichaje.pago_cerca ? 'cerca-de-vencer' : ''}">${formatDate(fichaje.date_of_renovation)}</td>
         `;
         tbody.appendChild(row);
       });
