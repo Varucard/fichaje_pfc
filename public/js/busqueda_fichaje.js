@@ -1,22 +1,12 @@
-function buscarFichaje() {
-  var input, filter, table, tr, td, i, j, txtValue;
-  input = document.getElementById("busqueda_fichaje");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("tabla-fichajes");
-  tr = table.getElementsByTagName("tr");
+document.getElementById('busqueda_fichaje').addEventListener('keyup', function(event) {
+  if (event.key === 'Enter') {
+    const busqueda = event.target.value.trim(); // Elimina espacios en blanco alrededor del valor
 
-  // Recorre todas las filas de la tabla y oculta las que no coincidan con la búsqueda
-  for (i = 1; i < tr.length; i++) {
-    tr[i].style.display = "none";
-    td = tr[i].getElementsByTagName("td");
-    for (j = 0; j < td.length; j++) {
-      if (td[j]) {
-        txtValue = td[j].textContent || td[j].innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-          break;
-        }
-      }
-    }
+    if (!(/^[A-Za-z\s]+$/.test(busqueda) || (/^\d{7,8}$/.test(busqueda)))) {
+      alert('Por favor, no ingrese valores erroneos');
+      exit();
+    } 
+
+    window.location.href = `../controllers/busqueda_fichaje_controller.php?busqueda=${encodeURIComponent(busqueda)}`;
   }
-}
+});

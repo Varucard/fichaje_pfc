@@ -34,6 +34,7 @@ if (empty($pago)) {
 }
 
 // Verificar si la fecha de pago está vencida
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 $fecha_actual = new DateTime();
 $fecha_vencida = false;
 $fecha_renovacion = new DateTime($pago['date_of_renovation']);
@@ -47,7 +48,7 @@ if ($fecha_vencida) {
   exit();
 }
 
-$fecha_fichada = $fecha_actual->format('Y-m-d');
+$fecha_fichada = $fecha_actual->format('Y-m-d H:i:s');
 
 if ($fichaje->guardarFichada($id_user, $fecha_fichada)) {
   echo "<script>alert('Fichada registrada exitosamente.'); window.location.href = '../views/fichaje_view.php';</script>";

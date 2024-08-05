@@ -41,6 +41,13 @@
 .tabla th {
   background-color: black;
 }
+.diminuto {
+  font-size: 0.9em;
+}
+.diminuto {
+  padding: 2px 5px;
+}
+
 
 /* Estilos Botones Fichaje Views*/
 .botonera button {

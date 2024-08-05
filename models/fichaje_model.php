@@ -32,27 +32,6 @@ class Fichajes {
     }
   }
 
-  public function getUltimaFechaPago($id_user) {
-    try {
-      $stmt = $this->pdo->prepare("
-        SELECT date_of_renovation 
-        FROM payments 
-        WHERE id_user = :id_user 
-        ORDER BY date_of_renovation DESC 
-        LIMIT 1
-      ");
-      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
-      $stmt->execute();
-
-      $result = $stmt->fetch(PDO::FETCH_ASSOC);
-      return $result ? $result['date_of_renovation'] : null;
-
-    } catch (PDOException $e) {
-      echo "Error en la consulta: " . $e->getMessage();
-      return null;
-    }
-  }
-
   public function guardarFichada($id_user, $addmission_date) {
     try {      
       // Consulta SQL para insertar la fichada en la tabla incomes
@@ -72,8 +51,29 @@ class Fichajes {
       // Manejo de errores
       $error = $e->getMessage();
       return $error;
+    }
   }
-}
+
+  public function getUltimosFichajesByUser($busqueda) {
+    try {
+      // Consulta para buscar fichajes basados en el término de búsqueda
+      $stmt = $this->pdo->prepare("
+        SELECT i.*, u.rfid, u.dni, CONCAT(u.name, ' ', u.surname) AS alumno
+        FROM incomes i
+        JOIN users u ON i.id_user = u.id_user
+        WHERE u.name LIKE :busqueda OR u.surname LIKE :busqueda OR u.dni LIKE :busqueda OR u.rfid LIKE :busqueda
+        ORDER BY i.addmission_date DESC
+      ");
+      $stmt->bindValue(':busqueda', '%' . $busqueda . '%', PDO::PARAM_STR);
+      $stmt->execute();
+
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch (PDOException $e) {
+      echo "Error en la consulta: " . $e->getMessage();
+      return false;
+    }
+  }
 }
 
 ?>

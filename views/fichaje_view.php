@@ -7,13 +7,13 @@
   <link rel="stylesheet" href="../public/css/festejados.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palillo Fight Club</title>
+  <title>Fichajes - Palillo Fight Club</title>
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
-    <h1 style="margin-right: 50px; text-align: center;">Fichaje Fight Club Palillo</h1>
-    <input type="text" id="busqueda_fichaje" placeholder="Buscar Fichaje" onkeyup="buscarFichaje()">
+    <h1 style="margin-right: 50px; text-align: center;">Fight Club Palillo</h1>
+    <input type="text" id="busqueda_fichaje" placeholder="Buscar Fichaje">
     <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente">
   </div>
   <div class="tabla">

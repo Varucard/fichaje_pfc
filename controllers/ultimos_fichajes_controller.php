@@ -1,12 +1,15 @@
 <?php
 require_once '../models/fichaje_model.php';
+require_once '../models/pago_model.php';
 
 $fichajesModel = new Fichajes();
+$pagosModel = new Pagos();
+
 $ultimosFichajes = $fichajesModel->getUltimosFichajes();
 
 $fichajesConPago = [];
 foreach ($ultimosFichajes as $fichaje) {
-  $fechaPago = $fichajesModel->getUltimaFechaPago($fichaje['id_user']);
+  $fechaPago = $pagosModel->getUltimaFechaPago($fichaje['id_user']);
   $fichaje['date_of_renovation'] = $fechaPago;
 
   // Calcular la diferencia de días entre la fecha de pago y la fecha actual

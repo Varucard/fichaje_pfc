@@ -69,6 +69,27 @@ class Pagos {
       // return false;
     }
   }
+
+  public function getUltimaFechaPago($id_user) {
+    try {
+      $stmt = $this->pdo->prepare("
+        SELECT date_of_renovation 
+        FROM payments 
+        WHERE id_user = :id_user 
+        ORDER BY date_of_renovation DESC 
+        LIMIT 1
+      ");
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+      $stmt->execute();
+
+      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+      return $result ? $result['date_of_renovation'] : null;
+
+    } catch (PDOException $e) {
+      echo "Error en la consulta: " . $e->getMessage();
+      return null;
+    }
+  }
 }
 
 ?>

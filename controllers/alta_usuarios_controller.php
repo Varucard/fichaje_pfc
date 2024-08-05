@@ -35,12 +35,24 @@ if ($aux) {
   }
 }
 
+// Normalizar el RFID
+$rfidNormalizado = strtolower($_POST['rfid']); // Convertir a minúsculas
+$rfidNormalizado = str_replace(' ', '', $rfid); // Eliminar espacios
+
+// Normalizo los nombres y apellido
+$nombreSinProcesar = $_POST['name'];
+$apellidoSinProcesar = isset($_POST['surname']) ? $_POST['surname'] : '';
+
+// Convertir el nombre y el apellido a tener la primera letra en mayúscula y el resto en minúscula
+$nombreNormalizado = ucwords(strtolower($nombreSinProcesar));
+$apellidoNormalizado = ucwords(strtolower($apellidoSinProcesar));
+
 // Creo al nuevo usuario
 $nuevoUsuario = [
-  $rfid = $_POST['rfid'],
+  $rfid = $rfidNormalizado,
   $dni = $_POST['dni'],
-  $nombre = $_POST['name'],
-  $apellido = $_POST['surname'],
+  $nombre = $nombreNormalizado,
+  $apellido = $apellidoNormalizado,
   $birth_day = $_POST['birth_day'],
   $email = $_POST['email'],
   $telefono = $_POST['phone'],

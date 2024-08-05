@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="../public/css/estilo.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palillo Fight Club</title>
+  <title>Cargar Usuario - Palillo Fight Club</title>
 </head>
 <body>
   <div class="cabecera">
