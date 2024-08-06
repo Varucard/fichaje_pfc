@@ -1,3 +1,7 @@
+<?php
+require_once '../config/fecha_arduino.php';
+crearArchivoFechaArduino();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>

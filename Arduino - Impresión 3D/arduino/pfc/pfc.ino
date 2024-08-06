@@ -161,7 +161,17 @@ void loop() {
     // Conectar a MySQL
     if (conn.connect(server_addr, port, user, password)) {
       // Consulta SQL para verificar si el UID existe
-      String query = "SELECT id_user, name, surname FROM pfc.users WHERE rfid='" + uid + "'";
+      String query = "SELECT u.id_user, u.name, u.surname, "
+                      "(SELECT date_of_renovation "
+                      " FROM pfc.payments p "
+                      " WHERE p.id_user = u.id_user "
+                      " ORDER BY p.date_of_renovation DESC "
+                      " LIMIT 1) AS last_payment_date, "
+                      "NOW() AS current_date_time "
+                      "FROM pfc.users u "
+                      "WHERE u.rfid = '" + uid + "'";
+
+
       cursor->execute(query.c_str());
 
       // Obtener el resultado de la consulta
@@ -172,6 +182,9 @@ void loop() {
         int userId = atoi(row->values[0]);
         String nombre = row->values[1];
         String apellido = row->values[2];
+        String fechaRenovacion = row->values[3];
+        String fechaActual = row->values[4];
+
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("Bienvenido/a!");
@@ -181,60 +194,30 @@ void loop() {
         lcd.print(apellido);
         delay(2000);
 
-        // Consultar la fecha de renovación más actual
-        String paymentQuery = "SELECT date_of_renovation FROM pfc.payments WHERE id_user=" + String(userId) + " ORDER BY date_of_renovation DESC LIMIT 1";
-        cursor->execute(paymentQuery.c_str());
+        // Comparar la fecha de renovación con la fecha actual
+        if (fechaActual < fechaRenovacion) {
+          // La fecha de renovación es mayor o igual a la fecha actual
+          lcd.setCursor(0, 3);
+          lcd.print("Disfrute su clase!");
+          beep(200);
 
-        // Obtener la fecha de renovación
-        column_names *paymentCols = cursor->get_columns();
-        row_values *paymentRow = cursor->get_next_row();
-        if (paymentRow != NULL) {
-          String renovationDateStr = paymentRow->values[0];
-
-          // Obtener la fecha actual desde MySQL
-          String currentDateQuery = "SELECT NOW()";
-          cursor->execute(currentDateQuery.c_str());
-          column_names *currentDateCols = cursor->get_columns();
-          row_values *currentDateRow = cursor->get_next_row();
-          String currentDateStr = currentDateRow->values[0];
-
-          Serial.println(currentDateStr);
-          Serial.println(renovationDateStr);
-          
-          // Comparar las fechas (suponiendo que ambas fechas están en formato YYYY-MM-DD)
-          if (currentDateStr <= renovationDateStr) {
-            lcd.clear();
-            lcd.setCursor(0, 0);
-            lcd.print("Por favor");
-            lcd.setCursor(0, 1);
-            lcd.print("Abone la cuota!");
-            lcd.setCursor(0, 3);
-            lcd.print("Gracias! PFC");
-            beep(600);
-            beep(600);
-            beep(600);
-          } else {
-            lcd.setCursor(0, 3);
-            lcd.print("Disfrute su clase!");
-          }
+          // Registrar la fichada en la tabla incomes
+          String insertQuery = "INSERT INTO pfc.incomes (id_user, addmission_date) VALUES (" + String(userId) + ", NOW())";
+          cursor->execute(insertQuery.c_str());
         } else {
-          // Si no se encuentra una fecha de renovación
+          // La fecha de renovación es menor que la fecha actual
           lcd.clear();
           lcd.setCursor(0, 0);
-          lcd.print("Error en pago");
+          lcd.print("Por favor");
           lcd.setCursor(0, 1);
-          lcd.print("verifique datos");
-          lcd.setCursor(0, 2);
-          lcd.print("Contactar Admin");
+          lcd.print("Abone la cuota!");
           lcd.setCursor(0, 3);
           lcd.print("Gracias! PFC");
+          beep(600);
+          beep(600);
+          beep(600);
         }
 
-        // Registrar la fichada en la tabla incomes
-        String insertQuery = "INSERT INTO pfc.incomes (id_user, addmission_date) VALUES (" + String(userId) + ", NOW())";
-        cursor->execute(insertQuery.c_str());
-
-        beep(200);
       } else {
         // UID no encontrado
         lcd.clear();
