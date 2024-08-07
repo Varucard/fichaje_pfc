@@ -4,6 +4,7 @@
 #include <MySQL_Cursor.h>
 #include <SPI.h>
 #include <MFRC522.h>
+#include <avr/wdt.h>  // Librería para el Watchdog Timer
 
 // Configuración de la pantalla LCD I2C
 LiquidCrystal_I2C lcd(0x27, 20, 4);
@@ -38,6 +39,9 @@ MySQL_Cursor* cursor;
 
 unsigned long lastMessageTime = 0;  // Último tiempo en que se mostró el mensaje de bienvenida
 const unsigned long messageInterval = 10000;  // Intervalo para mostrar el mensaje de bienvenida en milisegundos
+
+// Configuración del servidor HTTP
+EthernetServer httpServer(80);
 
 void setup() {
   Serial.begin(9600);
@@ -93,6 +97,9 @@ void setup() {
   lcd.print(Ethernet.localIP());
   delay(3000);
   
+  // Iniciar el servidor HTTP
+  httpServer.begin();
+
   // Intentar conectar a MySQL
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -137,6 +144,8 @@ void setup() {
 }
 
 void loop() {
+  handleHTTPRequests(); // Manejar solicitudes HTTP
+
   // Verificar si hay una nueva tarjeta presente
   if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
     digitalWrite(ledAzul, LOW);
@@ -147,6 +156,7 @@ void loop() {
       uid += String(mfrc522.uid.uidByte[i] < 0x10 ? "0" : "");
       uid += String(mfrc522.uid.uidByte[i], HEX);
     }
+    uid.toUpperCase();  // Convertir a mayúsculas para consistencia
 
     // Mostrar el UID en la pantalla LCD
     lcd.clear();
@@ -160,17 +170,18 @@ void loop() {
 
     // Conectar a MySQL
     if (conn.connect(server_addr, port, user, password)) {
-      // Consulta SQL para verificar si el UID existe
-      String query = "SELECT u.id_user, u.name, u.surname, "
-                      "(SELECT date_of_renovation "
-                      " FROM pfc.payments p "
-                      " WHERE p.id_user = u.id_user "
-                      " ORDER BY p.date_of_renovation DESC "
-                      " LIMIT 1) AS last_payment_date, "
-                      "NOW() AS current_date_time "
-                      "FROM pfc.users u "
-                      "WHERE u.rfid = '" + uid + "'";
-
+      // Consulta SQL para verificar si el UID existe y obtener estado de activo/inactivo
+      String query = "SELECT u.id_user, u.name, u.surname, u.asset, "
+                     "COALESCE( "
+                     "(SELECT date_of_renovation "
+                     " FROM pfc.payments p "
+                     " WHERE p.id_user = u.id_user "
+                     " ORDER BY p.date_of_renovation DESC "
+                     " LIMIT 1), "
+                     "'2010-01-01 00:00:00') AS last_payment_date, "
+                     "NOW() AS current_date_time "
+                     "FROM pfc.users u "
+                     "WHERE u.rfid = '" + uid + "'";
 
       cursor->execute(query.c_str());
 
@@ -182,8 +193,9 @@ void loop() {
         int userId = atoi(row->values[0]);
         String nombre = row->values[1];
         String apellido = row->values[2];
-        String fechaRenovacion = row->values[3];
-        String fechaActual = row->values[4];
+        int asset = atoi(row->values[3]);
+        String fechaRenovacion = row->values[4];
+        String fechaActual = row->values[5];
 
         lcd.clear();
         lcd.setCursor(0, 0);
@@ -194,31 +206,56 @@ void loop() {
         lcd.print(apellido);
         delay(2000);
 
-        // Comparar la fecha de renovación con la fecha actual
-        if (fechaActual < fechaRenovacion) {
-          // La fecha de renovación es mayor o igual a la fecha actual
-          lcd.setCursor(0, 3);
-          lcd.print("Disfrute su clase!");
-          beep(200);
+        // Verificar el estado de activo/inactivo del usuario
+        if (asset == 1) {
+          // Usuario activo, comparar la fecha de renovación con la fecha actual
+          if (fechaActual < fechaRenovacion) {
+            // La fecha de renovación es mayor o igual a la fecha actual
+            lcd.setCursor(0, 3);
+            lcd.print("Disfrute su clase!");
+            beep(200);
 
-          // Registrar la fichada en la tabla incomes
-          String insertQuery = "INSERT INTO pfc.incomes (id_user, addmission_date) VALUES (" + String(userId) + ", NOW())";
-          cursor->execute(insertQuery.c_str());
+            // Registrar la fichada en la tabla incomes
+            String insertQuery = "INSERT INTO pfc.incomes (id_user, addmission_date) VALUES (" + String(userId) + ", NOW())";
+            cursor->execute(insertQuery.c_str());
+          } else {
+            // La fecha de renovación es menor que la fecha actual
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Por favor");
+            lcd.setCursor(0, 1);
+            lcd.print("Abone la cuota!");
+            lcd.setCursor(0, 3);
+            lcd.print("Gracias! PFC");
+            beep(600);
+            beep(600);
+            beep(600);
+
+            // Registrar el UID del deudor en la BD
+            String insertQueryUIDDeudor = "INSERT INTO pfc.uid_incomes (uid) VALUES ('" + uid + "')";
+            cursor->execute(insertQueryUIDDeudor.c_str());
+          }
         } else {
-          // La fecha de renovación es menor que la fecha actual
+          // Usuario inactivo, mostrar mensaje y registrar UID en pfc.uid_incomes
           lcd.clear();
           lcd.setCursor(0, 0);
-          lcd.print("Por favor");
+          lcd.print("Usuario inactivo");
           lcd.setCursor(0, 1);
-          lcd.print("Abone la cuota!");
+          lcd.print("Contactar Admin");
           lcd.setCursor(0, 3);
           lcd.print("Gracias! PFC");
           beep(600);
-          beep(600);
-          beep(600);
+
+          // Registrar el UID del usuario inactivo en la BD
+          String insertQueryUIDInactivo = "INSERT INTO pfc.uid_incomes (uid) VALUES ('" + uid + "')";
+          cursor->execute(insertQueryUIDInactivo.c_str());
         }
 
       } else {
+        // Registrar el UID desconocido en la BD
+        String insertQueryUID = "INSERT INTO pfc.uid_incomes (uid) VALUES ('" + uid + "')";
+        cursor->execute(insertQueryUID.c_str());
+
         // UID no encontrado
         lcd.clear();
         lcd.setCursor(0, 0);
@@ -255,6 +292,7 @@ void loop() {
   }
 }
 
+
 // Función para emitir un pitido
 void beep(int duration) {
   digitalWrite(buzzerPin, HIGH);
@@ -275,4 +313,41 @@ void showWelcomeMessage() {
   lcd.print("Club!");
   lcd.setCursor(0, 3);
   lcd.print("Bienvenidos!");
+}
+
+// Función para reiniciar el Arduino
+void reiniciarArduino() {
+  Serial.println("Reiniciando...");
+  wdt_enable(WDTO_15MS); // Habilitar el Watchdog Timer con un tiempo de espera de 15ms
+  while (1) {} // Esperar a que el Watchdog Timer reinicie el Arduino
+}
+
+// Función para manejar solicitudes HTTP
+void handleHTTPRequests() {
+  EthernetClient client = httpServer.available(); // Escuchar clientes entrantes
+
+  if (client) {
+    boolean currentLineIsBlank = true;
+    String request = "";
+
+    while (client.available()) {
+      char c = client.read();
+      request += c;
+
+      if (c == '\n' && currentLineIsBlank) {
+        if (request.indexOf("GET /reiniciar HTTP/1.1") >= 0) {
+          reiniciarArduino(); // Llama a la función para reiniciar el Arduino
+        }
+      }
+
+      if (c == '\n') {
+        currentLineIsBlank = true;
+      } else if (c != '\r') {
+        currentLineIsBlank = false;
+      }
+    }
+
+    delay(1);
+    client.stop(); // Cerrar la conexión
+  }
 }

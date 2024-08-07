@@ -2,7 +2,7 @@
 .cabecera {
   display: flex;
   align-items: center;
-  padding-bottom: 50px;
+  padding-bottom: 30px;
 }  
 .cabecera img {
   margin-right: 10px;

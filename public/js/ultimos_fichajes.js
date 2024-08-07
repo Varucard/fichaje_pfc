@@ -6,6 +6,29 @@ function formatDate(dateString) {
   return `${day}-${month}-${year}`;
 }
 
+//** Contiene para evitar inconvenientes el checkeador de nuevos UID
+function checkForNewUID() {
+  fetch('../controllers/uid_desconocido_controller.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.uid) {
+        copyToClipboard(data.uid);
+        alert(`Nuevo UID desconocido detectado: ${data.uid}`);
+      }
+    })
+    .catch(error => console.error('Error fetching UID:', error));
+}
+
+//** Copia el UID desconocido al Portapapeles del Usuario
+function copyToClipboard(text) {
+  const dummy = document.createElement('textarea');
+  document.body.appendChild(dummy);
+  dummy.value = text;
+  dummy.select();
+  document.execCommand('copy');
+  document.body.removeChild(dummy);
+}
+
 function actualizarFichajes() {
   fetch('../controllers/ultimos_fichajes_controller.php')
     .then(response => response.json())
@@ -42,6 +65,7 @@ function formatDateTime(dateString) {
 // Long polling
 function longPolling() {
   actualizarFichajes();
+  checkForNewUID();
   setTimeout(longPolling, 5000); // Poll every 5 seconds
 }
 
