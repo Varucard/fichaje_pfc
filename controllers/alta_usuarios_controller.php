@@ -27,18 +27,21 @@ if ($aux) {
 }
 
 // Verifico no duplicar llaveros, a menos que el usuario que lo tiene se encuentre desactivado
-$aux = $user->getUserByRFID($_POST['rfid']);
-if ($aux) {
-  if ($aux[0]['asset'] == 1) {
-    echo "<script>alert('El llavero ya se encuentra registrado en un Usuario activo'); window.location.href = '../views/usuario_view.php?dni=" . htmlspecialchars($aux[0]['dni']) . "';</script>";
-    exit; 
+if ($_POST['rfid'] != 'SIN LLAVERO') {
+  $aux = $user->getUserByRFID($_POST['rfid']);
+  if ($aux) {
+    if ($aux[0]['asset'] == 1) {
+      echo "<script>alert('El llavero ya se encuentra registrado en un Usuario activo'); window.location.href = '../views/usuario_view.php?dni=" . htmlspecialchars($aux[0]['dni']) . "';</script>";
+      exit; 
+    }
   }
-}
 
-// Normalizar el RFID
-$rfidNormalizado = strtolower($_POST['rfid']); // Convertir a minúsculas
-$rfidNormalizado = str_replace(' ', '', $rfidNormalizado); // Eliminar espacios
+  // Normalizar el RFID solo si no es "SIN LLAVERO"
+  $rfidNormalizado = strtolower($_POST['rfid']); // Convertir a minúsculas
+  $rfidNormalizado = str_replace(' ', '', $rfidNormalizado); // Eliminar espacios
+} 
 
+$rfidNormalizado = $_POST['rfid'];
 // Normalizo los nombres y apellido
 $nombreSinProcesar = $_POST['name'];
 $apellidoSinProcesar = isset($_POST['surname']) ? $_POST['surname'] : '';
