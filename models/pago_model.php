@@ -20,7 +20,8 @@ class Pagos {
       return $stmt->fetch(PDO::FETCH_ASSOC);
 
     } catch (PDOException $e) {
-      echo "Error en la consulta: " . $e->getMessage();
+      // echo "Error en la consulta: " . $e->getMessage();
+      return false;
     }
   }
 
@@ -41,7 +42,7 @@ class Pagos {
       return $result;
         
     } catch (PDOException $e) {
-      echo "Error en la consulta: " . $e->getMessage();
+      // echo "Error en la consulta: " . $e->getMessage();
       return [];
     }
   }
@@ -65,8 +66,8 @@ class Pagos {
       return $stmt->execute();
 
     } catch (PDOException $e) {
-      echo "Error en la consulta: " . $e->getMessage();
-      // return false;
+      // echo "Error en la consulta: " . $e->getMessage();
+      return false;
     }
   }
 
@@ -86,8 +87,8 @@ class Pagos {
       return $result ? $result['date_of_renovation'] : null;
 
     } catch (PDOException $e) {
-      echo "Error en la consulta: " . $e->getMessage();
-      return null;
+      // echo "Error en la consulta: " . $e->getMessage();
+      return false;
     }
   }
 }

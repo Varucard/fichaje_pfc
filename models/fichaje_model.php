@@ -48,9 +48,9 @@ class Fichajes {
       // Retornar verdadero si la inserción fue exitosa
       return true;
     } catch (PDOException $e) {
-      // Manejo de errores
-      $error = $e->getMessage();
-      return $error;
+      // $error = $e->getMessage();
+      return false;
+
     }
   }
 
@@ -70,7 +70,7 @@ class Fichajes {
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     } catch (PDOException $e) {
-      echo "Error en la consulta: " . $e->getMessage();
+      // echo "Error en la consulta: " . $e->getMessage();
       return false;
     }
   }

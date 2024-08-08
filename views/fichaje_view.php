@@ -38,6 +38,7 @@
   </div>
   <div class="botonera">
     <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_usuario">Agregar Cliente</button>
+    <button style="color: red;" onclick="window.location.href='../config/reiniciar_arduino.php'" >Reiniciar Arduino</button>
   </div>
 
   <!-- Div para el cartel de cumpleaños -->
@@ -50,7 +51,7 @@
 
   <script src="../public/js/busqueda_usuario.js"></script>
   <script src="../public/js/busqueda_fichaje.js"></script>
-  <script src="../public/js/ultimos_fichajes.js"></script>
+  <script src="../public/js/ultimos_fichajes.js"></script> <!-- Contiene para evitar inconvenientes el checkeador de nuevos UID -->
   <script src="../public/js/fichaje_manual.js"></script>
   <script src="../public/js/festejados.js"></script>
 </body>

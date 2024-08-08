@@ -37,7 +37,7 @@ if ($aux) {
 
 // Normalizar el RFID
 $rfidNormalizado = strtolower($_POST['rfid']); // Convertir a minúsculas
-$rfidNormalizado = str_replace(' ', '', $rfid); // Eliminar espacios
+$rfidNormalizado = str_replace(' ', '', $rfidNormalizado); // Eliminar espacios
 
 // Normalizo los nombres y apellido
 $nombreSinProcesar = $_POST['name'];
@@ -60,10 +60,9 @@ $nuevoUsuario = [
 
 // Lo guardo en la BD, si todo fue bien lo busco y le creo su fecha de pago
 if ($user->cargarUsuario($nuevoUsuario)) {
-
+  
   $usuario = $user->getUserByDNI($_POST['dni']);
-
-  if ($_POST['pago'] == 'TRUE') {
+  if (isset($_POST['pago'])) {
     if (nuevo_pago($usuario[0]['id_user'])) {
       echo "<script>alert('Usuario cargado exitosamente con Pago'); window.location.href = '../views/usuario_view.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
       exit; 
