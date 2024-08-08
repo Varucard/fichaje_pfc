@@ -16,7 +16,7 @@ const int ledAmarillo = 6;
 const int ledAzul = 7;
 
 // Configuración del buzzer
-const int buzzerPin = 2;
+const int buzzerPin = 3;
 
 // Configuración del lector RFID
 #define RST_PIN         9  // Configurable, ver el esquema de pines

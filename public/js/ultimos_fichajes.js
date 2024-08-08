@@ -11,22 +11,11 @@ function checkForNewUID() {
   fetch('../controllers/uid_desconocido_controller.php')
     .then(response => response.json())
     .then(data => {
-      if (data.uid) {
-        copyToClipboard(data.uid);
-        alert(`Nuevo UID desconocido detectado: ${data.uid}`);
+      if (data.mensaje) {
+        alert(`${data.mensaje}`);
       }
     })
     .catch(error => console.error('Error fetching UID:', error));
-}
-
-//** Copia el UID desconocido al Portapapeles del Usuario
-function copyToClipboard(text) {
-  const dummy = document.createElement('textarea');
-  document.body.appendChild(dummy);
-  dummy.value = text;
-  dummy.select();
-  document.execCommand('copy');
-  document.body.removeChild(dummy);
 }
 
 function actualizarFichajes() {

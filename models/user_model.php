@@ -130,7 +130,7 @@ class User {
 
         return $stmt->execute();
     } catch (PDOException $e) {
-        echo "Error en la consulta: " . $e->getMessage();
+        // echo "Error en la consulta: " . $e->getMessage();
         return false;
     }
   }
@@ -187,7 +187,7 @@ class User {
         return $usuarios;
     } catch (PDOException $e) {
         // Manejar la excepción
-        echo "Error en la consulta: " . $e->getMessage();
+        // echo "Error en la consulta: " . $e->getMessage();
         return [];
     }
   }

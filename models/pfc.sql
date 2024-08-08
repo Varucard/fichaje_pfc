@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-08-2024 a las 03:36:02
+-- Tiempo de generación: 08-08-2024 a las 04:30:16
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -38,9 +38,10 @@ CREATE TABLE `incomes` (
 --
 
 INSERT INTO `incomes` (`id_income`, `id_user`, `addmission_date`) VALUES
-(46, 1, '2024-08-04 13:27:31'),
-(47, 18, '2024-08-04 16:21:35'),
-(48, 1, '2024-08-04 16:21:52');
+(72, 1, '2024-08-07 02:11:50'),
+(73, 1, '2024-08-07 02:54:48'),
+(74, 1, '2024-08-07 03:34:25'),
+(75, 1, '2024-08-08 02:28:35');
 
 -- --------------------------------------------------------
 
@@ -61,17 +62,18 @@ CREATE TABLE `payments` (
 
 INSERT INTO `payments` (`id_payment`, `id_user`, `discharge_date`, `date_of_renovation`) VALUES
 (2, 2, '2024-07-01', '2024-07-01'),
-(5, 16, '2024-07-16', '2024-08-15'),
-(6, 17, '2024-07-17', '2024-08-16'),
-(7, 18, '2024-07-17', '2024-08-16'),
-(14, 19, '2024-07-31', '2024-08-30'),
-(20, 24, '2024-08-03', '2024-09-02'),
-(25, 1, '2024-02-01', '2024-03-02'),
-(26, 1, '2024-08-03', '2024-07-02'),
-(27, 1, '2024-08-03', '2024-08-02'),
-(28, 1, '0245-01-01', '0245-01-31'),
-(29, 1, '2024-08-03', '2024-09-02'),
-(30, 29, '2024-08-04', '2024-09-03');
+(29, 1, '2024-08-03', '2024-09-02');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `uid_incomes`
+--
+
+CREATE TABLE `uid_incomes` (
+  `id` int(255) NOT NULL,
+  `uid` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -99,7 +101,7 @@ INSERT INTO `users` (`id_user`, `rfid`, `dni`, `name`, `surname`, `birth_day`, `
 (1, '73dcc413', 41550112, 'Cristian Ariel', 'Marquez', '1998-11-08', 'arielmolus25@gmail.com', 1162023318, 1),
 (2, '3a5cf681', 21903130, 'Gustavo Alejandro', 'Marquez', '2010-07-01', 'pitu702010@gmail.com', 1182153615, 1),
 (17, 'SIN LLAVERO', 15268365, 'Patricio Valentin', 'Marquez', '0000-00-00', 'algo@algo.com', 0, 1),
-(18, 'SIN LLAVERO', 20771757, 'Maria Fabriana', 'Garcia de Jalon', '2015-02-01', 'email@email.com', 2147483647, 1),
+(18, '133FD513', 20771757, 'Maria Fabriana', 'Garcia de Jalon', '2015-02-01', 'email@email.com', 2147483647, 0),
 (19, '2a1b9916', 12345678, 'Usuario', 'Prueba', '2000-02-02', 'prueba@prueba.com', 1155223366, 1);
 
 --
@@ -121,6 +123,12 @@ ALTER TABLE `payments`
   ADD KEY `id_user` (`id_user`);
 
 --
+-- Indices de la tabla `uid_incomes`
+--
+ALTER TABLE `uid_incomes`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `users`
 --
 ALTER TABLE `users`
@@ -134,19 +142,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `incomes`
 --
 ALTER TABLE `incomes`
-  MODIFY `id_income` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id_income` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT de la tabla `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id_payment` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id_payment` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT de la tabla `uid_incomes`
+--
+ALTER TABLE `uid_incomes`
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id_user` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id_user` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
