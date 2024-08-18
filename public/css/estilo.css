@@ -120,3 +120,60 @@ button .fas {
   padding: 0px;
   width: 100%;
 }
+
+/* Estilos para el Login*/
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 8px;
+  background-color: #3e4a61;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  height: 80;
+  margin: 0 auto;
+}
+
+.login-container img {
+  width: 200px;
+  margin-bottom: 1rem;
+}
+
+.login-container h1 {
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.login-container form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+}
+
+.login-container form div {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.login-container form div label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.login-container form div input {
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.login-container button:hover {
+  background-color: #4c56da;
+}
+
+.login-container p {
+  color: red;
+}

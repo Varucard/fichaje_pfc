@@ -15,7 +15,7 @@ class Fichajes {
     try {
       // Consulta para obtener los últimos fichajes
       $stmt = $this->pdo->prepare("
-        SELECT i.*, u.rfid, u.dni, CONCAT(u.name, ' ', u.surname) AS alumno
+        SELECT i.*, u.rfid, u.dni, CONCAT(u.user_name, ' ', u.user_surname) AS alumno
         FROM incomes i
         JOIN users u ON i.id_user = u.id_user
         ORDER BY i.addmission_date DESC
@@ -58,7 +58,7 @@ class Fichajes {
     try {
       // Consulta para buscar fichajes basados en el término de búsqueda
       $stmt = $this->pdo->prepare("
-        SELECT i.*, u.rfid, u.dni, CONCAT(u.name, ' ', u.surname) AS alumno
+        SELECT i.*, u.rfid, u.dni, CONCAT(u.user_name, ' ', u.user_surname) AS alumno
         FROM incomes i
         JOIN users u ON i.id_user = u.id_user
         WHERE u.name LIKE :busqueda OR u.surname LIKE :busqueda OR u.dni LIKE :busqueda OR u.rfid LIKE :busqueda

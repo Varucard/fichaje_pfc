@@ -57,9 +57,9 @@ class User {
 
   public function getUserByName(string $name) {
     try {
-      $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `name` LIKE :name");
+      $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `user_name` LIKE :name");
       $name = "%" . $name . "%"; // Agrega comodines para la búsqueda
-      $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+      $stmt->bindParam(':user_name', $name, PDO::PARAM_STR);
       $stmt->execute();
   
       // Obtengo el Usuario
@@ -93,19 +93,21 @@ class User {
     $birth_day = $user[4] ?? NULL;
     $email = $user[5] ?? NULL;
     $phone_number = $user[6] ?? NULL;
+    $type_user = $user[7] ?? 2;
 
     try {
       // Preparar la consulta SQL
-      $stmt = $this->pdo->prepare("INSERT INTO `users`(`rfid`, `dni`, `name`, `surname`, `birth_day`, `email`, `phone_number`) VALUES (:rfid, :dni, :name, :surname, :birth_day, :email, :phone_number)");
+      $stmt = $this->pdo->prepare("INSERT INTO `users`(`rfid`, `dni`, `user_name`, `user_surname`, `birth_day`, `email`, `phone_number`, `type_user`) VALUES (:rfid, :dni, :user_name, :user_surname, :birth_day, :email, :phone_number, :type_user)");
 
       // Enlazar los parámetros
       $stmt->bindParam(':rfid', $rfid, PDO::PARAM_STR);
       $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
-      $stmt->bindParam(':name', $name, PDO::PARAM_STR);
-      $stmt->bindParam(':surname', $surname, PDO::PARAM_STR);
+      $stmt->bindParam(':user_name', $name, PDO::PARAM_STR);
+      $stmt->bindParam(':user_surname', $surname, PDO::PARAM_STR);
       $stmt->bindParam(':birth_day', $birth_day, PDO::PARAM_STR);
       $stmt->bindParam(':email', $email, PDO::PARAM_STR);
       $stmt->bindParam(':phone_number', $phone_number, PDO::PARAM_STR);
+      $stmt->bindParam(':type_user', $type_user, PDO::PARAM_STR);
 
       // Ejecutar la consulta
       return $stmt->execute();
@@ -118,7 +120,7 @@ class User {
 
   public function actualizarUsuario($datos) {
     try {
-        $stmt = $this->pdo->prepare("UPDATE users SET name = :name, surname = :surname, birth_day = :birth_day, rfid = :rfid, dni = :dni, email = :email, phone_number = :phone WHERE id_user = :id");
+        $stmt = $this->pdo->prepare("UPDATE users SET user_name = :name, user_surname = :surname, birth_day = :birth_day, rfid = :rfid, dni = :dni, email = :email, phone_number = :phone, type_user = :type_user WHERE id_user = :id");
         $stmt->bindParam(':name', $datos['name'], PDO::PARAM_STR);
         $stmt->bindParam(':surname', $datos['surname'], PDO::PARAM_STR);
         $stmt->bindParam(':birth_day', $datos['birth_day'], PDO::PARAM_STR);
@@ -126,6 +128,7 @@ class User {
         $stmt->bindParam(':dni', $datos['dni'], PDO::PARAM_STR);
         $stmt->bindParam(':email', $datos['email'], PDO::PARAM_STR);
         $stmt->bindParam(':phone', $datos['phone_number'], PDO::PARAM_STR);
+        $stmt->bindParam(':type_user', $datos['type_user'], PDO::PARAM_STR);
         $stmt->bindParam(':id', $datos['id'], PDO::PARAM_INT);
 
         return $stmt->execute();
@@ -172,7 +175,7 @@ class User {
     try {
         // Preparar la consulta SQL para obtener usuarios con cumpleaños en la fecha dada (mes y día)
         $stmt = $this->pdo->prepare("
-            SELECT id_user, name, surname
+            SELECT id_user, user_name, user_surname
             FROM users
             WHERE DATE_FORMAT(birth_day, '%m-%d') = DATE_FORMAT(?, '%m-%d')
         ");
@@ -189,6 +192,42 @@ class User {
         // Manejar la excepción
         // echo "Error en la consulta: " . $e->getMessage();
         return [];
+    }
+  }
+
+  public function login($dni, $password) {
+    try {
+      // Preparar la consulta SQL
+      $sql = 'SELECT * FROM users WHERE dni = :dni';
+      $stmt = $this->pdo->prepare($sql);
+
+      // Vincular el parámetro
+      $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
+
+      // Ejecutar la consulta
+      $stmt->execute();
+
+      // Obtener el registro
+      $user = $stmt->fetch(PDO::FETCH_OBJ);
+
+      // Verificar si se encontró el usuario
+      if($user) {
+        // Verificar la contraseña sin hashear
+        if($password === $user->password) {
+          // Las credenciales son correctas
+          return true;
+        } else {
+          // Contraseña incorrecta
+          return false;
+        }
+      } else {
+        // No se encontró el usuario
+        return false;
+      }
+    } catch (PDOException $e) {
+      // Manejar cualquier excepción de PDO
+      echo 'Error: ' . $e->getMessage();
+      return false;
     }
   }
 
