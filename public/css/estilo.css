@@ -5,7 +5,7 @@
   padding-bottom: 30px;
 }  
 .cabecera img {
-  margin-right: 10px;
+  margin-right: 5px;
 }
 .cabecera input {
   display: flex;
@@ -46,13 +46,6 @@
 }
 .diminuto {
   padding: 2px 5px;
-}
-
-
-/* Estilos Botones Fichaje Views*/
-.botonera button {
-  margin-right: 15px;
-  margin-top: 15px;
 }
 
 /* Estilos Alta Fomulario*/
@@ -176,4 +169,55 @@ button .fas {
 
 .login-container p {
   color: red;
+}
+
+/* Estilo para inputs con icono de Lupa*/
+.search-container {
+  position: relative;
+  display: inline-block;
+  left: 20%;
+}
+.search-container input {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  padding-left: 50px; /* Espacio para el ícono */
+}
+.search-container i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888; /* Color del ícono */
+}
+
+/* Estilos Botones Fichaje Views*/
+.botonera-1 {
+  position: relative;
+  display: inline-block;
+}
+.botonera-1 button {
+  margin-bottom: 50px;
+  padding-left: 50px;
+}
+.botonera-1 i {
+  position: absolute;
+  left: 10px;
+  top: 25%;
+  transform: translateY(-50%);
+  color: #888;
+}
+.botonera-2 {
+  position: relative;
+  display: inline-block;
+  left: 25%;
+}
+.botonera-2 button {
+  padding-left: 50px;
+}
+.botonera-2 i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
 }

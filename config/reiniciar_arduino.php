@@ -13,6 +13,6 @@ curl_close($ch);
 // Mostrar alerta y redirigir inmediatamente
 echo "<script>
         alert('Reiniciando Arduino. Por favor aguarde...');
-        window.location.href = '../index.php';
+        window.location.href = '../views/dashboard_view.php';
         </script>";
 ?>

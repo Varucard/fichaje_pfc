@@ -1,6 +1,6 @@
 <?php
 
-require_once '../config/config.php';
+require_once dirname(__DIR__) . '../config/config.php';
 
 // Redirige a la página especificada
 function redirect($page) {
@@ -17,4 +17,5 @@ function currentUrl() {
 function getParam($param) {
     return isset($_GET[$param]) ? $_GET[$param] : null;
 }
+
 ?>

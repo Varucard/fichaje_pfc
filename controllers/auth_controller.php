@@ -25,12 +25,18 @@ class AuthController {
     // Intentar iniciar sesión
     if($this->userModel->login($dni, $password)) {
       // Inicio de sesión exitoso
-      redirect('../views/fichaje_view.php');
+      redirect('../views/dashboard_view.php');
     } else {
       // Fallo en el inicio de sesión
       flash('login_error', 'Credenciales incorrectas');
       redirect('../views/login_view.php');
     }
+  }
+
+  public function logout() {
+    // Destruir la sesión
+    session_destroy();
+    redirect('views/login_view.php');
   }
 }
 

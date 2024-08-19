@@ -38,7 +38,6 @@
   </div>
   <div class="botonera">
     <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_usuario">Agregar Cliente</button>
-    <button style="color: red;" onclick="window.location.href='../config/reiniciar_arduino.php'" >Reiniciar Arduino</button>
   </div>
 
   <!-- Div para el cartel de cumpleaños -->
