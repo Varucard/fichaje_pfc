@@ -3,7 +3,7 @@
 <head>
   <link rel="shortcut icon" href="../public/img/ico_logo.png">
   <link rel="stylesheet" href="../public/css/water.css">
-  <link rel="stylesheet" href="../public/css/estilo.css">
+  <link rel="stylesheet" href="../public/css/estilos.css">
   <link rel="stylesheet" href="../public/css/festejados.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

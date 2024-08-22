@@ -11,13 +11,13 @@ $pagos = new Pagos();
 $dni = isset($_GET['dni']) ? $_GET['dni'] : '';
 
 if (empty($dni)) {
-    redirect('busqueda_usuario_view.php'); // Redirige si no hay DNI
+    redirect('views/busqueda_usuario_view.php'); // Redirige si no hay DNI
     exit;
 }
 
 $usuario = $user->getUserByDNI($dni);
 if (!$usuario) {
-    redirect('busqueda_usuario_view.php'); // Redirige si no se encuentra el usuario
+    redirect('views/busqueda_usuario_view.php'); // Redirige si no se encuentra el usuario
     exit;
 }
 

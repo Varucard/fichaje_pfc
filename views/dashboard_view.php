@@ -3,7 +3,7 @@
 <head>
   <link rel="shortcut icon" href="../public/img/ico_logo.png">
   <link rel="stylesheet" href="../public/css/water.css">
-  <link rel="stylesheet" href="../public/css/estilo.css">
+  <link rel="stylesheet" href="../public/css/estilos.css">
   <link rel="stylesheet" href="../public/css/festejados.css">
   <link rel="stylesheet" href="../public/css/icons.css">
 
@@ -27,6 +27,10 @@
     <i class="fas fa-search"></i>
     <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente">
   </div>
+  <div class="search-container">
+    <i class="fas fa-search"></i>
+    <input type="text" id="busqueda_clase" placeholder="Buscar Clase">
+  </div>
 
   <!-- Botones de acciones -->
   <div>
@@ -40,11 +44,31 @@
     </div>
     <div class="botonera-1">
       <i class="fas fa-wallet"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_usuario">Registrar Pago</button>
+      <button onclick="window.location.href='cargar_usuario_view.php'" id="abono_clase_usuario">Abono Clase</button>
     </div>
     <div class="botonera-1">
       <i class="fas fa-chalkboard-teacher"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_usuario">Agregar Clase</button>
+      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Agregar Clase</button>
+    </div>
+    <div class="botonera-1">
+      <i class="fas fa-chalkboard-teacher"></i>
+      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Clases?</button>
+    </div>
+    <div class="botonera-1">
+      <i class="fas fa-chalkboard-teacher"></i>
+      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Clientes?</button>
+    </div>
+    <div class="botonera-1">
+      <i class="fas fa-chalkboard-teacher"></i>
+      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Fichajes</button>
+    </div>
+    <div class="botonera-1">
+      <i class="fas fa-chalkboard-teacher"></i>
+      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Deuda?</button>
+    </div>
+    <div class="botonera-1">
+      <i class="fas fa-chalkboard-teacher"></i>
+      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Liquidar?</button>
     </div>
   </div>
 

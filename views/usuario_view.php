@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <link rel="shortcut icon" href="<?php echo URLROOT; ?>/public/img/ico_logo.png">
-  <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/water.css">
-  <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/estilo.css">
-  <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/min.css">
+  <link rel="shortcut icon" href="../public/img/ico_logo.png">
+  <link rel="stylesheet" href="../public/css/water.css">
+  <link rel="stylesheet" href="../public/css/estilos.css">
+  <link rel="stylesheet" href="../public/css/min.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detalles del Cliente</title>
 </head>
 <body>
   <div class="cabecera">
-    <img src="<?php echo URLROOT; ?>/public/img/logo.png" alt="logo.png" width="100" height="100">
+    <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="padding-right: 40px;" >Detalle del Cliente</h1>
-    <button onclick="window.location.href='<?php echo URLROOT; ?>views/busqueda_usuario_view.php'">
+    <button onclick="window.location.href='../views/busqueda_usuario_view.php'">
       <i style="padding-right: 10px; padding-top: 6px" class="fas fa-undo-alt"></i>
       Volver
     </button>
     <?php if ($usuario && $usuario[0]['asset'] == 1): ?>
-      <button style="color: red" onclick="window.location.href='<?php echo URLROOT; ?>controllers/baja_usuarios_controller.php?dni=<?php echo urlencode($usuario[0]['dni']); ?>'">
+      <button style="color: red" onclick="window.location.href='../controllers/baja_usuarios_controller.php?dni=<?php echo urlencode($usuario[0]['dni']); ?>'">
         <i style="color: red; padding-right: 10px; padding-top: 6px" class="fas fa-trash"></i>
         Inhabilitar Usuario
       </button>
     <?php else: ?>
-      <button onclick="window.location.href='<?php echo URLROOT; ?>controllers/activar_usuario_controller.php?dni=<?php echo urlencode($usuario[0]['dni']); ?>'">
+      <button onclick="window.location.href='../controllers/activar_usuario_controller.php?dni=<?php echo urlencode($usuario[0]['dni']); ?>'">
         <i style="padding-right: 10px; padding-top: 6px" class="fas fa-user-plus"></i>
         Re-activar Usuario
       </button>
@@ -36,8 +36,8 @@
     <?php endif; ?>
 
     <?php if ($usuario): ?>
-      <form id="form-datos-usuario" action="<?php echo URLROOT; ?>/controllers/actualizar_usuarios_controller.php" method="post" class="form-container">
-        <input type="hidden" name="id" value="<?php echo htmlspecialchars($usuario[0]['id_user']); ?>">
+      <form id="form-datos-usuario" action="../controllers/actualizar_usuarios_controller.php" method="post" class="form-container">
+        <input type="hidden" id="id" name="id" value="<?php echo htmlspecialchars($usuario[0]['id_user']); ?>">
 
         <div class="form-group">
           <label for="rfid">N° de llavero:</label>
@@ -78,7 +78,7 @@
 
       <h2>Historial de Pagos</h2>
       <?php if ($usuario[0]['asset'] == 1): ?>
-        <button onclick="window.location.href='<?php echo URLROOT; ?>/controllers/nuevo_pago_controller.php?id_user=<?php echo $usuario[0]['id_user']; ?>'" id="cargar_pago">
+        <button onclick="window.location.href='../controllers/nuevo_pago_controller.php?id_user=<?php echo $usuario[0]['id_user']; ?>'" id="cargar_pago">
           <i style="padding-right: 10px;" class="fas fa-wallet"></i>
           Renovar pago
         </button>
@@ -88,7 +88,7 @@
           Pago manual
         </button>
       <?php endif; ?>
-      <button onclick="location.href='<?php echo URLROOT; ?>/views/dashboard_view.php'">
+      <button onclick="location.href='../views/dashboard_view.php'">
         <i style="padding-right: 10px;" class="fas fa-home"></i>
         Inicio
       </button>
@@ -114,7 +114,7 @@
     <?php endif; ?>
   </div>
 
-  <script src="<?php echo URLROOT; ?>/public/js/pago_manual.js"></script>
-  <script src="<?php echo URLROOT; ?>/public/js/icons.js"></script>
+  <script src="../public/js/pago_manual.js"></script>
+  <script src="../public/js/icons.js"></script>
 </body>
 </html>

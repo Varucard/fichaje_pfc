@@ -36,11 +36,11 @@ if ($user_aux) {
         }
       }
     }
-    echo "<script>alert('Usuario reactivado exitosamente'); window.location.href = '" . URLROOT . "controllers/detalle_usuario_controller.php?dni=$dni';</script>";
+    echo "<script>alert('Usuario reactivado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
   } else {
-    echo "<script>alert('Ocurrió un error al reactivar el usuario'); window.location.href = '" . URLROOT . "controllers/detalle_usuario_controller.php?dni=$dni';</script>";
+    echo "<script>alert('Ocurrió un error al reactivar el usuario'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
   }
 } else {
-  echo "<script>alert('Usuario no encontrado'); window.location.href = '" . URLROOT . "controllers/detalle_usuario_controller.php';</script>";
+  echo "<script>alert('Usuario no encontrado'); window.location.href = '../controllers/detalle_usuario_controller.php';</script>";
 }
 ?>

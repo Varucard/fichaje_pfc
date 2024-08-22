@@ -1,7 +1,6 @@
 <?php
   require_once 'config/config.php';
   require_once 'helpers/url_helper.php';
-  require_once 'helpers/session_helper.php';
 
   // Verificar si el usuario está autenticado
   if (isset($_SESSION['user_id'])) {

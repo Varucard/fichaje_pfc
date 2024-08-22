@@ -1,6 +1,7 @@
 <?php
 
 require_once '../models/user_model.php';
+require_once '../helpers/url_helper.php';
 
 $user = new User();
 
@@ -46,8 +47,9 @@ $nuevosDatos = [
 
 // Actualiza los datos del usuario en la base de datos
 if ($user->actualizarUsuario($nuevosDatos)) {
-  echo "<script>alert('Usuario actualizado exitosamente'); window.location.href = '../views/usuario_view.php?dni=$dni';</script>";
+  echo "<script>alert('Usuario actualizado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
 } else {
-  echo "<script>alert('Ocurrió un error al actualizar el usuario'); window.location.href = '../views/usuario_view.php?dni=$dni';</script>";
+  echo "<script>alert('Ocurrió un error al actualizar el usuario'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
 }
+
 ?>

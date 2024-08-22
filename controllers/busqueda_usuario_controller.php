@@ -19,22 +19,22 @@ if (isset($_GET['busqueda']) && isset($_GET['tipo_busqueda'])) {
       $resultados = $userModel->getUserByName($busqueda);
       break;
     default:
-      echo "<script>alert('Ocurrio un error, por favor, probar nuevamente'); window.location.href = '" . URLROOT . "views/dashboard_view.php';</script>";
+      echo "<script>alert('Ocurrio un error, por favor, probar nuevamente'); window.location.href = '../views/dashboard_view.php';</script>";
       exit; 
   }
 
   // Verifica si se encontraron resultados
   if (empty($resultados)) {
-    echo "<script>alert('No se encontraron resultados'); window.location.href = '" . URLROOT . "views/dashboard_view.php';</script>";
+    echo "<script>alert('No se encontraron resultados'); window.location.href = '../views/dashboard_view.php';</script>";
     exit;
   } else {
     // Almacena los resultados en la sesión y redirige a la vista de búsqueda
     $_SESSION['resultados_busqueda'] = $resultados;
-    header('Location: ' . URLROOT . '/views/busqueda_usuario_view.php');
+    header('Location:' . URLROOT . '/views/busqueda_usuario_view.php');
     exit;
   }
 } else {
-  echo "<script>alert('Ocurrio un error, por favor, probar nuevamente'); window.location.href = '" . URLROOT . "views/dashboard_view.php';</script>";
+  echo "<script>alert('Ocurrio un error, por favor, probar nuevamente'); window.location.href = '../views/dashboard_view.php';</script>";
   exit; 
 }
 ?>

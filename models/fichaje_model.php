@@ -61,7 +61,7 @@ class Fichajes {
         SELECT i.*, u.rfid, u.dni, CONCAT(u.user_name, ' ', u.user_surname) AS alumno
         FROM incomes i
         JOIN users u ON i.id_user = u.id_user
-        WHERE u.name LIKE :busqueda OR u.surname LIKE :busqueda OR u.dni LIKE :busqueda OR u.rfid LIKE :busqueda
+        WHERE u.user_name LIKE :busqueda OR u.user_surname LIKE :busqueda OR u.dni LIKE :busqueda OR u.rfid LIKE :busqueda
         ORDER BY i.addmission_date DESC
       ");
       $stmt->bindValue(':busqueda', '%' . $busqueda . '%', PDO::PARAM_STR);
@@ -71,7 +71,7 @@ class Fichajes {
 
     } catch (PDOException $e) {
       // echo "Error en la consulta: " . $e->getMessage();
-      return false;
+      return [];
     }
   }
 }

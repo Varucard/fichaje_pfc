@@ -4,16 +4,13 @@ require_once '../models/user_model.php';
 
 // Recuperar los resultados de la sesión
 $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_busqueda'] : [];
-
-// var_dump($resultados);
-// exit;
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <link rel="shortcut icon" href="../public/img/ico_logo.png">
   <link rel="stylesheet" href="../public/css/water.css">
-  <link rel="stylesheet" href="../public/css/estilo.css">
+  <link rel="stylesheet" href="../public/css/estilos.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Búsqueda Fichajes - Palillo Fight Club</title>  
@@ -23,7 +20,6 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Búsqueda de Fichajes</h1>
     <input type="text" id="busqueda_fichaje" placeholder="Buscar Fichaje">
-    <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente">
   </div>
   
   <div class="tabla">
@@ -58,11 +54,10 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   </div>
 
   <div class="botonera">
-    <button onclick="window.location.href='../index.php'">Volver</button>
+    <button onclick="window.location.href='../views/dashboard_view.php'">Volver</button>
   </div>
 
   <script src="../public/js/icons.js"></script>
-  <script src="../public/js/busqueda_usuario.js"></script>
   <script src="../public/js/busqueda_fichaje.js"></script>
 </body>
 </html>

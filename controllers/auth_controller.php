@@ -19,17 +19,17 @@ class AuthController {
     // Validar que no estén vacíos
     if(empty($dni) || empty($password)) {
       flash('login_error', 'Por favor, complete todos los campos');
-      redirect('../views/login_view.php');
+      redirect('views/login_view.php');
     }
 
     // Intentar iniciar sesión
     if($this->userModel->login($dni, $password)) {
       // Inicio de sesión exitoso
-      redirect('../views/dashboard_view.php');
+      redirect('views/dashboard_view.php');
     } else {
       // Fallo en el inicio de sesión
       flash('login_error', 'Credenciales incorrectas');
-      redirect('../views/login_view.php');
+      redirect('views/login_view.php');
     }
   }
 
