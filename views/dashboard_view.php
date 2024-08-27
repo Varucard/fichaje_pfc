@@ -5,11 +5,10 @@
   <link rel="stylesheet" href="../public/css/water.css">
   <link rel="stylesheet" href="../public/css/estilos.css">
   <link rel="stylesheet" href="../public/css/festejados.css">
-  <link rel="stylesheet" href="../public/css/icons.css">
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel del AdministradorPalillo Fight Club</title>
+  <title>Panel del Administrador</title>
 </head>
 <body>
   <div class="cabecera">
@@ -21,11 +20,11 @@
   <!-- Busqueda -->
   <div class="search-container">
     <i class="fas fa-search"></i>
-    <input type="text" id="busqueda_fichaje" placeholder="Buscar Fichaje"> 
+    <input type="text" id="busqueda_fichaje" placeholder="Buscar Ingreso"> 
   </div>
   <div class="search-container">
     <i class="fas fa-search"></i>
-    <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente">
+    <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente/ Usuario">
   </div>
   <div class="search-container">
     <i class="fas fa-search"></i>
@@ -40,11 +39,11 @@
     </div>
     <div class="botonera-1">
       <i class="fas fa-user-plus"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_usuario">Agregar Cliente</button>
+      <button id="cargar_usuario">Agregar Cliente</button>
     </div>
     <div class="botonera-1">
       <i class="fas fa-wallet"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="abono_clase_usuario">Abono Clase</button>
+      <button id="cargar_pago_manual_usuario">Abono Clase</button>
     </div>
     <div class="botonera-1">
       <i class="fas fa-chalkboard-teacher"></i>
@@ -59,8 +58,8 @@
       <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Clientes?</button>
     </div>
     <div class="botonera-1">
-      <i class="fas fa-chalkboard-teacher"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Fichajes</button>
+      <i class="fas fa-clipboard-check"></i>
+      <button onclick="window.location.href='fichajes_view.php'">Ultimos Ingresos</button>
     </div>
     <div class="botonera-1">
       <i class="fas fa-chalkboard-teacher"></i>
@@ -81,7 +80,7 @@
     <div class="botonera-2">
       <i style="color: red;" class="fas fa-sign-out-alt"></i>
       <form action="../controllers/auth_controller.php?action=logout" method="POST">
-        <button style="color: red;" onclick="window.location.href='../config/reiniciar_arduino.php'" >Cerrar Sesión</button>
+        <button style="color: red;">Cerrar Sesión</button>
       </form>
     </div>
   </div>
@@ -96,9 +95,10 @@
 
   <script src="../public/js/busqueda_usuario.js"></script>
   <script src="../public/js/busqueda_fichaje.js"></script>
-  <script src="../public/js/ultimos_fichajes.js"></script> <!-- Contiene para evitar inconvenientes el checkeador de nuevos UID -->
+  <!-- <script src="../public/js/ultimos_fichajes.js"></script> Contiene para evitar inconvenientes el checkeador de nuevos UID -->
   <script src="../public/js/fichaje_manual.js"></script>
   <script src="../public/js/festejados.js"></script>
   <script src="../public/js/icons.js"></script>
+  <script src="../public/js/pago_manual_user.js"></script>
 </body>
 </html>

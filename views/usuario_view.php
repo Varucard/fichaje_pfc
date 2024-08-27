@@ -4,7 +4,6 @@
   <link rel="shortcut icon" href="../public/img/ico_logo.png">
   <link rel="stylesheet" href="../public/css/water.css">
   <link rel="stylesheet" href="../public/css/estilos.css">
-  <link rel="stylesheet" href="../public/css/min.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detalles del Cliente</title>

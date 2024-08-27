@@ -7,7 +7,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="../public/img/ico_logo.png">
-  <title>Iniciar Sesión - Palillo Fight Club</title>
+  <title>Inicio de Sesión</title>
   <link rel="stylesheet" href="../public/css/estilos.css">
   <link rel="stylesheet" href="../public/css/water.css">
 </head>

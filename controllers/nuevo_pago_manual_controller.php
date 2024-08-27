@@ -34,9 +34,16 @@
   }
 
   $id_user = isset($_GET['id_user']) ? $_GET['id_user'] : '';
+  $dni_user = isset($_GET['dni']) ? $_GET['dni'] : '';
   $fecha_pago_manual = isset($_GET['fecha_pago_manual']) ? $_GET['fecha_pago_manual'] : '';
 
   $usuario = $user->getUserByID($id_user);
+
+  // Si el usuario no aparece con id lo busco con el DNI, una seguridad para user el mismo controladora en diferentes casos
+  if (!$usuario) {
+    $usuario = $user->getUserByDNI($dni_user);
+    $id_user = $usuario[0]['id_user'];
+  }
 
   if ($id_user && $fecha_pago_manual && $usuario && nuevo_pago_manual($id_user, $fecha_pago_manual)) {
     echo "<script>alert('Pago registrado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario[0]['dni']) . "';</script>";

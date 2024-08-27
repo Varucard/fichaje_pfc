@@ -17,7 +17,7 @@ $usuario = $user->getUserByDNI($dni_user);
 
 // Si el usuario no existe
 if (empty($usuario[0])) {
-  echo "<script>alert('Usuario inexistente'); window.location.href = '../views/fichaje_view.php';</script>";
+  echo "<script>alert('Usuario inexistente'); window.location.href = '../views/fichajes_view.php';</script>";
   exit();
 }
 
@@ -29,7 +29,7 @@ $pago = $pagos->getPagoActualByUser($id_user);
 
 // Si el usuario no tiene pagos registrados
 if (empty($pago)) {
-  echo "<script>alert('El usuario no tiene pagos registrados. Debe abonar antes de fichar.'); window.location.href = '../views/fichaje_view.php';</script>";
+  echo "<script>alert('El usuario no tiene pagos registrados. Debe abonar antes de fichar.'); window.location.href = '../views/fichajes_view.php';</script>";
   exit();
 }
 
@@ -44,17 +44,17 @@ if ($fecha_actual > $fecha_renovacion) {
 
 // Si la fecha de pago está vencida
 if ($fecha_vencida) {
-  echo "<script>alert('La fecha de pago está vencida. Debe abonar antes de fichar.'); window.location.href = '../views/fichaje_view.php';</script>";
+  echo "<script>alert('La fecha de pago está vencida. Debe abonar antes de fichar.'); window.location.href = '../views/fichajes_view.php';</script>";
   exit();
 }
 
 $fecha_fichada = $fecha_actual->format('Y-m-d H:i:s');
 
 if ($fichaje->guardarFichada($id_user, $fecha_fichada)) {
-  echo "<script>alert('Fichada registrada exitosamente.'); window.location.href = '../views/fichaje_view.php';</script>";
+  echo "<script>alert('Fichada registrada exitosamente.'); window.location.href = '../views/fichajes_view.php';</script>";
   exit();
 } else {
-  echo "<script>alert('Ocurrio un inconveniente al momento de registrar la fichada del usuario.'); window.location.href = '../views/fichaje_view.php';</script>";
+  echo "<script>alert('Ocurrio un inconveniente al momento de registrar la fichada del usuario.'); window.location.href = '../views/fichajes_view.php';</script>";
   exit();
 }
 ?>

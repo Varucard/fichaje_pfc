@@ -6,12 +6,12 @@
   <link rel="stylesheet" href="../public/css/estilos.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cargar Usuario - Palillo Fight Club</title>
+  <title>Registrar Nuevo Cliente</title>
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
-    <h1 style="margin-right: 50px;">Agregar nuevo cliente</h1>
+    <h1 style="margin-right: 50px;">Registrar nuevo cliente</h1>
   </div>
     <form action="../controllers/alta_usuarios_controller.php" method="post" class="form-container">
       <div class="form-group">
@@ -44,9 +44,20 @@
         <input type="int" id="phone" name="phone">
       </div>
 
-      <input type="submit" value="Cargar Cliente">
-      <button type="button" onclick="window.location.href='fichaje_view.php'">Volver</button>
+      
+      <button type="submit">
+        <i style="padding-right: 10px;" class="fas fa-user-plus"></i>
+        Registrar cliente
+      </button>
+      
+      <button type="button" onclick="window.location.href='dashboard_view.php'">
+        <i style="padding-right: 10px;" class="fas fa-arrow-left"></i>
+        Volver
+      </button>
     </form>
   </div>
+
+  <script src="../public/js/icons.js"></script>
+
 </body>
 </html>

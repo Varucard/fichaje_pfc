@@ -13,13 +13,13 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   <link rel="stylesheet" href="../public/css/estilos.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Búsqueda Fichajes - Palillo Fight Club</title>  
+  <title>Búsqueda Fichajes</title>  
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Búsqueda de Fichajes</h1>
-    <input type="text" id="busqueda_fichaje" placeholder="Buscar Fichaje">
+    <input type="text" id="busqueda_fichaje" placeholder="Buscar Ingreso">
   </div>
   
   <div class="tabla">
@@ -54,7 +54,10 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   </div>
 
   <div class="botonera">
-    <button onclick="window.location.href='../views/dashboard_view.php'">Volver</button>
+    <button onclick="window.location.href='../views/dashboard_view.php'">
+      <i style="padding-right: 10px;" class="fas fa-arrow-left"></i>
+      Volver
+    </button>
   </div>
 
   <script src="../public/js/icons.js"></script>
