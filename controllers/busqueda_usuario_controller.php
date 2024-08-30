@@ -19,7 +19,7 @@ if (isset($_GET['busqueda']) && isset($_GET['tipo_busqueda'])) {
       $resultados = $userModel->getUserByName($busqueda);
       break;
     default:
-      echo "<script>alert('Ocurrio un error, por favor, probar nuevamente'); window.location.href = '../views/dashboard_view.php';</script>";
+      echo "<script>alert('Por favor, realice nuevamente la busqueda'); window.location.href = '../views/dashboard_view.php';</script>";
       exit; 
   }
 
@@ -34,7 +34,7 @@ if (isset($_GET['busqueda']) && isset($_GET['tipo_busqueda'])) {
     exit;
   }
 } else {
-  echo "<script>alert('Ocurrio un error, por favor, probar nuevamente'); window.location.href = '../views/dashboard_view.php';</script>";
+  echo "<script>alert('Sin resultados previos'); window.location.href = '../views/dashboard_view.php';</script>";
   exit; 
 }
 ?>

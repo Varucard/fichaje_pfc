@@ -109,9 +109,12 @@ button .fas {
 
 /* Estilo para cuando exceptuar algo */
 .exceptuado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: red;
   padding: 0px;
-  width: 100%;
+  width: 50%;
 }
 
 /* Estilos para el Login*/

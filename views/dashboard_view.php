@@ -24,7 +24,7 @@
   </div>
   <div class="search-container">
     <i class="fas fa-search"></i>
-    <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente/ Usuario">
+    <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente/ Profesor">
   </div>
   <div class="search-container">
     <i class="fas fa-search"></i>
@@ -39,15 +39,15 @@
     </div>
     <div class="botonera-1">
       <i class="fas fa-user-plus"></i>
-      <button id="cargar_usuario">Agregar Cliente</button>
+      <button onclick="window.location.href='cargar_usuario_view.php'" style="font-size: 12px; padding-top: 15px; padding-bottom: 11px" id="cargar_usuario">Agregar Cliente/ Profesor</button>
     </div>
     <div class="botonera-1">
       <i class="fas fa-wallet"></i>
-      <button id="cargar_pago_manual_usuario">Abono Clase</button>
+      <button style="font-size: 14px; padding-top: 13px; padding-bottom: 11px" id="cargar_pago_manual_usuario">Abonar Clase</button>
     </div>
     <div class="botonera-1">
       <i class="fas fa-chalkboard-teacher"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Agregar Clase</button>
+      <button onclick="window.location.href='cargar_clase_view.php'" id="cargar_clase">Agregar Clase</button>
     </div>
     <div class="botonera-1">
       <i class="fas fa-chalkboard-teacher"></i>

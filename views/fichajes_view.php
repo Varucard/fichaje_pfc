@@ -14,7 +14,7 @@
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px; text-align: center;">Últimos Ingresos</h1>
     <input type="text" id="busqueda_fichaje" placeholder="Buscar Ingreso">
-    <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente/ Usuario">
+    <input type="text" id="busqueda_usuario" placeholder="Buscar Cliente/ Profesor">
   </div>
   <div class="tabla">
     <button id="fichaje_manual">
