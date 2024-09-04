@@ -1,12 +1,11 @@
 <?php
+session_start();
 
 require_once '../models/user_model.php';
 require_once 'pagos_controller.php';
 
 $user = new User();
 $aux = null;
-
-global $user;
 
 // Valido que lo indispensable me llegue (N° de Llavero, N° de Documento y nombre)
 if (empty($_POST['rfid']) || empty($_POST['dni']) || empty($_POST['name'])) {
@@ -50,9 +49,9 @@ $apellidoSinProcesar = isset($_POST['surname']) ? $_POST['surname'] : '';
 $nombreNormalizado = ucwords(strtolower($nombreSinProcesar));
 $apellidoNormalizado = ucwords(strtolower($apellidoSinProcesar));
 
-$tipo_usuario = isset($_POST['profesor']) ? 3 : null; // Profesor
+$tipo_usuario = isset($_POST['profesor']) ? 3 : null; // A menos que se indique que es profesore lo usuarios son clientes
 
-// Creo al nuevo usuario
+// Obtengo los datos del nuevo usuario
 $nuevoUsuario = [
   $rfid = $rfidNormalizado,
   $dni = $_POST['dni'],

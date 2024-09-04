@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once '../models/user_model.php';
 
 $userModel = new User();

@@ -13,34 +13,38 @@
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Registrar nueva clase</h1>
   </div>
-    <form action="../controllers/alta_usuarios_controller.php" method="post" class="form-container">
-      <div class="form-group">
-        <label for="nombre_clase">Nombre de la clase:</label>
-        <input type="text" id="nombre_clase" name="nombre_clase" required><br>
-      </div>
+  <form action="../controllers/alta_clase_controller.php" method="post" class="form-container">
+    <div class="form-group">
+      <label for="nombre_clase">Nombre de la clase:</label>
+      <input type="text" id="nombre_clase" name="nombre_clase" required><br>
+    </div>
 
-      <div class="form-group">
-        <label for="precio">Precio:</label>
-        <input type="number" id="precio" name="precio" step="0.01" min="0" placeholder="0.00" required><br>     
-      </div>
+    <div class="form-group">
+      <label for="precio">Precio:</label>
+      <input type="number" id="precio" min="0" name="precio" placeholder="$" required><br>     
+    </div>
 
-      <div class="form-group">
-        <label for="email">Profesor/es:</label>
-        <input type="email" id="email" name="email"><br>
-      </div>
-    
-      <div style="padding-top: 30px">
-        <button type="submit">
-          <i style="padding-right: 10px;" class="fas fa-user-plus"></i>
-          Registrar Clase
-        </button>
-        
-        <button type="button" onclick="window.location.href='dashboard_view.php'">
-          <i style="padding-right: 10px;" class="fas fa-arrow-left"></i>
-          Volver
-        </button>
-      </div>
-    </form>
+    <div class="form-group">
+      <label for="profesor">Profesor/es:</label>
+      <select id="profesor" name="profesores[]" size="<?= min(count($profesores), 5) ?>" multiple>
+        <?php foreach ($profesores as $profesor): ?>
+          <option style="padding-right: 150px;" value="<?= $profesor->id_user ?>"><?= htmlspecialchars($profesor->user_name) ?></option>
+        <?php endforeach; ?>
+      </select><br>
+    </div>
+
+    <div style="padding-top: 30px">
+      <button type="submit">
+        <i style="padding-right: 10px;" class="fas fa-user-plus"></i>
+        Registrar Clase
+      </button>
+      
+      <button type="button" onclick="window.location.href='../views/dashboard_view.php'">
+        <i style="padding-right: 10px;" class="fas fa-arrow-left"></i>
+        Volver
+      </button>
+    </div>
+  </form>
 
   <script src="../public/js/icons.js"></script>
 

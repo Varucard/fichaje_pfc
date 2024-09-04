@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once '../models/user_model.php';
+require_once '../models/clase_model.php';
 
 // Recuperar los resultados de la sesión
 $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_busqueda'] : [];
@@ -14,18 +14,13 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   <link rel="stylesheet" href="../public/css/estilos.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Búsqueda Fichajes</title>  
+  <title>Búsqueda Clases</title>  
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
-    <h1 style="margin-right: 130px;">Búsqueda de Fichajes</h1>
+    <h1 style="margin-right: 50px;">Búsqueda de Clases</h1>
     <input type="text" id="busqueda_fichaje" placeholder="Buscar Ingreso">
-  </div>
-
-  <div class="botonera-1">
-    <i class="fas fa-clock"></i>
-    <button id="fichaje_manual">Registrar Fichada</button>
   </div>
   
   <div class="tabla">
@@ -68,6 +63,5 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
 
   <script src="../public/js/icons.js"></script>
   <script src="../public/js/busqueda_fichaje.js"></script>
-  <script src="../public/js/fichaje_manual.js"></script>
 </body>
 </html>

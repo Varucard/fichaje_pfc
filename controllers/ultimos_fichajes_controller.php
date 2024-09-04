@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once '../models/fichaje_model.php';
 require_once '../models/pago_model.php';
 

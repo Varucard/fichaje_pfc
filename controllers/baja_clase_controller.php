@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+var_dump('Controlador para eliminar la clase');
+exit;
+
 require_once '../models/user_model.php';
 require_once '../helpers/url_helper.php';
 

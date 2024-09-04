@@ -1,11 +1,3 @@
-<?php
-session_start();
-
-require_once '../helpers/url_helper.php';
-
-// Inicializa resultados si no hay en la sesión
-$resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_busqueda'] : [];
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,18 +6,18 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   <link rel="stylesheet" href="../public/css/estilos.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Búsqueda de Usuarios</title>  
+  <title>Lista de Clientes</title>  
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
-    <h1>Búsqueda de Usuarios</h1>
-    <input style="margin-left: 130px; margin-top: 15px;" type="text" id="busqueda_usuario" name="dni" placeholder="Buscar Cliente/ Profesor">
+    <h1>Lista de Clientes</h1>
+    <input style="margin-left: 230px; margin-top: 15px;" type="text" id="busqueda_usuario" name="dni" placeholder="Buscar Cliente/ Profesor">
   </div>
 
   <div class="botonera-1">
     <i class="fas fa-user-plus"></i>
-    <button onclick="window.location.href='cargar_usuario_view.php'" style="font-size: 12px; padding-top: 15px; padding-bottom: 11px" id="cargar_usuario">Agregar Cliente/ Profesor</button>
+    <button onclick="window.location.href='../views/cargar_usuario_view.php'" id="cargar_usuario">Agregar Cliente</button>
   </div>
   
   <div class="tabla">
@@ -61,7 +53,7 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
                   </button>
                 <?php } ?>
                 <?php if ($usuario['asset'] == 0) { ?>
-                  <p style="color:red">Usuario inactivo</p>
+                  <p style="color:red">Cliente inactivo</p>
                 <?php } ?>
               </td>
             </tr>
@@ -72,14 +64,9 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   </div>
 
   <div class="botonera">
-    <button onclick="location.href='../controllers/busqueda_usuario_controller.php'">
+    <button onclick="location.href='../views/dashboard_view.php'">
       <i style="padding-right: 10px;" class="fas fa-arrow-left"></i>
       Volver
-    </button>
-
-    <button onclick="location.href='../views/dashboard_view.php'">
-      <i style="padding-right: 10px;" class="fas fa-home"></i>
-      Inicio
     </button>
   </div>
 

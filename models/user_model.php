@@ -231,6 +231,28 @@ class User {
     }
   }
 
+  public function getUsersByRole($type_user) {
+    try {
+      // Preparar la consulta SQL para seleccionar usuarios por rol
+      $sql = 'SELECT * FROM users WHERE type_user = :type_user';
+      $stmt = $this->pdo->prepare($sql);
+
+      // Vincular el parámetro
+      $stmt->bindParam(':type_user', $type_user, PDO::PARAM_STR);
+
+      // Ejecutar la consulta
+      $stmt->execute();
+
+      // Obtener todos los registros que coincidan con el rol
+      return $stmt->fetchAll(PDO::FETCH_OBJ);
+
+    } catch (PDOException $e) {
+      // Manejar cualquier excepción de PDO
+      echo 'Error: ' . $e->getMessage();
+      return false;
+    }
+}
+
 }
 
 ?>

@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once '../models/uid_model.php';
 require_once '../models/user_model.php';
 require_once '../models/pago_model.php';

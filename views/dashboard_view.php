@@ -47,15 +47,19 @@
     </div>
     <div class="botonera-1">
       <i class="fas fa-chalkboard-teacher"></i>
-      <button onclick="window.location.href='cargar_clase_view.php'" id="cargar_clase">Agregar Clase</button>
+      <button onclick="window.location.href='../controllers/cargar_clase_controller.php'">Agregar Clase</button>
     </div>
     <div class="botonera-1">
       <i class="fas fa-chalkboard-teacher"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Clases?</button>
+      <button onclick="window.location.href='../controllers/lista_clases_controller.php'">Clases</button>
     </div>
     <div class="botonera-1">
-      <i class="fas fa-chalkboard-teacher"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Clientes?</button>
+      <i class="fas fa-users"></i>
+      <button onclick="window.location.href='../controllers/lista_clientes_controller.php'">Clientes</button>
+    </div>
+    <div class="botonera-1">
+      <i class="fas fa-user-graduate"></i>
+      <button onclick="window.location.href='../controllers/lista_profesores_controller.php'">Profesores</button>
     </div>
     <div class="botonera-1">
       <i class="fas fa-clipboard-check"></i>

@@ -6,12 +6,12 @@
   <link rel="stylesheet" href="../public/css/estilos.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registrar Nuevo Cliente</title>
+  <title>Registrar Nuevo Cliente/ Profesor</title>
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
-    <h1 style="margin-right: 50px;">Registrar nuevo cliente</h1>
+    <h1 style="margin-right: 50px;">Registrar nuevo Cliente/ Profesor</h1>
   </div>
     <form action="../controllers/alta_usuarios_controller.php" method="post" class="form-container">
       <div class="form-group">

@@ -2,7 +2,7 @@
 
 require_once 'conexion_model.php';
 
-class Clase {
+class ClaseProfesor {
   private $database;
   private $pdo;
 
@@ -11,15 +11,15 @@ class Clase {
     $this->pdo = $this->database->getConnection();
   }  
 
-  public function createClase($data) {
+  public function createClaseProfesor($data) {
     try {
       // Preparar la consulta SQL de inserción
-      $sql = 'INSERT INTO classes (name_class, price_class) VALUES (:name_class, :price_class)';
+      $sql = 'INSERT INTO classes (id_user, id_class) VALUES (:id_user, :id_class)';
       $stmt = $this->pdo->prepare($sql);
 
       // Vincular los parámetros con los valores del arreglo $data
-      $stmt->bindParam(':name_class', $data['name_class'], PDO::PARAM_STR);
-      $stmt->bindParam(':price_class', $data['price_class'], PDO::PARAM_STR);
+      $stmt->bindParam(':id_user', $data['id_user'], PDO::PARAM_STR);
+      $stmt->bindParam(':id_class', $data['id_class'], PDO::PARAM_STR);
 
       // Ejecutar la consulta
       return $stmt->execute();
@@ -30,10 +30,9 @@ class Clase {
     }
   }
 
-  // Obtener todas las clases
-  public function getClases() {
+  public function getClasesProfesor() {
     try {
-      $sql = 'SELECT * FROM classes';
+      $sql = 'SELECT * FROM teacher_class';
       $stmt = $this->pdo->prepare($sql);
       $stmt->execute();
       return $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -43,12 +42,11 @@ class Clase {
     }
   }
 
-  // Obtener una clase por su nombre
-  public function getClaseByNameClase($nameClase) {
+  public function getClaseProfesorByIdProfesor($idUser) {
     try {
-      $sql = 'SELECT * FROM classes WHERE name_class = :name_class';
+      $sql = 'SELECT * FROM teacher_class WHERE id_user = :id_user';
       $stmt = $this->pdo->prepare($sql);
-      $stmt->bindParam(':name_class', $nameClase, PDO::PARAM_STR);
+      $stmt->bindParam(':id_user', $idUser, PDO::PARAM_STR);
       $stmt->execute();
       return $stmt->fetch(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
@@ -57,12 +55,11 @@ class Clase {
     }
   }
 
-  // Obtener una clase por su ID
-  public function getClaseById($id) {
+  public function getClaseProfesorByIdClass($idClass) {
     try {
-      $sql = 'SELECT * FROM classes WHERE id_class = :id_class';
+      $sql = 'SELECT * FROM teacher_class WHERE id_class = :id_class';
       $stmt = $this->pdo->prepare($sql);
-      $stmt->bindParam(':id_class', $id, PDO::PARAM_INT);
+      $stmt->bindParam(':id_class', $idClass, PDO::PARAM_INT);
       $stmt->execute();
       return $stmt->fetch(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
@@ -71,12 +68,11 @@ class Clase {
     }
   }
 
-  // Eliminar una clase por su ID
-  public function deleteClaseById($id) {
+  public function deleteClaseProfesorById($id) {
     try {
-      $sql = 'DELETE FROM classes WHERE id_class = :id_class';
+      $sql = 'DELETE FROM teacher_class WHERE id_teacher_class = :id_teacher_class';
       $stmt = $this->pdo->prepare($sql);
-      $stmt->bindParam(':id_class', $id, PDO::PARAM_INT);
+      $stmt->bindParam(':id_teacher_class', $id, PDO::PARAM_INT);
       return $stmt->execute();
     } catch (PDOException $e) {
       echo 'Error: ' . $e->getMessage();
