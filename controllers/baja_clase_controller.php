@@ -1,11 +1,14 @@
 <?php
 session_start();
 
+require_once '../models/user_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
+
 var_dump('Controlador para eliminar la clase');
 exit;
 
-require_once '../models/user_model.php';
-require_once '../helpers/url_helper.php';
 
 $user = new User();
 $dni = isset($_GET['dni']) ? $_GET['dni'] : '';

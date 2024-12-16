@@ -5,6 +5,8 @@ require_once '../models/user_model.php';
 require_once '../models/pago_model.php';
 require_once '../helpers/url_helper.php';
 
+checkSesion();
+
 $user = new User();
 $pagos = new Pagos();
 

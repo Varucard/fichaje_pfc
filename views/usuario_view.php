@@ -12,7 +12,7 @@
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="padding-right: 40px;" >Detalle del <?php echo $usuario[0]['type_user'] == 3 ? 'Profesor' : 'Cliente'; ?></h1>
-    <button onclick="window.location.href='../views/busqueda_usuario_view.php'">
+    <button onclick="window.location.href='../controllers/lista_clientes_controller.php'">
       <i style="padding-right: 10px; padding-top: 6px" class="fas fa-undo-alt"></i>
       Volver
     </button>

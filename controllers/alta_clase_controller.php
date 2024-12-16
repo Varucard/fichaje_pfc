@@ -4,6 +4,9 @@ session_start();
 require_once '../models/clase_model.php';
 require_once '../models/user_model.php';
 require_once '../models/clase_profesor_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
 
 $clase = new Clase();
 $user = new User();

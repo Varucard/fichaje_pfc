@@ -21,6 +21,7 @@ class AuthController {
     }
 
     if($this->userModel->login($dni, $password)) {
+      $_SESSION['login'] = true;
       redirect('views/dashboard_view.php');
     } else {
       flash('login_error', 'Credenciales incorrectas');
@@ -30,8 +31,10 @@ class AuthController {
 
   // Destruir la sesión
   public function logout() {
+    session_unset();
     session_destroy();
     redirect('views/login_view.php');
+    exit;
   }
 }
 

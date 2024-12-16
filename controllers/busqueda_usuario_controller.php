@@ -4,6 +4,8 @@ session_start();
 require_once '../models/user_model.php';
 require_once '../helpers/url_helper.php';
 
+checkSesion();
+
 if (isset($_GET['busqueda']) && isset($_GET['tipo_busqueda'])) {
   $busqueda = $_GET['busqueda'];
   $tipoBusqueda = $_GET['tipo_busqueda'];

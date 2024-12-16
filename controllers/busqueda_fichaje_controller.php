@@ -3,6 +3,9 @@ session_start();
 
 require_once '../models/fichaje_model.php';
 require_once '../models/pago_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
 
 if (isset($_GET['busqueda'])) {
   $busqueda = trim($_GET['busqueda']);
@@ -36,7 +39,7 @@ if (isset($_GET['busqueda'])) {
 
   $_SESSION['resultados_busqueda'] = $fichajesConPago;
 
-  header('Location: ../views/busqueda_fichaje_view.php');
+  header('Location:../views/busqueda_fichaje_view.php');
   exit();
 }
 ?>

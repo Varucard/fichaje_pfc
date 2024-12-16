@@ -2,6 +2,9 @@
 session_start();
 
 require_once '../models/pago_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
 
 function nuevo_pago($id_user) {
   $pago = new Pagos();

@@ -18,4 +18,11 @@ function currentUrl() {
 function getParam($param) {
 	return isset($_GET[$param]) ? $_GET[$param] : null;
 }
+
+function checkSesion() {
+	if (!isset($_SESSION['login'])) {
+		redirect('views/login_view.php');
+		exit;
+	}
+}
 ?>

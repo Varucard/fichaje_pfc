@@ -1,3 +1,10 @@
+<?php
+  require_once '../helpers/url_helper.php';
+
+  session_start();
+
+  checkSesion();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>

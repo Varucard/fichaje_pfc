@@ -1,10 +1,14 @@
 <?php
 session_start();
 
-require_once '../models/clase_model.php';
 require_once '../helpers/url_helper.php';
+require_once '../models/clase_model.php';
+require_once '../models/user_model.php';
+
+checkSesion();
 
 $clase = new Clase();
+$user = new User();
 
 $id_class = isset($_GET['id_class']) ? $_GET['id_class'] : '';
 
@@ -18,5 +22,8 @@ if (!$clase_data) {
 redirect('views/busqueda_clases_view.php'); // Redirige si no se encuentra el usuario
 exit;
 }
+
+$profesores = $user->getUsersByRole(3); //TODO El profesor tiene que estar inscripto en la clase
+$clientes = $user->getUsersByRole(2); //TODO El cliente tiene que estar inscripto en la clase
 
 include '../views/clase_view.php';

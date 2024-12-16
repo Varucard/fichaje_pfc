@@ -4,6 +4,8 @@ session_start();
 require_once '../models/user_model.php';
 require_once '../helpers/url_helper.php';
 
+checkSesion();
+
 $user = new User();
 
 $dni = isset($_GET['dni']) ? $_GET['dni'] : '';
