@@ -6,12 +6,12 @@
   <link rel="stylesheet" href="../public/css/estilos.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registrar Nueva Clase</title>
+  <title>Agregar Usuario a Clase</title>
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
-    <h1 style="margin-right: 50px;">Registrar nueva clase</h1>
+    <h1 style="margin-right: 50px;">Registrar Usuario a clase</h1>
   </div>
   <form action="../controllers/alta_clase_controller.php" method="post" class="form-container">
     <div class="form-group">

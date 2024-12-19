@@ -16,7 +16,7 @@
       <i style="padding-right: 10px; padding-top: 6px" class="fas fa-undo-alt"></i>
       Volver
     </button>
-    <button style="color: red" onclick="window.location.href='../controllers/baja_clase_controller.php?dni=<?php echo urlencode($clase_data->id_class); ?>'">
+    <button style="color: red; font-size: 9px;" onclick="window.location.href='../controllers/baja_clase_controller.php?id_class=<?php echo urlencode($clase_data->id_class); ?>'">
       <i style="color: red; padding-right: 10px; padding-top: 6px" class="fas fa-trash"></i>
       Eliminar Clase
     </button>
@@ -29,11 +29,8 @@
         <input type="hidden" id="id" name="id" value="<?php echo htmlspecialchars($clase_data->id_class); ?>">
 
         <div class="form-group">
-          <label for="name_class">Nombre de la case:</label>
+          <label for="name_class">Nombre de la clase:</label>
           <input type="text" id="name_class" name="name_class" value="<?php echo htmlspecialchars($clase_data->name_class); ?>">
-
-          <label for="precio">Precio de la clase:</label>
-          <input type="text" id="precio" name="precio" value="<?php echo htmlspecialchars($clase_data->price_class); ?>" required>
 
           <button type="submit">
             <i class="fas fa-sync-alt"></i>
@@ -42,12 +39,17 @@
         </div>
 
         <div class="form-group">
-          <div class="botonera-1">
-            <i class="fas fa-user-plus"></i>
-            <button onclick="window.location.href='cargar_usuario_view.php'" style="font-size: 12px; padding-top: 15px; padding-bottom: 11px" id="cargar_usuario">Agregar Cliente/ Profesor</button>
-          </div>
+          <label for="precio">Precio de la clase:</label>
+          <input type="text" id="precio" name="precio" value="<?php echo htmlspecialchars($clase_data->price_class); ?>" required>
         </div>
       </form>
+
+      <div class="form-group">
+        <div class="botonera-1">
+          <i class="fas fa-user-plus"></i>
+          <button onclick="window.location.href='../views/agregar_usuario_clase_view.php'" style="font-size: 12px; padding-top: 15px; padding-bottom: 11px" id="cargar_usuario">Agregar Cliente/ Profesor</button>
+        </div>
+      </div>
 
         <?php if (isset($profesores) || isset($clientes)): ?>
         <hr>

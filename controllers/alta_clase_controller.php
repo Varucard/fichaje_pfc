@@ -40,7 +40,7 @@ if (!$nuevaClase) {
 // Asignar profesores a la clase, si hay profesores seleccionados
 $erroresProfesores = [];
 if (!empty($profesores)) {
-  $nuevaClaseId = $clase->getClaseByNameClase($nombreClase)[0]['id_class'];
+  $nuevaClaseId = $clase->getClaseByNameClase($nombreClase)->id_class;
 
   foreach ($profesores as $profesorId) {
     $profesor = $user->getUserByID($profesorId);
@@ -55,7 +55,7 @@ if (!empty($profesores)) {
 
 // Mostrar mensaje final al usuario
 if (empty($erroresProfesores)) {
-  echo "<script>alert('Clase creada con los profesores solicitados'); window.location.href = '../controllers/cargar_clase_controller.php';</script>";
+  echo "<script>alert('Clase creada con los profesores solicitados'); window.location.href = '../controllers/detalle_clase_controller.php?id_class=" . htmlspecialchars($nuevaClaseId) . "';</script>";
 } else {
   echo "<script>alert('Clase creada, pero algunos profesores no fueron asignados: " . implode(', ', $erroresProfesores) . "'); window.location.href = '../controllers/cargar_clase_controller.php';</script>";
 }

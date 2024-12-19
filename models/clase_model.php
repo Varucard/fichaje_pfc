@@ -30,6 +30,20 @@ class Clase {
     }
   }
 
+  public function updateClase($data) {
+    try {
+      $stmt = $this->pdo->prepare("UPDATE classes SET name_class = :name_class, price_class = :price_class WHERE id_class = :id_class");
+      $stmt->bindParam(':name_class', $data['name_class'], PDO::PARAM_STR);
+      $stmt->bindParam(':price_class', $data['price_class'], PDO::PARAM_STR);
+      $stmt->bindParam(':id_class', $data['id_class'], PDO::PARAM_STR);
+
+      return $stmt->execute();
+    } catch (PDOException $e) {
+      // echo "Error en la consulta: " . $e->getMessage();
+      return false;
+    }
+  }
+
   // Obtener todas las clases
   public function getClases() {
     try {

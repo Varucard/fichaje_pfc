@@ -2,7 +2,7 @@
 
 require_once 'conexion_model.php';
 
-class ClaseProfesor {
+class ClaseAlumno {
   private $database;
   private $pdo;
 
@@ -64,7 +64,7 @@ class ClaseProfesor {
       return $stmt->fetch(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
       echo 'Error: ' . $e->getMessage();
-      return false;
+      return null;
     }
   }
 

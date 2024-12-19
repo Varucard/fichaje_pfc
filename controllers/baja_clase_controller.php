@@ -1,30 +1,17 @@
 <?php
 session_start();
 
-require_once '../models/user_model.php';
+require_once '../models/clase_model.php';
 require_once '../helpers/url_helper.php';
 
 checkSesion();
 
-var_dump('Controlador para eliminar la clase');
-exit;
+$clase = new Clase();
+$id_clase = isset($_GET['id_class']) ? $_GET['id_class'] : '';
 
-
-$user = new User();
-$dni = isset($_GET['dni']) ? $_GET['dni'] : '';
-
-if ($user->desactivarUsuario($dni)) {
-  // Actualizar los resultados de la sesión
-  if (isset($_SESSION['resultados_busqueda'])) {
-    foreach ($_SESSION['resultados_busqueda'] as &$usuario) {
-      if ($usuario['dni'] == $dni) {
-        $usuario['asset'] = 0;
-        break;
-      }
-    }
-  }
-  echo "<script>alert('Usuario desactivado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
+if ($clase->deleteClaseById($id_clase)) {
+  echo "<script>alert('Clase eliminada exitosamente'); window.location.href = '../controllers/lista_clases_controller.php';</script>";
 } else {
-  echo "<script>alert('Ocurrió un error al desactivar el usuario'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
+  echo "<script>alert('Ocurrió un error al intentar eliminar la clase'); window.location.href = '../controllers/detalle_clase_controller.php?id_class=" . htmlspecialchars($id_clase) . "';</script>";
 }
 ?>
