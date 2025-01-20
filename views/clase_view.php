@@ -49,6 +49,11 @@
           <i class="fas fa-user-plus"></i>
           <button onclick="window.location.href='../views/agregar_usuario_clase_view.php'" style="font-size: 12px; padding-top: 15px; padding-bottom: 11px" id="cargar_usuario">Agregar Cliente/ Profesor</button>
         </div>
+        
+        <button onclick="location.href='../views/dashboard_view.php'">
+          <i style="padding-right: 10px;" class="fas fa-home"></i>
+          Inicio
+        </button>
       </div>
 
         <?php if (isset($profesores) || isset($clientes)): ?>
@@ -66,7 +71,7 @@
               <tbody>
                 <?php foreach ($profesores as $profesor): ?>
                   <tr>
-                    <td><?php echo $profesor->user_name; ?></td>
+                    <td><?php echo $profesor['user_name']; ?></td>
                     <td>
                       <button style="color: red" class="button_small" onclick="window.location.href='../controllers/baja_clase_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
                         <i style="color: red" class="fas fa-trash"></i>
@@ -90,7 +95,7 @@
               <tbody>
                 <?php foreach ($clientes as $cliente): ?>
                   <tr>
-                    <td><?php echo $cliente->user_name; ?></td>
+                    <td><?php echo $cliente['user_name']; ?></td>
                     <td>
                       <button style="color: red" class="button_small" onclick="window.location.href='../controllers/baja_clase_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
                         <i style="color: red" class="fas fa-trash"></i>

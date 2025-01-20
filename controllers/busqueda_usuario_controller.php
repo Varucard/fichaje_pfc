@@ -7,36 +7,33 @@ require_once '../helpers/url_helper.php';
 checkSesion();
 
 if (isset($_GET['busqueda']) && isset($_GET['tipo_busqueda'])) {
-  $busqueda = $_GET['busqueda'];
-  $tipoBusqueda = $_GET['tipo_busqueda'];
+  $busqueda = trim($_GET['busqueda']);
+  $tipoBusqueda = trim($_GET['tipo_busqueda']);
 
   $userModel = new User();
-  $resultados = [];
+  $resultadosBusqueda = [];
 
   switch ($tipoBusqueda) {
     case 'dni':
-      $resultados = $userModel->getUserByDni($busqueda);
+      $resultadosBusqueda = $userModel->getUserByDni($busqueda);
       break;
     case 'name':
-      $resultados = $userModel->getUserByName($busqueda);
+      $resultadosBusqueda = $userModel->getUserByName($busqueda);
       break;
     default:
-      echo "<script>alert('Por favor, realice nuevamente la busqueda'); window.location.href = '../views/dashboard_view.php';</script>";
-      exit; 
+      redirect('../views/dashboard_view.php');
+      exit;
   }
 
-  // Verifica si se encontraron resultados
-  if (empty($resultados)) {
-    echo "<script>alert('No se encontraron resultados'); window.location.href = '../views/dashboard_view.php';</script>";
-    exit;
+  if (empty($resultadosBusqueda)) {
+    $_SESSION['resultados_busqueda'] = []; 
   } else {
-    // Almacena los resultados en la sesión y redirige a la vista de búsqueda
-    $_SESSION['resultados_busqueda'] = $resultados;
-    header('Location:' . URLROOT . '/views/busqueda_usuario_view.php');
-    exit;
+    $_SESSION['resultados_busqueda'] = $resultadosBusqueda;
   }
+
+  header('Location: ../views/busqueda_usuario_view.php');
+  exit;
 } else {
-  echo "<script>alert('Sin resultados previos'); window.location.href = '../views/dashboard_view.php';</script>";
-  exit; 
+  redirect('views/dashboard_view.php'); 
+  exit;
 }
-?>

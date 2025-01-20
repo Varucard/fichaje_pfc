@@ -11,10 +11,10 @@ class ClaseAlumno {
     $this->pdo = $this->database->getConnection();
   }  
 
-  public function createClaseProfesor($data) {
+  public function createClaseAlumno($data) {
     try {
       // Preparar la consulta SQL de inserción
-      $sql = 'INSERT INTO teacher_class (id_user, id_class) VALUES (:id_user, :id_class)';
+      $sql = 'INSERT INTO user_class (id_user, id_class) VALUES (:id_user, :id_class)';
       $stmt = $this->pdo->prepare($sql);
 
       // Vincular los parámetros con los valores del arreglo $data
@@ -30,9 +30,9 @@ class ClaseAlumno {
     }
   }
 
-  public function getClasesProfesor() {
+  public function getClasesAlumno() {
     try {
-      $sql = 'SELECT * FROM teacher_class';
+      $sql = 'SELECT * FROM user_class';
       $stmt = $this->pdo->prepare($sql);
       $stmt->execute();
       return $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -42,9 +42,9 @@ class ClaseAlumno {
     }
   }
 
-  public function getClaseProfesorByIdProfesor($idUser) {
+  public function getClaseAlumnoByIdAlumno($idUser) {
     try {
-      $sql = 'SELECT * FROM teacher_class WHERE id_user = :id_user';
+      $sql = 'SELECT * FROM user_class WHERE id_user = :id_user';
       $stmt = $this->pdo->prepare($sql);
       $stmt->bindParam(':id_user', $idUser, PDO::PARAM_STR);
       $stmt->execute();
@@ -55,22 +55,22 @@ class ClaseAlumno {
     }
   }
 
-  public function getClaseProfesorByIdClass($idClass) {
+  public function getClaseAlumnoByIdClass($idClass) {
     try {
-      $sql = 'SELECT * FROM teacher_class WHERE id_class = :id_class';
+      $sql = 'SELECT * FROM user_class WHERE id_class = :id_class';
       $stmt = $this->pdo->prepare($sql);
       $stmt->bindParam(':id_class', $idClass, PDO::PARAM_INT);
       $stmt->execute();
-      return $stmt->fetch(PDO::FETCH_OBJ);
+      return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
       echo 'Error: ' . $e->getMessage();
       return null;
     }
   }
 
-  public function deleteClaseProfesorById($id) {
+  public function deleteClaseAlumnoById($id) {
     try {
-      $sql = 'DELETE FROM teacher_class WHERE id_teacher_class = :id_teacher_class';
+      $sql = 'DELETE FROM user_class WHERE id_user_class = :id_user_class';
       $stmt = $this->pdo->prepare($sql);
       $stmt->bindParam(':id_teacher_class', $id, PDO::PARAM_INT);
       return $stmt->execute();

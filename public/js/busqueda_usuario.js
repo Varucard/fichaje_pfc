@@ -10,7 +10,7 @@ document.getElementById('busqueda_usuario').addEventListener('keyup', function(e
     } 
     else {
       alert('Por favor, no ingrese valores erroneos');
-      exit();
+      return;
     }
 
     window.location.href = `../controllers/busqueda_usuario_controller.php?busqueda=${encodeURIComponent(busqueda)}&tipo_busqueda=${tipoBusqueda}`;

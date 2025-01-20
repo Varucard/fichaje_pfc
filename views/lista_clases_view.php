@@ -61,8 +61,14 @@
       <i style="padding-right: 10px;" class="fas fa-arrow-left"></i>
       Volver
     </button>
+
+    <button onclick="location.href='../views/dashboard_view.php'">
+      <i style="padding-right: 10px;" class="fas fa-home"></i>
+      Inicio
+    </button>
   </div>
 
   <script src="../public/js/icons.js"></script>
+  <script src="../public/js/busqueda_clase.js"></script>
 </body>
 </html>

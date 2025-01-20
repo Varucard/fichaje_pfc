@@ -17,7 +17,7 @@ class User {
       $stmt = $this->pdo->query("SELECT * FROM `users` WHERE `id_user` = $id_user");
   
       // Obtengo el Usuario
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      return $stmt->fetch(PDO::FETCH_ASSOC);
   
     } catch (PDOException $e) {
       // echo "Error en la consulta: " . $e->getMessage();

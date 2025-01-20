@@ -61,7 +61,7 @@ class ClaseProfesor {
       $stmt = $this->pdo->prepare($sql);
       $stmt->bindParam(':id_class', $idClass, PDO::PARAM_INT);
       $stmt->execute();
-      return $stmt->fetch(PDO::FETCH_OBJ);
+      return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
       echo 'Error: ' . $e->getMessage();
       return false;

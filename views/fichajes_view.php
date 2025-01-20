@@ -41,6 +41,11 @@
       <i style="padding-right: 10px;" class="fas fa-arrow-left"></i>
       Volver
     </button>
+
+    <button onclick="location.href='../views/dashboard_view.php'">
+      <i style="padding-right: 10px;" class="fas fa-home"></i>
+      Inicio
+    </button>
   </div>
 
   <!-- Div para el cartel de cumpleaños -->

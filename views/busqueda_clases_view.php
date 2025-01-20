@@ -20,7 +20,7 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="margin-right: 50px;">Búsqueda de Clases</h1>
-    <input type="text" id="busqueda_fichaje" placeholder="Buscar Ingreso">
+    <input type="text" id="busqueda_clase" placeholder="Buscar Ingreso">
   </div>
   
   <div class="tabla">
@@ -62,6 +62,6 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   </div>
 
   <script src="../public/js/icons.js"></script>
-  <script src="../public/js/busqueda_fichaje.js"></script>
+  <script src="../public/js/busqueda_clase.js"></script>
 </body>
 </html>
