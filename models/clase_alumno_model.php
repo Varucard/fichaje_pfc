@@ -11,21 +11,21 @@ class ClaseAlumno {
     $this->pdo = $this->database->getConnection();
   }  
 
-  public function createClaseAlumno($data) {
+  public function createClaseAlumno($id_user, $id_class) {
     try {
       // Preparar la consulta SQL de inserción
       $sql = 'INSERT INTO user_class (id_user, id_class) VALUES (:id_user, :id_class)';
       $stmt = $this->pdo->prepare($sql);
 
       // Vincular los parámetros con los valores del arreglo $data
-      $stmt->bindParam(':id_user', $data['id_user'], PDO::PARAM_STR);
-      $stmt->bindParam(':id_class', $data['id_class'], PDO::PARAM_STR);
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_STR);
+      $stmt->bindParam(':id_class', $id_class, PDO::PARAM_STR);
 
       // Ejecutar la consulta
       return $stmt->execute();
     } catch (PDOException $e) {
       // Manejar cualquier excepción de PDO
-      echo 'Error: ' . $e->getMessage();
+      // return 'Error: ' . $e->getMessage();
       return false;
     }
   }
@@ -68,14 +68,15 @@ class ClaseAlumno {
     }
   }
 
-  public function deleteClaseAlumnoById($id) {
+  public function deleteClaseAlumnoById($id_user, $id_class) {
     try {
-      $sql = 'DELETE FROM user_class WHERE id_user_class = :id_user_class';
+      $sql = 'DELETE FROM user_class WHERE id_user = :id_user AND id_class = :id_class';
       $stmt = $this->pdo->prepare($sql);
-      $stmt->bindParam(':id_teacher_class', $id, PDO::PARAM_INT);
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+      $stmt->bindParam(':id_class', $id_class, PDO::PARAM_INT);
       return $stmt->execute();
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
+      // return 'Error: ' . $e->getMessage();
       return false;
     }
   }

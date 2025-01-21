@@ -6,78 +6,78 @@
   <link rel="stylesheet" href="../public/css/estilos.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detalles del <?php echo $usuario[0]['type_user'] == 3 ? 'Profesor' : 'Cliente'; ?></title>
+  <title>Detalles del <?php echo $usuario['type_user'] == 1 ? 'Profesor' : 'Cliente'; ?></title>
 </head>
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
-    <h1 style="padding-right: 40px;" >Detalle del <?php echo $usuario[0]['type_user'] == 3 ? 'Profesor' : 'Cliente'; ?></h1>
+    <h1 style="padding-right: 40px;" >Detalle del <?php echo $usuario['type_user'] == 1 ? 'Profesor' : 'Cliente'; ?></h1>
     <button onclick="window.location.href='../controllers/lista_clientes_controller.php'">
       <i style="padding-right: 10px; padding-top: 6px" class="fas fa-undo-alt"></i>
       Volver
     </button>
-    <?php if ($usuario && $usuario[0]['asset'] == 1): ?>
-      <button style="color: red" onclick="window.location.href='../controllers/baja_usuarios_controller.php?dni=<?php echo urlencode($usuario[0]['dni']); ?>'">
+    <?php if ($usuario && $usuario['asset'] == 1): ?>
+      <button style="color: red" onclick="window.location.href='../controllers/baja_usuarios_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
         <i style="color: red; padding-right: 10px; padding-top: 6px" class="fas fa-trash"></i>
-        Inhabilitar <?php echo $usuario[0]['type_user'] == 3 ? 'Profesor' : 'Cliente'; ?>
+        Inhabilitar <?php echo $usuario['type_user'] == 1 ? 'Profesor' : 'Cliente'; ?>
       </button>
     <?php else: ?>
-      <button onclick="window.location.href='../controllers/activar_usuario_controller.php?dni=<?php echo urlencode($usuario[0]['dni']); ?>'">
+      <button onclick="window.location.href='../controllers/activar_usuario_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
         <i style="padding-right: 10px; padding-top: 6px" class="fas fa-user-plus"></i>
-        Re-activar <?php echo $usuario[0]['type_user'] == 3 ? 'Profesor' : 'Cliente'; ?>
+        Re-activar <?php echo $usuario['type_user'] == 1 ? 'Profesor' : 'Cliente'; ?>
       </button>
     <?php endif; ?>
   </div>
 
   <div class="detalle-usuario">
-    <?php if ($usuario && $usuario[0]['asset'] == 0): ?>
-      <p class="status-inactive"><?php echo $usuario[0]['type_user'] == 3 ? 'Profesor inactivo' : 'Cliente inactivo'; ?></p>
+    <?php if ($usuario && $usuario['asset'] == 0): ?>
+      <p class="status-inactive"><?php echo $usuario['type_user'] == 1 ? 'Profesor inactivo' : 'Cliente inactivo'; ?></p>
     <?php endif; ?>
 
     <?php if ($usuario): ?>
       <form id="form-datos-usuario" action="../controllers/actualizar_usuarios_controller.php" method="post" class="form-container">
-        <input type="hidden" id="id" name="id" value="<?php echo htmlspecialchars($usuario[0]['id_user']); ?>">
+        <input type="hidden" id="id" name="id" value="<?php echo htmlspecialchars($usuario['id_user']); ?>">
 
         <div class="form-group">
           <label for="rfid">N° de llavero:</label>
-          <input type="text" id="rfid" name="rfid" value="<?php echo htmlspecialchars($usuario[0]['rfid']); ?>">
+          <input type="text" id="rfid" name="rfid" value="<?php echo htmlspecialchars($usuario['rfid']); ?>">
 
           <label for="dni">N° de DNI:</label>
-          <input type="text" id="dni" name="dni" value="<?php echo htmlspecialchars($usuario[0]['dni']); ?>">
+          <input type="text" id="dni" name="dni" value="<?php echo htmlspecialchars($usuario['dni']); ?>">
 
           <label for="name">Nombre:</label>
-          <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($usuario[0]['user_name']); ?>">
+          <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($usuario['user_name']); ?>">
 
-          <?php if ($usuario[0]['asset'] == 1): ?>
+          <?php if ($usuario['asset'] == 1): ?>
             <button type="submit">
               <i class="fas fa-sync-alt"></i>
-              Actualizar <?php echo $usuario[0]['type_user'] == 3 ? 'Profesor' : 'Cliente'; ?>
+              Actualizar <?php echo $usuario['type_user'] == 1 ? 'Profesor' : 'Cliente'; ?>
             </button>
           <?php endif; ?>
         </div>
 
         <div class="form-group">
           <label for="surname">Apellido:</label>
-          <input type="text" id="surname" name="surname" value="<?php echo htmlspecialchars($usuario[0]['user_surname']); ?>">
+          <input type="text" id="surname" name="surname" value="<?php echo htmlspecialchars($usuario['user_surname']); ?>">
 
           <label for="birth_day">Fecha de Nacimiento:</label>
-          <input type="date" id="birth_day" name="birth_day" value="<?php echo htmlspecialchars($usuario[0]['birth_day']); ?>">
+          <input type="date" id="birth_day" name="birth_day" value="<?php echo htmlspecialchars($usuario['birth_day']); ?>">
         </div>
 
         <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($usuario[0]['email']); ?>">
+          <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($usuario['email']); ?>">
 
           <label for="phone">Teléfono:</label>
-          <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($usuario[0]['phone_number']); ?>">
+          <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($usuario['phone_number']); ?>">
         </div>
       </form>
 
-      <?php if ($usuario[0]['type_user'] != 3): ?>
+      <?php if ($usuario['type_user'] != 1): ?>
         <hr>
         <h2>Historial de Pagos</h2>
-        <?php if ($usuario[0]['asset'] == 1): ?>
-          <button onclick="window.location.href='../controllers/nuevo_pago_controller.php?id_user=<?php echo $usuario[0]['id_user']; ?>'" id="cargar_pago">
+        <?php if ($usuario['asset'] == 1): ?>
+          <button onclick="window.location.href='../controllers/nuevo_pago_controller.php?id_user=<?php echo $usuario['id_user']; ?>'" id="cargar_pago">
             <i style="padding-right: 10px;" class="fas fa-wallet"></i>
             Renovar pago
           </button>
@@ -110,7 +110,7 @@
       <?php endif; ?>
 
     <?php else: ?>
-      <p>No se encontraron datos para este <?php echo $usuario[0]['type_user'] == 3 ? 'Profesor' : 'Cliente'; ?>.</p>
+      <p>No se encontraron datos para este <?php echo $usuario['type_user'] == 1 ? 'Profesor' : 'Cliente'; ?>.</p>
     <?php endif; ?>
   </div>
 

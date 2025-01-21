@@ -9,6 +9,6 @@ checkSesion();
 $user = new User();
 
 // Obtener solo los usuarios que son profesores
-$profesores = $user->getUsersByRole(3);
+$profesores = $user->getUsersByRole(1);
 
 include '../views/cargar_clase_view.php';

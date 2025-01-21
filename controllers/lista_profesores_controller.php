@@ -13,7 +13,7 @@ $resultados = [];
 
 // Traigo unicamente los usuarios Profesores
 foreach ($usuarios as $usuario) {
-  if ($usuario['type_user'] == 3)
+  if ($usuario['type_user'] == 1)
   $resultados[] = $usuario;
 }
 

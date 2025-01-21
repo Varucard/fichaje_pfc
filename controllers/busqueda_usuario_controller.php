@@ -15,10 +15,10 @@ if (isset($_GET['busqueda']) && isset($_GET['tipo_busqueda'])) {
 
   switch ($tipoBusqueda) {
     case 'dni':
-      $resultadosBusqueda = $userModel->getUserByDni($busqueda);
+      array_push($resultadosBusqueda, $userModel->getUserByDni($busqueda));
       break;
     case 'name':
-      $resultadosBusqueda = $userModel->getUserByName($busqueda);
+      array_push($resultadosBusqueda, $userModel->getUserByName($busqueda));
       break;
     default:
       redirect('../views/dashboard_view.php');

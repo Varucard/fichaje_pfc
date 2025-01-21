@@ -47,7 +47,7 @@
       <div class="form-group">
         <div class="botonera-1">
           <i class="fas fa-user-plus"></i>
-          <button onclick="window.location.href='../views/agregar_usuario_clase_view.php'" style="font-size: 12px; padding-top: 15px; padding-bottom: 11px" id="cargar_usuario">Agregar Cliente/ Profesor</button>
+          <button style="font-size: 12px; padding-top: 15px; padding-bottom: 11px" id="cargar_alumno_profesor">Agregar Alumno/ Profesor</button>
         </div>
         
         <button onclick="location.href='../views/dashboard_view.php'">
@@ -73,7 +73,7 @@
                   <tr>
                     <td><?php echo $profesor['user_name']; ?></td>
                     <td>
-                      <button style="color: red" class="button_small" onclick="window.location.href='../controllers/baja_clase_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
+                      <button style="color: red" class="button_small" onclick="window.location.href='../controllers/baja_profesor_clase_controller.php?id_profesor=<?php echo urlencode($profesor['id_user']); ?>&id_clase=<?php echo urlencode($clase_data->id_class); ?>'">
                         <i style="color: red" class="fas fa-trash"></i>
                         Remover Profesor
                       </button>
@@ -97,7 +97,7 @@
                   <tr>
                     <td><?php echo $cliente['user_name']; ?></td>
                     <td>
-                      <button style="color: red" class="button_small" onclick="window.location.href='../controllers/baja_clase_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
+                      <button style="color: red" class="button_small" onclick="window.location.href='../controllers/baja_alumno_clase_controller.php?id_alumno=<?php echo urlencode($cliente['id_user']); ?>&id_clase=<?php echo urlencode($clase_data->id_class); ?>'">
                         <i style="color: red" class="fas fa-trash"></i>
                         Remover Alumno
                       </button>
@@ -116,5 +116,7 @@
   </div>
 
   <script src="../public/js/icons.js"></script>
+  <script src="../public/js/agregar_alumno_profesor.js"></script>
+
 </body>
 </html>

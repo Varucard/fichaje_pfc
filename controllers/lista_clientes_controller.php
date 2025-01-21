@@ -11,7 +11,7 @@ $user = new User();
 $usuarios = $user->getUsers();
 $resultados = [];
 
-// Traigo unicamente los usuarios clientes
+// Traigo unicamente los usuarios clientes/ Alumnos
 foreach ($usuarios as $usuario) {
   if ($usuario['type_user'] == 2)
   $resultados[] = $usuario;

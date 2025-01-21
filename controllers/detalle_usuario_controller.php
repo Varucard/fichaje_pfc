@@ -23,7 +23,7 @@ redirect('views/busqueda_usuario_view.php'); // Redirige si no se encuentra el u
 exit;
 }
 
-$pago = $pagos->getPagosByUser($usuario[0]['id_user']);
+$pago = $pagos->getPagosByUser($usuario['id_user']);
 $pago = array_slice($pago, 0, 5);
 $pago = array_reverse($pago);
 

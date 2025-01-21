@@ -3,7 +3,6 @@ session_start();
 
 require_once '../helpers/url_helper.php';
 
-// Inicializa resultados si no hay en la sesión
 $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_busqueda'] : [];
 ?>
 <!DOCTYPE html>
@@ -83,7 +82,7 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
     </button>
   </div>
 
-  <script src="../public/js/icons.js"></script>
   <script src="../public/js/busqueda_usuario.js"></script>
+  <script src="../public/js/icons.js"></script>
 </body>
 </html>

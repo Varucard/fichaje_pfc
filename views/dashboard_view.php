@@ -104,8 +104,8 @@
     </div>
   </div>
 
-  <script src="../public/js/busqueda_usuario.js"></script>
   <script src="../public/js/busqueda_fichaje.js"></script>
+  <script src="../public/js/busqueda_usuario.js"></script>
   <script src="../public/js/busqueda_clase.js"></script>
   <!-- <script src="../public/js/ultimos_fichajes.js"></script> Contiene para evitar inconvenientes el checkeador de nuevos UID -->
   <script src="../public/js/fichaje_manual.js"></script>
