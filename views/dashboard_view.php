@@ -72,14 +72,6 @@
       <i class="fas fa-clipboard-check"></i>
       <button onclick="window.location.href='fichajes_view.php'">Ultimos Ingresos</button>
     </div>
-    <div class="botonera-1">
-      <i class="fas fa-chalkboard-teacher"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Deuda?</button>
-    </div>
-    <div class="botonera-1">
-      <i class="fas fa-chalkboard-teacher"></i>
-      <button onclick="window.location.href='cargar_usuario_view.php'" id="cargar_clase">Liquidar?</button>
-    </div>
   </div>
 
   <!-- Botones que pueden romper cosas -->

@@ -50,8 +50,8 @@ class ClaseProfesor {
       $stmt->execute();
       return $stmt->fetch(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
-      return null;
+      // echo 'Error: ' . $e->getMessage();
+      return false;
     }
   }
 

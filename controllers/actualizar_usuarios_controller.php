@@ -17,10 +17,12 @@ $surname = $_POST['surname'];
 $birth_day = $_POST['birth_day'];
 $email = $_POST['email'];
 $phone = $_POST['phone'];
+$type_user = $_POST['type_user'];
+$cambioTipoUsuario = $_POST['cambioTipoUsuario'];
 
 // Verifico si el DNI ya está registrado en otro usuario activo
 $aux = $user->getUserByDNI($dni);
-if ($aux && $aux[0]['id_user'] != $id && $aux[0]['asset'] == 1) {
+if ($aux && $aux['id_user'] != $id && $aux['asset'] == 1) {
     echo "<script>alert('El Nro. de Documento ya se encuentra registrado en otro Usuario activo'); window.location.href = '../views/usuario_view.php?dni=" . htmlspecialchars($dni) . "';</script>";
     exit; 
 }
@@ -36,6 +38,12 @@ if ($rfid != 'SIN LLAVERO' && $auxs_rfid) {
   }
 }
 
+// Verifico si debo cambiar el tipo de Usuario
+if ($cambioTipoUsuario) {
+  if ($type_user == 1) $type_user = 0;
+  else $type_user = 1; 
+}
+
 // Crea un array con los nuevos datos del usuario
 $nuevosDatos = [
   'id' => $id,
@@ -46,6 +54,7 @@ $nuevosDatos = [
   'dni' => $dni,
   'email' => $email,
   'phone_number' => $phone,
+  'type_user' => $type_user
 ];
 
 // Actualiza los datos del usuario en la base de datos

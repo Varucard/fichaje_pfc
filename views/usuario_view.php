@@ -12,7 +12,7 @@
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
     <h1 style="padding-right: 40px;" >Detalle del <?php echo $usuario['type_user'] == 1 ? 'Profesor' : 'Cliente'; ?></h1>
-    <button onclick="window.location.href='../controllers/lista_clientes_controller.php'">
+    <button onclick="window.location.href='../controllers/lista_<?php echo $usuario['type_user'] == 1 ? 'profesores' : 'clientes'; ?>_controller.php'">
       <i style="padding-right: 10px; padding-top: 6px" class="fas fa-undo-alt"></i>
       Volver
     </button>
@@ -38,6 +38,8 @@
       <form id="form-datos-usuario" action="../controllers/actualizar_usuarios_controller.php" method="post" class="form-container">
         <input type="hidden" id="id" name="id" value="<?php echo htmlspecialchars($usuario['id_user']); ?>">
 
+        <input type="hidden" id="type_user" name="type_user" value="<?php echo htmlspecialchars($usuario['type_user']); ?>">
+
         <div class="form-group">
           <label for="rfid">N° de llavero:</label>
           <input type="text" id="rfid" name="rfid" value="<?php echo htmlspecialchars($usuario['rfid']); ?>">
@@ -49,10 +51,24 @@
           <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($usuario['user_name']); ?>">
 
           <?php if ($usuario['asset'] == 1): ?>
+            <div style="padding-top: 15px; padding-bottom: 15px;" class="exceptuado">
+              <label for="profesor"><?php echo $usuario['type_user'] != 1 ? '¿Profesor?' : '¿Cliente?'; ?></label>
+              <input type="checkbox" id="cambioTipoUsuario" name="cambioTipoUsuario-" value="TRUE">
+            </div>
+          <?php endif; ?>
+
+          <?php if ($usuario['asset'] == 1): ?>
             <button type="submit">
               <i class="fas fa-sync-alt"></i>
               Actualizar <?php echo $usuario['type_user'] == 1 ? 'Profesor' : 'Cliente'; ?>
             </button>
+          <?php endif; ?>
+
+          <?php if ($usuario['type_user'] == 1): ?>
+            <div class="botonera-1">
+              <i class="fas fa-chalkboard-teacher"></i>
+              <button>Liquidar</button>
+            </div>
           <?php endif; ?>
         </div>
 

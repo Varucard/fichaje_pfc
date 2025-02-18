@@ -1,0 +1,19 @@
+PFC NOTAS
+
+Actualizar Usuario:
+- Validación al momento de cambiar un profesor por cliente:
+	- Si esta matriculado como profesor en alguna clase debo eliminar su matriculación de la misma.
+- Validación al momento de cambiar un alumno por cliente:
+	- Si esta matriculado como alumno en alguna clase debo eliminar su matriculación de la misma.
+
+Vista de Usuario:
+- Un listado de las clases donde esta matriculado el profesor.
+	- Dentro del listado pueden eliminarse las matriculaciones.
+	- Dentro del listado se puede redirigir a clases donde este matriculado.
+- Un listado de las clases donde esta matriculado el alumno.
+	- Dentro del listado pueden eliminarse las matriculaciones.
+	- Dentro del listado se puede redirigir a clases donde este matriculado.
+
+Deuda:
+
+Liquidar:
