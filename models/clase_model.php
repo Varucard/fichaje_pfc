@@ -11,6 +11,7 @@ class Clase {
     $this->pdo = $this->database->getConnection();
   }  
 
+  // Crea una clase
   public function createClase($data) {
     try {
       // Preparar la consulta SQL de inserción
@@ -24,12 +25,12 @@ class Clase {
       // Ejecutar la consulta
       return $stmt->execute();
     } catch (PDOException $e) {
-      // Manejar cualquier excepción de PDO
-      echo 'Error: ' . $e->getMessage();
+      // echo 'Error: ' . $e->getMessage();
       return false;
     }
   }
 
+  // Actualiza una clase
   public function updateClase($data) {
     try {
       $stmt = $this->pdo->prepare("UPDATE classes SET name_class = :name_class, price_class = :price_class WHERE id_class = :id_class");
@@ -52,12 +53,12 @@ class Clase {
       $stmt->execute();
       return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
+      // echo 'Error: ' . $e->getMessage();
       return [];
     }
   }
 
-  // Obtener una clase por su nombre
+  // Obtener clases por su nombre
   public function getClaseByNameClase($nameClase) {
     try {
       $sql = 'SELECT * FROM classes WHERE name_class = :name_class';
@@ -66,8 +67,8 @@ class Clase {
       $stmt->execute();
       return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
-      return null;
+      // echo 'Error: ' . $e->getMessage();
+      return false;
     }
   }
 
@@ -80,8 +81,8 @@ class Clase {
       $stmt->execute();
       return $stmt->fetch(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
-      return null;
+      // echo 'Error: ' . $e->getMessage();
+      return false;
     }
   }
 
@@ -93,7 +94,7 @@ class Clase {
       $stmt->bindParam(':id_class', $id, PDO::PARAM_INT);
       return $stmt->execute();
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
+      // echo 'Error: ' . $e->getMessage();
       return false;
     }
   }

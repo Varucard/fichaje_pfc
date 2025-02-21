@@ -11,6 +11,7 @@ class User {
     $this->pdo = $this->database->getConnection();
   }
 
+  // Trae un usuario
   public function getUserByID(string $id_user) {
     try {
       // Preparar la consulta SQL
@@ -25,6 +26,7 @@ class User {
     }
   }
 
+  // Trae un usuario
   public function getUserByDNI(string $dni) {
     try {
       // Preparar la consulta SQL
@@ -55,6 +57,7 @@ class User {
     }
   }
 
+  // Trae un usuario
   public function getUserByName(string $name) {
     try {
       $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `user_name` LIKE :name");
@@ -71,6 +74,7 @@ class User {
     }
   }
 
+  // Trae todos los usuarios sin discriminación de tipo
   public function getUsers() {
     try {
       // Preparar la consulta SQL
@@ -85,6 +89,7 @@ class User {
     }
   }
 
+  // Registra un nuevo Usuario
   public function cargarUsuario(array $user) {
     $rfid = $user[0];
     $dni = $user[1];
@@ -118,6 +123,7 @@ class User {
     }
   }
 
+  // Actualiza un Usuario
   public function actualizarUsuario($datos) {
     try {
         $stmt = $this->pdo->prepare("UPDATE users SET user_name = :name, user_surname = :surname, birth_day = :birth_day, rfid = :rfid, dni = :dni, email = :email, phone_number = :phone, type_user = :type_user WHERE id_user = :id");
@@ -138,6 +144,7 @@ class User {
     }
   }
 
+  // Elimmina el llavero del usuario Alumno
   public function desetearRFID($dni) {
     try {
       $stmt = $this->pdo->prepare("UPDATE users SET rfid = 'SIN LLAVERO' WHERE dni = :dni");
@@ -149,6 +156,7 @@ class User {
     }
   }
 
+  // Reactiva usuarios
   public function activarUsuario($dni) {
     try {
       $stmt = $this->pdo->prepare("UPDATE users SET asset = 1 WHERE dni = :dni");
@@ -160,6 +168,7 @@ class User {
     }
   }
 
+  // Desactiva usuarios
   public function desactivarUsuario($dni) {
     try {
       $stmt = $this->pdo->prepare("UPDATE users SET asset = 0 WHERE dni = :dni");
@@ -171,6 +180,7 @@ class User {
     }
   }
 
+  // Trae usuarios que cumplan años
   public function getUsersFestejados($date) {
     try {
         // Preparar la consulta SQL para obtener usuarios con cumpleaños en la fecha dada (mes y día)
@@ -195,6 +205,7 @@ class User {
     }
   }
 
+  // Inicio de sesión
   public function login($dni, $password) {
     try {
       // Preparar la consulta SQL
@@ -226,11 +237,12 @@ class User {
       }
     } catch (PDOException $e) {
       // Manejar cualquier excepción de PDO
-      echo 'Error: ' . $e->getMessage();
+      // echo 'Error: ' . $e->getMessage();
       return false;
     }
   }
 
+  // Trae usuario según su rol
   public function getUsersByRole($type_user) {
     try {
       // Preparar la consulta SQL para seleccionar usuarios por rol
@@ -248,7 +260,7 @@ class User {
 
     } catch (PDOException $e) {
       // Manejar cualquier excepción de PDO
-      echo 'Error: ' . $e->getMessage();
+      // echo 'Error: ' . $e->getMessage();
       return false;
     }
 }

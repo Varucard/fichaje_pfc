@@ -53,7 +53,7 @@
           <?php if ($usuario['asset'] == 1): ?>
             <div style="padding-top: 15px; padding-bottom: 15px;" class="exceptuado">
               <label for="profesor"><?php echo $usuario['type_user'] != 1 ? '¿Profesor?' : '¿Cliente?'; ?></label>
-              <input type="checkbox" id="cambioTipoUsuario" name="cambioTipoUsuario-" value="TRUE">
+              <input type="checkbox" id="cambioTipoUsuario" name="cambioTipoUsuario" value="TRUE">
             </div>
           <?php endif; ?>
 
@@ -91,7 +91,7 @@
 
       <?php if ($usuario['type_user'] != 1): ?>
         <hr>
-        <h2>Historial de Pagos</h2>
+        <h2>Pagos</h2>
         <?php if ($usuario['asset'] == 1): ?>
           <button onclick="window.location.href='../controllers/nuevo_pago_controller.php?id_user=<?php echo $usuario['id_user']; ?>'" id="cargar_pago">
             <i style="padding-right: 10px;" class="fas fa-wallet"></i>
@@ -107,28 +107,70 @@
           <i style="padding-right: 10px;" class="fas fa-home"></i>
           Inicio
         </button>
-        <table id="pagos-table">
-          <thead>
-            <tr>
-              <th>Fecha de Pago</th>
-              <th>Fecha de Renovación</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($pago as $p): ?>
-              <tr>
-                <td><?php echo date('d-m-Y', strtotime($p['discharge_date'])); ?></td>
-                <td><?php echo date('d-m-Y', strtotime($p['date_of_renovation'])); ?></td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
+
+        <!-- La tabla de pagos solo se ve si tiene pagos -->
+        <?php if (!empty($pago)): ?>
+          <hr>
+          <h2>Historial de Pagos</h2>
+          <table id="pagos-table">
+              <thead>
+                  <tr>
+                      <th>Fecha de Pago</th>
+                      <th>Fecha de Renovación</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <?php foreach ($pago as $p): ?>
+                      <tr>
+                          <td><?php echo date('d-m-Y', strtotime($p['discharge_date'])); ?></td>
+                          <td><?php echo date('d-m-Y', strtotime($p['date_of_renovation'])); ?></td>
+                      </tr>
+                  <?php endforeach; ?>
+              </tbody>
+          </table>
+        <?php endif; ?>
+        <!-- fin tabla pagos -->
+
       <?php endif; ?>
 
     <?php else: ?>
       <p>No se encontraron datos para este <?php echo $usuario['type_user'] == 1 ? 'Profesor' : 'Cliente'; ?>.</p>
     <?php endif; ?>
   </div>
+
+  <?php if (!empty($clases)): ?>
+  <div>
+    <br>
+    <hr>
+    <h2>Listado de clases</h2>
+    <table >
+      <thead>
+          <tr>
+              <th>Clase</th>
+              <th>Acciones</th>
+          </tr>
+      </thead>
+      <tbody>
+          <?php foreach ($clases as $c): ?>
+              <tr>
+                  <td><?php echo $c->name_class; ?></td>
+                  <td>
+                    <button class="button_small" onclick="window.location.href='../controllers/detalle_clase_controller.php?id_class=<?php echo urlencode($c->id_class); ?>'">
+                      <i class="fas fa-user"></i>
+                      Ver +
+                    </button>
+                    <button style="color: red" class="button_small"
+                      onclick="window.location.href='../controllers/<?php echo $controlador; ?>?<?php echo $tipo_usuario; ?>=<?php echo urlencode($usuario['id_user']); ?>&id_clase=<?php echo urlencode($c->id_class); ?>'">
+                      <i style="color: red" class="fas fa-trash"></i>
+                      Eliminar de la clase
+                    </button>
+                  </td>
+              </tr>
+          <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+  <?php endif; ?>
 
   <script src="../public/js/pago_manual.js"></script>
   <script src="../public/js/icons.js"></script>

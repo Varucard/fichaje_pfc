@@ -1,5 +1,6 @@
 <?php
 
+// TODO: Revisar, no se que hace este modelo aca
 require_once 'conexion_model.php';
 
 class ProfesorClase {

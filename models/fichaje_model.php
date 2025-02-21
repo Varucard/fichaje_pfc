@@ -11,6 +11,7 @@ class Fichajes {
     $this->pdo = $this->database->getConnection();
   }
 
+  // Trae los ultimos fichaje de usuarios Alumnos
   public function getUltimosFichajes($limite = 10) {
     try {
       // Consulta para obtener los últimos fichajes
@@ -32,6 +33,7 @@ class Fichajes {
     }
   }
 
+  // Registra la fichada de Usuarios
   public function guardarFichada($id_user, $addmission_date) {
     try {      
       // Consulta SQL para insertar la fichada en la tabla incomes
@@ -50,10 +52,10 @@ class Fichajes {
     } catch (PDOException $e) {
       // $error = $e->getMessage();
       return false;
-
     }
   }
 
+  // Trae las ultimos fichajes de un usuario Alumno
   public function getUltimosFichajesByUser($busqueda) {
     try {
       // Consulta para buscar fichajes basados en el término de búsqueda

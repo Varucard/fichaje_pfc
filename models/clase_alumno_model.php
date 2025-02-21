@@ -11,6 +11,7 @@ class ClaseAlumno {
     $this->pdo = $this->database->getConnection();
   }  
 
+  // Crea una matriculación de clase de un Usuario Alumno
   public function createClaseAlumno($id_user, $id_class) {
     try {
       // Preparar la consulta SQL de inserción
@@ -24,12 +25,12 @@ class ClaseAlumno {
       // Ejecutar la consulta
       return $stmt->execute();
     } catch (PDOException $e) {
-      // Manejar cualquier excepción de PDO
       // return 'Error: ' . $e->getMessage();
       return false;
     }
   }
 
+  // Trae masivamenta las matriculaciones en clases de usuarios Alumnos
   public function getClasesAlumno() {
     try {
       $sql = 'SELECT * FROM user_class';
@@ -37,24 +38,26 @@ class ClaseAlumno {
       $stmt->execute();
       return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
+      // echo 'Error: ' . $e->getMessage();
       return [];
     }
   }
 
+  // Trae masivamenta las matriculaciones en clases de un usuario Alumno por su ID
   public function getClaseAlumnoByIdAlumno($idUser) {
     try {
       $sql = 'SELECT * FROM user_class WHERE id_user = :id_user';
       $stmt = $this->pdo->prepare($sql);
       $stmt->bindParam(':id_user', $idUser, PDO::PARAM_STR);
       $stmt->execute();
-      return $stmt->fetch(PDO::FETCH_OBJ);
+      return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
-      return null;
+      // echo 'Error: ' . $e->getMessage();
+      return false;
     }
   }
 
+  // Trae masivamenta las matriculaciones en clases de un usuario Alumno por el ID de la clase
   public function getClaseAlumnoByIdClass($idClass) {
     try {
       $sql = 'SELECT * FROM user_class WHERE id_class = :id_class';
@@ -63,12 +66,13 @@ class ClaseAlumno {
       $stmt->execute();
       return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
-      return null;
+      // echo 'Error: ' . $e->getMessage();
+      return false;
     }
   }
 
-  public function deleteClaseAlumnoById($id_user, $id_class) {
+  // Elimina una matriculacion en clases de un usuario Alumno
+  public function deleteClaseAlumnoByIds($id_user, $id_class) {
     try {
       $sql = 'DELETE FROM user_class WHERE id_user = :id_user AND id_class = :id_class';
       $stmt = $this->pdo->prepare($sql);

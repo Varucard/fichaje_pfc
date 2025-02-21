@@ -37,8 +37,8 @@ $usuario = $user->getUserByID($id_user);
 
 // Verificar si se proporcionó un ID de usuario y si se pudo registrar el pago
 if ($id_user && $usuario && nuevo_pago($id_user)) {
-  echo "<script>alert('Pago registrado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario[0]['dni']) . "';</script>";
+  echo "<script>alert('Pago registrado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
 } else {
-  echo "<script>alert('Ocurrió un error al registrar el pago'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario[0]['dni']) . "';</script>";
+  echo "<script>alert('Ocurrió un error al registrar el pago'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
 }
 ?>

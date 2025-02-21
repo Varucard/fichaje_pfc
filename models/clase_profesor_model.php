@@ -11,6 +11,7 @@ class ClaseProfesor {
     $this->pdo = $this->database->getConnection();
   }  
 
+  // Crea una matriculación de un usuari Profesor
   public function createClaseProfesor($id_user, $id_class) {
     try {
       // Preparar la consulta SQL de inserción
@@ -30,6 +31,7 @@ class ClaseProfesor {
     }
   }
 
+  // Trae las matriculaciones de clases de Usuarios Profesor
   public function getClasesProfesor() {
     try {
       $sql = 'SELECT * FROM teacher_class';
@@ -37,24 +39,26 @@ class ClaseProfesor {
       $stmt->execute();
       return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
+      // echo 'Error: ' . $e->getMessage();
       return [];
     }
   }
 
+  // Trae una matriculación de un usuario Profesor
   public function getClaseProfesorByIdProfesor($idUser) {
     try {
       $sql = 'SELECT * FROM teacher_class WHERE id_user = :id_user';
       $stmt = $this->pdo->prepare($sql);
       $stmt->bindParam(':id_user', $idUser, PDO::PARAM_STR);
       $stmt->execute();
-      return $stmt->fetch(PDO::FETCH_OBJ);
+      return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
       // echo 'Error: ' . $e->getMessage();
       return false;
     }
   }
 
+  // Trae una matriculación de un usuario Profesor por el ID de la clase
   public function getClaseProfesorByIdClass($idClass) {
     try {
       $sql = 'SELECT * FROM teacher_class WHERE id_class = :id_class';
@@ -63,11 +67,12 @@ class ClaseProfesor {
       $stmt->execute();
       return $stmt->fetchAll(PDO::FETCH_OBJ);
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
+      // echo 'Error: ' . $e->getMessage();
       return false;
     }
   }
 
+  // Elimina una matriculación de un usuario Profesor
   public function deleteClaseProfesorById($id_user, $id_class) {
     try {
       $sql = 'DELETE FROM teacher_class WHERE id_user = :id_user AND id_class = :id_class';
@@ -76,7 +81,7 @@ class ClaseProfesor {
       $stmt->bindParam(':id_class', $id_class, PDO::PARAM_INT);
       return $stmt->execute();
     } catch (PDOException $e) {
-      echo 'Error: ' . $e->getMessage();
+      // echo 'Error: ' . $e->getMessage();
       return false;
     }
   }
