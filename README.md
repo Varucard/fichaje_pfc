@@ -41,6 +41,3 @@ El sistema está diseñado para funcionar con un **lector RFID basado en Arduino
 
 ## 🔓 Licencia  
 Este proyecto es **de código abierto** y utiliza herramientas de la comunidad. Puedes modificarlo y distribuirlo libremente bajo la licencia **MIT**.  
-
----
-
