@@ -20,7 +20,7 @@
 <body>
   <div class="cabecera">
     <img src="../public/img/logo.png" alt="logo.png" width="200" height="200">
-    <h1 style="margin-left: 60px; text-align: center;">Fight Club Palillo</h1>
+    <h1 style="margin-left: 60px; text-align: center;">Palillo Fight Club</h1>
   </div>
   <h2 style="text-align: center;">Bienvenido Administrador!</h2>
 

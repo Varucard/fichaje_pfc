@@ -15,3 +15,8 @@ NOTAS:
 - Los profesores si se pueden registrar en mas de una clase mientras esta no se repita, lo mismo con el Usuario.
 
 - No se puede eliminar un alumno que tenga deuda. Ya sea de una clase o del sistema.
+
+
+- Terminada vista de busqueda de clases.
+- Corrección error con los profesores al crear la clase.
+- Los profesores se pueden anotar en mas de una clase.

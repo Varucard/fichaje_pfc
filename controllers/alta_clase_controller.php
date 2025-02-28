@@ -33,29 +33,29 @@ if ($clase->getClaseByNameClase($nombreClase)) {
 $nuevaClase = $clase->createClase(['name_class' => $nombreClase, 'price_class' => $precio]);
 
 if (!$nuevaClase) {
-  echo "<script>alert('Ocurrió un error al guardar la clase'); window.location.href = '../controllers/cargar_clase_controller.php';</script>";
+  echo "<script>alert('Ocurrió un error al crear la clase'); window.location.href = '../controllers/cargar_clase_controller.php';</script>";
   exit;
 }
 
 // Asignar profesores a la clase, si hay profesores seleccionados
 $erroresProfesores = [];
 if (!empty($profesores)) {
-  $nuevaClaseId = $clase->getClaseByNameClase($nombreClase)->id_class;
+  $nuevaClase = $clase->getClaseByNameClase($nombreClase);
 
   foreach ($profesores as $profesorId) {
     $profesor = $user->getUserByID($profesorId);
 
-    if ($profesor[0]['type_user'] != 3) {
+    if ($profesor['type_user'] != 1) {
       $erroresProfesores[] = "El usuario con ID $profesorId no es un profesor.";
     } else {
-      $claseProfesor->createClaseProfesor(['id_class' => $nuevaClaseId, 'id_user' => $profesor[0]['id_user']]);
+      $claseProfesor->createClaseProfesor($nuevaClase->id_class, $profesor->id_user);
     }
   }
 }
 
 // Mostrar mensaje final al usuario
 if (empty($erroresProfesores)) {
-  echo "<script>alert('Clase creada con los profesores solicitados'); window.location.href = '../controllers/detalle_clase_controller.php?id_class=" . htmlspecialchars($nuevaClaseId) . "';</script>";
+  echo "<script>alert('Clase creada con los profesores solicitados'); window.location.href = '../controllers/detalle_clase_controller.php?id_class=" . htmlspecialchars($nuevaClase->id_class) . "';</script>";
 } else {
   echo "<script>alert('Clase creada, pero algunos profesores no fueron asignados: " . implode(', ', $erroresProfesores) . "'); window.location.href = '../controllers/cargar_clase_controller.php';</script>";
 }

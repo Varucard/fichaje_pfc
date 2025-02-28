@@ -49,7 +49,7 @@ class User {
       $stmt->execute();
       
       // Obtener el Usuario
-      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+      return $stmt->fetch(PDO::FETCH_ASSOC);
         
     } catch (PDOException $e) {
       // echo "Error en la consulta: " . $e->getMessage();

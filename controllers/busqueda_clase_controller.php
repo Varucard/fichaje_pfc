@@ -12,7 +12,7 @@ if (isset($_GET['busqueda'])) {
   $claseModel = new Clase();
   $clases = [];
   
-  $clases = $claseModel->getClaseByNameClase($busqueda);
+  $clases = $claseModel->getClasesByNameClase($busqueda);
   
   if (empty($resultadosBusqueda)) {
     $_SESSION['resultados_busqueda'] = []; 
@@ -20,10 +20,6 @@ if (isset($_GET['busqueda'])) {
     $_SESSION['resultados_busqueda'] = $resultadosBusqueda;
   }
 
-  include '../views/lista_clases_view.php';
-  exit;
-
-} else {
-  redirect('views/dashboard_view.php'); 
+  include '../views/busqueda_clases_view.php';
   exit;
 }
