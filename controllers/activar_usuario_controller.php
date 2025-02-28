@@ -1,6 +1,10 @@
 <?php
 session_start();
+
 require_once '../models/user_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
 
 $user = new User();
 
@@ -23,7 +27,7 @@ if ($user_aux) {
     }
   }
 
-    // Activar el usuario
+  // Activar el usuario
   if ($user->activarUsuario($dni)) {
     // Actualizar los resultados de la sesión
     if (isset($_SESSION['resultados_busqueda'])) {
@@ -34,11 +38,11 @@ if ($user_aux) {
         }
       }
     }
-    echo "<script>alert('Usuario reactivado exitosamente'); window.location.href = '../views/usuario_view.php?dni=$dni';</script>";
+    echo "<script>alert('Usuario reactivado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
   } else {
-    echo "<script>alert('Ocurrió un error al reactivar el usuario'); window.location.href = '../views/usuario_view.php?dni=$dni';</script>";
+    echo "<script>alert('Ocurrió un error al reactivar el usuario'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
   }
 } else {
-  echo "<script>alert('Usuario no encontrado'); window.location.href = '../views/usuario_view.php';</script>";
+  echo "<script>alert('Usuario no encontrado'); window.location.href = '../controllers/detalle_usuario_controller.php';</script>";
 }
 ?>

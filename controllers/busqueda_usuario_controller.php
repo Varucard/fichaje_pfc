@@ -1,37 +1,39 @@
 <?php
+session_start();
+
 require_once '../models/user_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
 
 if (isset($_GET['busqueda']) && isset($_GET['tipo_busqueda'])) {
-  $busqueda = $_GET['busqueda'];
-  $tipoBusqueda = $_GET['tipo_busqueda'];
+  $busqueda = trim($_GET['busqueda']);
+  $tipoBusqueda = trim($_GET['tipo_busqueda']);
 
   $userModel = new User();
-  $resultados = [];
+  $resultadosBusqueda = [];
 
   switch ($tipoBusqueda) {
     case 'dni':
-      $resultados = $userModel->getUserByDni($busqueda);
+      array_push($resultadosBusqueda, $userModel->getUserByDni($busqueda));
       break;
     case 'name':
-      $resultados = $userModel->getUserByName($busqueda);
+      array_push($resultadosBusqueda, $userModel->getUserByName($busqueda));
       break;
     default:
-      echo "<script>alert('Ocurrio un error, por favor, probar nuevamente'); window.location.href = '../index.php';</script>";
-      exit; 
+      redirect('../views/dashboard_view.php');
+      exit;
   }
 
-  // Verifica si se encontraron resultados
-  if (empty($resultados)) {
-    echo "<script>alert('No se encontraron resultados'); window.location.href = '../index.php';</script>";
-    exit;
+  if (empty($resultadosBusqueda)) {
+    $_SESSION['resultados_busqueda'] = []; 
   } else {
-    // Almacena los resultados en la sesión y redirige a la vista de búsqueda
-    session_start();
-    $_SESSION['resultados_busqueda'] = $resultados;
-    header('Location: ../views/busqueda_usuario_view.php');
-    exit;
+    $_SESSION['resultados_busqueda'] = $resultadosBusqueda;
   }
+
+  header('Location: ../views/busqueda_usuario_view.php');
+  exit;
 } else {
-  echo "<script>alert('Ocurrio un error, por favor, probar nuevamente'); window.location.href = '../index.php';</script>";
-  exit; 
+  redirect('views/dashboard_view.php'); 
+  exit;
 }

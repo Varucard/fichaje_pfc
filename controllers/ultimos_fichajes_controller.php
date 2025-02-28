@@ -1,6 +1,11 @@
 <?php
+session_start();
+
 require_once '../models/fichaje_model.php';
 require_once '../models/pago_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
 
 $fichajesModel = new Fichajes();
 $pagosModel = new Pagos();

@@ -11,11 +11,12 @@ class Fichajes {
     $this->pdo = $this->database->getConnection();
   }
 
+  // Trae los ultimos fichaje de usuarios Alumnos
   public function getUltimosFichajes($limite = 10) {
     try {
       // Consulta para obtener los últimos fichajes
       $stmt = $this->pdo->prepare("
-        SELECT i.*, u.rfid, u.dni, CONCAT(u.name, ' ', u.surname) AS alumno
+        SELECT i.*, u.rfid, u.dni, CONCAT(u.user_name, ' ', u.user_surname) AS alumno
         FROM incomes i
         JOIN users u ON i.id_user = u.id_user
         ORDER BY i.addmission_date DESC
@@ -32,6 +33,7 @@ class Fichajes {
     }
   }
 
+  // Registra la fichada de Usuarios
   public function guardarFichada($id_user, $addmission_date) {
     try {      
       // Consulta SQL para insertar la fichada en la tabla incomes
@@ -50,18 +52,18 @@ class Fichajes {
     } catch (PDOException $e) {
       // $error = $e->getMessage();
       return false;
-
     }
   }
 
+  // Trae las ultimos fichajes de un usuario Alumno
   public function getUltimosFichajesByUser($busqueda) {
     try {
       // Consulta para buscar fichajes basados en el término de búsqueda
       $stmt = $this->pdo->prepare("
-        SELECT i.*, u.rfid, u.dni, CONCAT(u.name, ' ', u.surname) AS alumno
+        SELECT i.*, u.rfid, u.dni, CONCAT(u.user_name, ' ', u.user_surname) AS alumno
         FROM incomes i
         JOIN users u ON i.id_user = u.id_user
-        WHERE u.name LIKE :busqueda OR u.surname LIKE :busqueda OR u.dni LIKE :busqueda OR u.rfid LIKE :busqueda
+        WHERE u.user_name LIKE :busqueda OR u.user_surname LIKE :busqueda OR u.dni LIKE :busqueda OR u.rfid LIKE :busqueda
         ORDER BY i.addmission_date DESC
       ");
       $stmt->bindValue(':busqueda', '%' . $busqueda . '%', PDO::PARAM_STR);
@@ -71,7 +73,7 @@ class Fichajes {
 
     } catch (PDOException $e) {
       // echo "Error en la consulta: " . $e->getMessage();
-      return false;
+      return [];
     }
   }
 }

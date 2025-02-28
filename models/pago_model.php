@@ -11,6 +11,7 @@ class Pagos {
     $this->pdo = $this->database->getConnection();
   }
 
+  // Trae el ultimo pago registrado por un usuario Alumno
   public function getPagoActualByUser(int $id_user) {
     try {
       $stmt = $this->pdo->prepare("SELECT * FROM `payments` WHERE `id_user` = :id_user ORDER BY `discharge_date` DESC LIMIT 1");
@@ -25,6 +26,7 @@ class Pagos {
     }
   }
 
+  // Trae los pagos de un usuario Alumno
   public function getPagosByUser($id_user) {
     try {
       // Preparar la consulta SQL
@@ -47,6 +49,7 @@ class Pagos {
     }
   }
 
+  // Registra el pago de un usuario Alumno
   public function cargarPago(array $payment) {
 
     $id_user = $payment[0];
@@ -71,6 +74,7 @@ class Pagos {
     }
   }
 
+  // Trae la ultima fecha de pago de los pagos de un usuario Alumno
   public function getUltimaFechaPago($id_user) {
     try {
       $stmt = $this->pdo->prepare("

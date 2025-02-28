@@ -4,7 +4,7 @@ document.getElementById('busqueda_fichaje').addEventListener('keyup', function(e
 
     if (!(/^[A-Za-z\s]+$/.test(busqueda) || (/^\d{7,8}$/.test(busqueda)))) {
       alert('Por favor, no ingrese valores erroneos');
-      exit();
+      return;
     } 
 
     window.location.href = `../controllers/busqueda_fichaje_controller.php?busqueda=${encodeURIComponent(busqueda)}`;

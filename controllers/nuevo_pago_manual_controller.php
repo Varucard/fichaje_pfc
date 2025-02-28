@@ -1,7 +1,11 @@
 <?php
 session_start();
+
 require_once '../models/pago_model.php';
 require_once '../models/user_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
 
 $user = new User();
 
@@ -32,13 +36,20 @@ function nuevo_pago_manual($id_user, $fecha_pago_manual) {
 }
 
 $id_user = isset($_GET['id_user']) ? $_GET['id_user'] : '';
+$dni_user = isset($_GET['dni']) ? $_GET['dni'] : '';
 $fecha_pago_manual = isset($_GET['fecha_pago_manual']) ? $_GET['fecha_pago_manual'] : '';
 
 $usuario = $user->getUserByID($id_user);
 
-if ($id_user && $fecha_pago_manual && nuevo_pago_manual($id_user, $fecha_pago_manual)) {
-  echo "<script>alert('Pago registrado exitosamente'); window.location.href = '../views/usuario_view.php?dni=" . urlencode($usuario[0]['dni']) . "';</script>";
+// Si el usuario no aparece con id lo busco con el DNI, una seguridad para user el mismo controladora en diferentes casos
+if (!$usuario) {
+  $usuario = $user->getUserByDNI($dni_user);
+  $id_user = $usuario[0]['id_user'];
+}
+
+if ($id_user && $fecha_pago_manual && $usuario && nuevo_pago_manual($id_user, $fecha_pago_manual)) {
+  echo "<script>alert('Pago registrado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario[0]['dni']) . "';</script>";
 } else {
-  echo "<script>alert('Ocurrió un error al registrar el pago'); window.location.href = '../views/usuario_view.php?dni=" . urlencode($usuario[0]['dni']) . "';</script>";
+  echo "<script>alert('Ocurrió un error al registrar el pago'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario[0]['dni']) . "';</script>";
 }
 ?>

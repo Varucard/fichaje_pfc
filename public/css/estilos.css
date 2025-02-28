@@ -1,0 +1,274 @@
+/* Estilos Cabecera*/
+.cabecera {
+  display: flex;
+  align-items: center;
+  padding-bottom: 30px;
+}  
+.cabecera img {
+  margin-right: 5px;
+}
+.cabecera input {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.cabecera button {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+/* Estilos para la cabecera de la tabla de fichajes */
+.cabecera_tabla {
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+}  
+.cabecera_tabla button {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+/* Estilos De la Tabla Fichajes*/
+.tabla th, .tabla td{
+  padding-bottom: 100px;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+.tabla th {
+  background-color: black;
+}
+.diminuto {
+  font-size: 0.9em;
+}
+.diminuto {
+  padding: 2px 5px;
+}
+
+/* Estilos Alta Fomulario*/
+.form-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+.form-group {
+  flex: 1 1 30%; 
+  padding: 10px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+@media (max-width: 768px) {
+  .form-group {
+      flex: 1 1 45%;
+  }
+}
+@media (max-width: 480px) {
+  .form-group {
+      flex: 1 1 100%;
+  }
+}
+
+/* Estilos vista Busqueda Usuario*/
+.button_small {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+/* Ajustar el tamaño del ícono dentro del botón vista Busqueda Usuario*/
+button .fas {
+  font-size: 12px;
+}
+
+/* Estilo por estado de la cuota*/
+.cerca-de-vencer {
+  color: red;
+}
+
+/* Estilos para la tabla de Pagos vista de Usuarios */
+.detalle-usuario table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.detalle-usuario th, .detalle-usuario td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+.detalle-usuario th {
+  background-color: black;
+}
+
+/* Estilo para cuando exceptuar algo */
+.exceptuado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: red;
+  padding: 0px;
+  width: 50%;
+}
+
+/* Estilos para el Login*/
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 8px;
+  background-color: #3e4a61;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  height: 80;
+  margin: 0 auto;
+}
+
+.login-container img {
+  width: 200px;
+  margin-bottom: 1rem;
+}
+
+.login-container h1 {
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.login-container form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+}
+
+.login-container form div {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.login-container form div label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.login-container form div input {
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.login-container button:hover {
+  background-color: #4c56da;
+}
+
+.login-container p {
+  color: red;
+}
+
+/* Estilo para inputs con icono de Lupa*/
+.search-container {
+  position: relative;
+  display: inline-block;
+  left: 2.5%;
+}
+.search-container input {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  padding-left: 50px; /* Espacio para el ícono */
+}
+.search-container i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888; /* Color del ícono */
+}
+
+/* Estilos Botones Dashboard*/
+.botonera-1 {
+  position: relative;
+  display: inline-block;
+}
+.botonera-1 button {
+  margin-bottom: 50px;
+  padding-left: 50px;
+}
+.botonera-1 i {
+  position: absolute;
+  left: 10px;
+  top: 25%;
+  transform: translateY(-50%);
+  color: #888;
+}
+.botonera-2 {
+  position: relative;
+  display: inline-block;
+  left: 25%;
+}
+.botonera-2 button {
+  padding-left: 50px;
+}
+.botonera-2 i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+/* Estilos para los datos de la clase */
+.detalle-clase table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.detalle-clase th, .detalle-clase td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+.detalle-clase th {
+  background-color: black;
+}
+
+/* Contenedor de las tablas */
+.tabla-container {
+  display: flex;
+  justify-content: space-between; /* Para separar las tablas */
+  gap: 20px; /* Espacio entre las tablas */
+  margin-top: 20px;
+}
+
+/* Ajusta las tablas */
+/* Cada tabla ocupa aproximadamente la mitad del contenedor */
+
+/* .tabla {
+  width: 48%; 
+  color: white;
+} */
+
+/* Estilos generales para las tablas */
+/* .tabla table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th, .tabla td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.tabla th {
+  background-color: black;
+  color: white;
+} */
