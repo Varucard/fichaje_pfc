@@ -1,22 +1,37 @@
-PFC NOTAS
+PFC FICHAJES NOTAS
 
 Vista de Usuario:
 Mejoras:
 - Agregar un botón con el cual poder matricular los Usuarios en una clase.
 
-Deuda:
+Vista creación de clase:
+Mejoras:
+- Poder agregar Usuarios.
 
-Liquidar:
+Vista busqueda de clases:
+- Terminar vista de busqueda de clases.
+
+Vista de Registro Usuario:
+Mejoras:
+- Poder solo marcar una casilla ya que el profesor no paga clases.
+
+Pagos Alumnos:
+¿Es posible adelantar un pago? ¿Como maneja Palillo el tema de adelanto de pago de meses (Consultar a Palillo).
+Mejoras:
+- Que el usuario no puede tener 2 pagos en una misma clase en un margen de tiempo. (Consultar tiempo Palillo).
+Corregir:
+
+Deuda Alumnos:
+
+Liquidación profesores:
 
 NOTAS:
-- No puedo eliminar una clase con alumnos.
-	- Capaz una opción de eliminar todo de una?.
+- No se puede desactivar un alumno que tenga deuda. Ya sea de una clase o del sistema.
+- ¿Aquellos usuarios que tengan deuda (Alumnos) Pueden matricularse en otro lado? (Preguntar a Palillo).
 
-- Los profesores si se pueden registrar en mas de una clase mientras esta no se repita, lo mismo con el Usuario.
+ERRORES GENERALES:
+- Los buscadores por momento como que se tildan.
 
-- No se puede eliminar un alumno que tenga deuda. Ya sea de una clase o del sistema.
-
-
-- Terminada vista de busqueda de clases.
-- Corrección error con los profesores al crear la clase.
-- Los profesores se pueden anotar en mas de una clase.
+MEJORAS SUPER A FUTURO:
+- Al cargar un Email que te llegue un mensaje y que por este medio te pueda llegar información de las clases o algo de ese estilo.
+- Modulo de Stockeo de insumos para venta.

@@ -6,43 +6,37 @@ require_once '../helpers/url_helper.php';
 
 checkSesion();
 
-$user = new User();
+$user_class = new User();
 
 $dni = isset($_GET['dni']) ? $_GET['dni'] : '';
 
-// Verificar si el usuario con el DNI dado existe
-$user_aux = $user->getUserByDNI($dni);
+// Traigo al usuario desactivado
+$user_disabled = $user_class->getUserByDNI($dni);
 
-if ($user_aux) {
-  // Obtener usuarios por el RFID del usuario actual
-  $users_by_rfid = $user->getUserByRFID($user_aux[0]['rfid']);
+// Obtengo si hay, al unico usuario activo que tenga el RFID del usuario desactivado
+$user_by_rfid = $user_class->getUserByRFID($user_disabled['rfid']);
 
-  if ($users_by_rfid) {
-    foreach ($users_by_rfid as $user_by_rfid) {
-      // Si hay otro usuario activo con el mismo RFID y el RFID no es 'SIN LLAVERO', resetear el RFID del usuario actual
-      if ($user_by_rfid['asset'] == 1 && $user_by_rfid['rfid'] != 'SIN LLAVERO') {
-        $user->desetearRFID($user_aux[0]['id_user']);
+if ($user_by_rfid) {
+  // Si hay otro usuario activo con el mismo RFID y el RFID no es 'SIN LLAVERO', resetear el RFID del usuario actual
+  if ($user_by_rfid['asset'] == 1 && $user_by_rfid['rfid'] != 'SIN LLAVERO') {
+    $user_class->desetearRFID($user_disabled['id_user']);
+  }
+}
+
+// Activar el usuario
+if ($user_class->activarUsuario($user_disabled['id_user'])) {
+  // Actualizar los resultados de la sesión
+  if (isset($_SESSION['resultados_busqueda'])) {
+    foreach ($_SESSION['resultados_busqueda'] as &$usuario) {
+      if ($usuario['dni'] == $dni) {
+        $usuario['asset'] = 1;
         break;
       }
     }
   }
-
-  // Activar el usuario
-  if ($user->activarUsuario($dni)) {
-    // Actualizar los resultados de la sesión
-    if (isset($_SESSION['resultados_busqueda'])) {
-      foreach ($_SESSION['resultados_busqueda'] as &$usuario) {
-        if ($usuario['dni'] == $dni) {
-          $usuario['asset'] = 1;
-          break;
-        }
-      }
-    }
-    echo "<script>alert('Usuario reactivado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
-  } else {
-    echo "<script>alert('Ocurrió un error al reactivar el usuario'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
-  }
+  echo "<script>alert('Usuario reactivado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
 } else {
-  echo "<script>alert('Usuario no encontrado'); window.location.href = '../controllers/detalle_usuario_controller.php';</script>";
+  echo "<script>alert('Ocurrió un error al reactivar el usuario'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=$dni';</script>";
 }
+
 ?>

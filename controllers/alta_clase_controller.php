@@ -45,13 +45,15 @@ if (!empty($profesores)) {
   foreach ($profesores as $profesorId) {
     $profesor = $user->getUserByID($profesorId);
 
-    if ($profesor['type_user'] != 1) {
-      $erroresProfesores[] = "El usuario con ID $profesorId no es un profesor.";
+    if ($profesor['type_user'] == 1) {
+      $error = $claseProfesor->createClaseProfesor($profesor['id_user'], $nuevaClase->id_class);
     } else {
-      $claseProfesor->createClaseProfesor($nuevaClase->id_class, $profesor->id_user);
+      $erroresProfesores[] = "El usuario con ID $profesorId no es un profesor.";
     }
   }
 }
+
+// TODO: Agregar Usuarios al momento de crear una clase
 
 // Mostrar mensaje final al usuario
 if (empty($erroresProfesores)) {

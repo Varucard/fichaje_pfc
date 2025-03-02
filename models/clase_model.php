@@ -135,7 +135,7 @@ class Clase {
         // echo 'Error: ' . $e->getMessage(); // Para depuración, si lo necesitas
         return false;
     }
-}
+  }
 
 }
 

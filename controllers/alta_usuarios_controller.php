@@ -10,9 +10,9 @@ checkSesion();
 $user = new User();
 $aux = null;
 
-// Valido que lo indispensable me llegue (N° de Llavero, N° de Documento y nombre)
-if (empty($_POST['rfid']) || empty($_POST['dni']) || empty($_POST['name'])) {
-  echo "<script>alert('Faltan datos N° de Llavero, N° de Documento, Nombre son campos obligatorios'); window.location.href = '../views/cargar_usuario_views.php';</script>";
+// Valido que lo indispensable me llegue (N° de Documento y nombre)
+if (empty($_POST['dni']) || empty($_POST['name'])) {
+  echo "<script>alert('Faltan datos: N° de Documento, Nombre son campos obligatorios'); window.location.href = '../views/cargar_usuario_views.php';</script>";
   exit; 
 } 
 
@@ -52,7 +52,7 @@ $apellidoSinProcesar = isset($_POST['surname']) ? $_POST['surname'] : '';
 $nombreNormalizado = ucwords(strtolower($nombreSinProcesar));
 $apellidoNormalizado = ucwords(strtolower($apellidoSinProcesar));
 
-$tipo_usuario = isset($_POST['profesor']) ? 3 : null; // A menos que se indique que es profesore lo usuarios son clientes
+$tipo_usuario = isset($_POST['profesor']) ? 2 : null; // A menos que se indique que es profesor lo usuarios son clientes siempre
 
 // Obtengo los datos del nuevo usuario
 $nuevoUsuario = [
@@ -79,7 +79,7 @@ if ($user->cargarUsuario($nuevoUsuario)) {
       echo "<script>alert('Cliente cargado exitosamente con Pago'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
       exit; 
     } else {
-      echo "<script>alert('Ocurrio un error con la fecha de pago'); window.location.href = '../views/cargar_usuario_view.php';</script>";
+      echo "<script>alert('Cliente cargado pero ocurrio un error al momento de cargar el pago'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
     }
   } else {
     echo "<script>alert('Cliente cargado exitosamente sin Pago'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";

@@ -30,7 +30,9 @@ class User {
   public function getUserByDNI(string $dni) {
     try {
       // Preparar la consulta SQL
-      $stmt = $this->pdo->query("SELECT * FROM `users` WHERE `dni` = $dni");
+      $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `dni` = :dni");
+      $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
+      $stmt->execute();
   
       // Obtengo el Usuario
       return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -41,10 +43,11 @@ class User {
     }
   }
 
+  // Trae un usuario por RFID que se encuentre activo
   public function getUserByRFID(string $rfid) {
     try {
       // Preparar la consulta SQL
-      $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `rfid` = :rfid");
+      $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `rfid` = :rfid AND `asset` = 1");
       $stmt->bindParam(':rfid', $rfid, PDO::PARAM_STR);
       $stmt->execute();
       
@@ -145,10 +148,10 @@ class User {
   }
 
   // Elimmina el llavero del usuario Alumno
-  public function desetearRFID($dni) {
+  public function desetearRFID($id_user) {
     try {
-      $stmt = $this->pdo->prepare("UPDATE users SET rfid = 'SIN LLAVERO' WHERE dni = :dni");
-      $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
+      $stmt = $this->pdo->prepare("UPDATE users SET rfid = 'SIN LLAVERO' WHERE id_user = :id_user");
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_STR);
       return $stmt->execute();
     } catch (PDOException $e) {
       // echo "Error en la consulta: " . $e->getMessage();
@@ -157,10 +160,10 @@ class User {
   }
 
   // Reactiva usuarios
-  public function activarUsuario($dni) {
+  public function activarUsuario($id_user) {
     try {
-      $stmt = $this->pdo->prepare("UPDATE users SET asset = 1 WHERE dni = :dni");
-      $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
+      $stmt = $this->pdo->prepare("UPDATE users SET asset = 1 WHERE id_user = :id_user");
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_STR);
       return $stmt->execute();
     } catch (PDOException $e) {
       // echo "Error en la consulta: " . $e->getMessage();

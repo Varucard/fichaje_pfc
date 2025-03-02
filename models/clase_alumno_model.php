@@ -57,6 +57,21 @@ class ClaseAlumno {
     }
   }
 
+  // Trae masivamenta las matriculaciones en clases de un usuario Alumno por su ID y por el ID de una clase
+  public function getClaseAlumnoByIdAlumnoAndIdClass($id_user, $id_class) {
+    try {
+      $sql = 'SELECT * FROM user_class WHERE id_user = :id_user AND id_class = :id_class';
+      $stmt = $this->pdo->prepare($sql);
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_STR);
+      $stmt->bindParam(':id_class', $id_class, PDO::PARAM_INT);
+      $stmt->execute();
+      return $stmt->fetchAll(PDO::FETCH_OBJ);
+    } catch (PDOException $e) {
+      // echo 'Error: ' . $e->getMessage();
+      return false;
+    }
+  }
+
   // Trae masivamenta las matriculaciones en clases de un usuario Alumno por el ID de la clase
   public function getClaseAlumnoByIdClass($idClass) {
     try {
