@@ -66,7 +66,8 @@ class Pagos {
       $stmt->bindParam(':date_of_renovation', $fecha_renovacion, PDO::PARAM_STR);
 
       // Ejecutar la consulta
-      return $stmt->execute();
+      if ($stmt->execute())
+        return true;
 
     } catch (PDOException $e) {
       // echo "Error en la consulta: " . $e->getMessage();
@@ -95,6 +96,20 @@ class Pagos {
       return false;
     }
   }
+
+  // Eliminar un pago por su ID
+  public function deletePagoById($id_payment) {
+    try {
+      $stmt = $this->pdo->prepare("DELETE FROM payments WHERE id_payment = :id_payment");
+      $stmt->bindParam(':id_payment', $id_payment, PDO::PARAM_INT);
+
+      return $stmt->execute(); // Retorna true si la eliminación fue exitosa, false si falló
+    } catch (PDOException $e) {
+      // echo 'Error: ' . $e->getMessage(); // Para depuración, si lo necesitas
+      return false;
+    }
+  }
+
 }
 
 ?>
