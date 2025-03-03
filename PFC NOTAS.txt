@@ -20,3 +20,6 @@ NOTAS:
 - Terminada vista de busqueda de clases.
 - Corrección error con los profesores al crear la clase.
 - Los profesores se pueden anotar en mas de una clase.
+
+- Error al crear un cliente
+- Error al reactivar cliente
