@@ -117,6 +117,7 @@
                   <tr>
                       <th>Fecha de Pago</th>
                       <th>Fecha de Renovación</th>
+                      <th>Acciones</th>
                   </tr>
               </thead>
               <tbody>
@@ -124,6 +125,13 @@
                       <tr>
                           <td><?php echo date('d-m-Y', strtotime($p['discharge_date'])); ?></td>
                           <td><?php echo date('d-m-Y', strtotime($p['date_of_renovation'])); ?></td>
+                          <td>
+                            <button style="color: red" class="button_small" 
+                              onclick="window.location.href='../controllers/pagos_controller.php?id_pago=<?php echo urlencode($p['id_payment']); ?>&dni=<?php echo urlencode($usuario['dni']); ?>'">
+                              <i style="color: red" class="fas fa-trash"></i>
+                              Eliminar pago
+                            </button>
+                          </td>
                       </tr>
                   <?php endforeach; ?>
               </tbody>

@@ -34,7 +34,7 @@ $pago = $pagos->getPagoActualByUser($id_user);
 
 // Si el usuario no tiene pagos registrados
 if (empty($pago)) {
-  echo "<script>alert('El usuario no tiene pagos registrados. Debe abonar antes de fichar.'); window.location.href = '../views/fichajes_view.php';</script>";
+  echo "<script>alert('El usuario no tiene pagos registrados. Debe abonar antes de fichar.'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
   exit();
 }
 
@@ -49,16 +49,16 @@ if ($fecha_actual > $fecha_renovacion) {
 
 // Si la fecha de pago está vencida
 if ($fecha_vencida) {
-  echo "<script>alert('La fecha de pago está vencida. Debe abonar antes de fichar.'); window.location.href = '../views/fichajes_view.php';</script>";
+  echo "<script>alert('La fecha de pago está vencida. Debe abonar antes de fichar.'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
   exit();
 }
 
 // Que el Usuario no sea un profesor y que este en una clase como alumno
 if ($usuario['type_user'] == 1) {
-  echo "<script>alert('Los profesores no pueden fichar'); window.location.href = '../views/dashboard_view.php';</script>";
+  echo "<script>alert('Los profesores no pueden fichar'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
   exit();
 } elseif (!$alumnoClase->getClaseAlumnoByIdAlumno($id_user)) {
-  echo "<script>alert('El alumno aun no se registro en una clase'); window.location.href = '../views/dashboard_view.php';</script>";
+  echo "<script>alert('El alumno aun no se registro en una clase'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
   exit();
 }
 

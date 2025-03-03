@@ -13,6 +13,7 @@ $alumnoClase = new ClaseAlumno;
 $profesorClase = new ClaseProfesor;
 
 // Captura los datos del formulario
+
 $id = $_POST['id'];
 $rfid = $_POST['rfid'];
 $dni = $_POST['dni'];
@@ -22,7 +23,7 @@ $birth_day = $_POST['birth_day'];
 $email = $_POST['email'];
 $phone = $_POST['phone'];
 $type_user = $_POST['type_user'];
-$cambioTipoUsuario = $_POST['cambioTipoUsuario'];
+$cambioTipoUsuario = isset($_POST['cambioTipoUsuario']) ? $_POST['cambioTipoUsuario'] : FALSE;
 
 // Verifico si el DNI ya está registrado en otro usuario activo
 $aux = $user->getUserByDNI($dni);
@@ -32,21 +33,19 @@ if ($aux && $aux['id_user'] != $id && $aux['asset'] == 1) {
 }
 
 // Verifico si el RFID ya está registrado en otro usuario activo, excluyendo el caso de "SIN LLAVERO"
-$auxs_rfid = $user->getUserByRFID($rfid);
-if ($rfid != 'SIN LLAVERO' && $auxs_rfid) {
-  foreach ($auxs_rfid as $aux_rfid) {
-    if ($aux_rfid['id_user'] != $id && $aux_rfid['asset'] == 1) {
-      echo "<script>alert('El llavero ya se encuentra registrado en un Usuario activo'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($dni) . "';</script>";
-      exit; 
-    }
+$aux_rfid = $user->getUserByRFID($rfid);
+if ($rfid != 'SIN LLAVERO' && $aux_rfid) {
+  if ($aux_rfid['id_user'] != $id && $aux_rfid['asset'] == 1) {
+    echo "<script>alert('El llavero ya se encuentra registrado en un Usuario activo'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($dni) . "';</script>";
+    exit; 
   }
 }
 
 // Verifico si debo cambiar el tipo de Usuario
 if ($cambioTipoUsuario) {
   // Antes de cambiar el tipo de usuario primero verifico que no se encuentre matriculado en ningún lado
-  if ($alumnoClase->getClaseAlumnoByIdAlumno($id) || $profesorClase->getClaseProfesorByIdClass($id)) {
-    echo "<script>alert('El profesor o alumno tiene matriculaciones en clases activas. Por favor eliminelas antes de modificar al Usuario'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($dni) . "';</script>";
+  if ($alumnoClase->getClaseAlumnoByIdAlumno($id) || $profesorClase->getClaseProfesorByIdProfesor($id)) {
+    echo "<script>alert('El profesor o alumno posee matriculaciones activas. Por favor eliminelas antes de modificar al Usuario'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($dni) . "';</script>";
     exit; 
   }
 
