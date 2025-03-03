@@ -1,9 +1,14 @@
+// Libreria de Ethernet
 #include <Ethernet.h>
-#include <MySQL_Connection.h>
-#include <LiquidCrystal_I2C.h>
-#include <MySQL_Cursor.h>
 #include <SPI.h>
+// Libreria de SQL
+#include <MySQL_Connection.h>
+#include <MySQL_Cursor.h>
+// Libreria Pantalla
+#include <LiquidCrystal_I2C.h>
+// Libreria lector RFID
 #include <MFRC522.h>
+// Libreria registro de eventos
 #include <avr/wdt.h>  // Librería para el Watchdog Timer
 
 // Configuración de la pantalla LCD I2C
@@ -15,7 +20,7 @@ const int ledRojo = 5;
 const int ledAmarillo = 6;
 const int ledAzul = 7;
 
-// Configuración del buzzer
+// Configuración del buzzerc:\xampp\htdocs\fichaje_pfc\Arduino - Impresión 3D\Arduino viejo\src\main.cpp
 const int buzzerPin = 3;
 
 // Configuración del lector RFID
@@ -25,10 +30,10 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);   // Crear instancia del MFRC522
 
 // Datos de configuración de Internet y MySQL
 byte mac_addr[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress server_addr(192, 168, 1, 40); // IP del MySQL *server*
-IPAddress ip(192, 168, 1, 36);          // IP de Arduino
+IPAddress server_addr(192, 168, 0, 49); // IP del MySQL *server*
+IPAddress ip(192, 168, 0, 36);          // IP de Arduino
 IPAddress subnet(255, 255, 255, 0);     // Sub-Mascara Arduino
-IPAddress gateway(192, 168, 1, 1);      // Puerta de acceso Arduino
+IPAddress gateway(192, 168, 0, 1);      // Puerta de acceso Arduino
 unsigned int port = 3306;               // Puerto MySQL
 char user[] = "root";                   // MySQL username
 char password[] = "Mercedes";           // MySQL password
