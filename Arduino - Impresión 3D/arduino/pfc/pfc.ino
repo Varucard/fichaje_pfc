@@ -21,7 +21,7 @@ const int ledAmarillo = 6;
 const int ledAzul = 7;
 
 // Configuración del buzzerc:\xampp\htdocs\fichaje_pfc\Arduino - Impresión 3D\Arduino viejo\src\main.cpp
-const int buzzerPin = 3;
+const int buzzerPin = 13; // Modificar a futuro
 
 // Configuración del lector RFID
 #define RST_PIN         9  // Configurable, ver el esquema de pines
