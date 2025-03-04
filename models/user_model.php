@@ -208,43 +208,6 @@ class User {
     }
   }
 
-  // Inicio de sesión
-  public function login($dni, $password) {
-    try {
-      // Preparar la consulta SQL
-      $sql = 'SELECT * FROM users WHERE dni = :dni';
-      $stmt = $this->pdo->prepare($sql);
-
-      // Vincular el parámetro
-      $stmt->bindParam(':dni', $dni, PDO::PARAM_STR);
-
-      // Ejecutar la consulta
-      $stmt->execute();
-
-      // Obtener el registro
-      $user = $stmt->fetch(PDO::FETCH_OBJ);
-
-      // Verificar si se encontró el usuario
-      if($user) {
-        // Verificar la contraseña sin hashear
-        if($password === $user->password) {
-          // Las credenciales son correctas
-          return true;
-        } else {
-          // Contraseña incorrecta
-          return false;
-        }
-      } else {
-        // No se encontró el usuario
-        return false;
-      }
-    } catch (PDOException $e) {
-      // Manejar cualquier excepción de PDO
-      // echo 'Error: ' . $e->getMessage();
-      return false;
-    }
-  }
-
   // Trae usuario según su rol
   public function getUsersByRole($type_user) {
     try {

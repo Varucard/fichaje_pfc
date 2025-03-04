@@ -1,31 +1,14 @@
-#Archivo Env de Ejemplo
+# Configuración de la base de datos
+MYSQL_DB_HOST=localhost
+MYSQL_DB_USER=root
+MYSQL_DB_PASSWORD=clave
+MYSQL_DB_NAME=bd_name
+MYSQL_DB_PORT=3306
 
-#Ubicación del proveedor
-MYSQL_DB_HOST='localhost'
+# Dirección del Arduino
+IP_ARDUINO=192.168.0.XX
 
-#Nombre del usuario
-MYSQL_DB_USER='user'
-
-#Clave del usuario
-MYSQL_DB_PASSWORD='clave'
-
-#Nombre de la BD
-MYSQL_DB_NAME='base_datos'
-
-#Puerto de acceso
-MYSQL_DB_PORT='3306'
-
-#Ruta y nombre Archivo DNI Tutores
-EXCEL_TUTORS='files/tutores/dni_tutores.xlsx'
-
-#Nombre Hoja Archivo DNI Tutores
-EXCEL_TUTORS_SHEET='dni_tutores'
-
-#Ruta y nombre Archivo DNI Alumnos
-EXCEL_STUDENTS='files/alumnos/dni_alumnos.xlsx'
-
-#Nombre Hoja Archivo DNI Alumnos
-EXCEL_STUDENTS_SHEET='dni_alumnos'
-
-#Columna donde buscar el valor dentro del Excel, hoja de Alumnos
-EXCEL_COLUMN='D'
+# Configuración de la aplicación
+URLROOT=http://localhost/proyecto
+SITENAME=Nombre de proyecto
+APPVERSION=1.0.0
