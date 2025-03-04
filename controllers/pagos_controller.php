@@ -1,6 +1,10 @@
 <?php
+session_start();
 
 require_once '../models/pago_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
 
 function nuevo_pago($id_user) {
   $pago = new Pagos();
@@ -21,11 +25,24 @@ function nuevo_pago($id_user) {
     $fecha_30_dias_mas_str
   ];
 
-  if ($pago->cargarPago($nuevo_pago)) 
-    return true;
-  else 
-    return false;
+  return $pago->cargarPago($nuevo_pago);
+}
 
+function eliminar_pago($id_payment, $dni) {
+  $pago = new Pagos();
+
+  if ($pago->deletePagoById($id_payment)) {
+    echo "<script>alert('Pago eliminado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($dni) . "';</script>";
+    exit;
+  }
+}
+
+// Si me llega un ID de pago es para eliminarlo
+$id_payment = isset($_GET['id_pago']) ? $_GET['id_pago'] : FALSE;
+$dni_user = isset($_GET['dni']) ? $_GET['dni'] : '';
+
+if ($id_payment) {
+  eliminar_pago($id_payment, $dni_user);
 }
 
 ?>

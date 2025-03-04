@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="shortcut icon" href="../public/img/ico_logo.png">
+  <link rel="stylesheet" href="../public/css/water.css">
+  <link rel="stylesheet" href="../public/css/estilos.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Clientes</title>  
+</head>
+<body>
+  <div class="cabecera">
+    <img src="../public/img/logo.png" alt="logo.png" width="100" height="100">
+    <h1>Lista de Clientes</h1>
+    <input style="margin-left: 230px; margin-top: 15px;" type="text" id="busqueda_usuario" name="dni" placeholder="Buscar Cliente/ Profesor">
+  </div>
+
+  <div class="botonera-1">
+    <i class="fas fa-user-plus"></i>
+    <button onclick="window.location.href='../views/cargar_usuario_view.php'" id="cargar_usuario">Agregar Cliente</button>
+  </div>
+  
+  <div class="tabla">
+    <?php if (empty($resultados)) { ?>
+      <p>No se encontraron resultados</p>
+    <?php } else { ?>
+      <table>
+        <thead>
+          <tr>
+            <th>LLAVERO</th>
+            <th>DNI</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($resultados as $usuario) { ?>
+            <tr>
+              <td><?php echo htmlspecialchars($usuario['rfid'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td style="color:red"><?php echo htmlspecialchars($usuario['dni'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td><?php echo htmlspecialchars($usuario['user_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td><?php echo htmlspecialchars($usuario['user_surname'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td>
+                <button class="button_small" onclick="window.location.href='../controllers/detalle_usuario_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
+                  <i class="fas fa-user"></i>
+                  Ver +
+                </button>
+                <?php if ($usuario['asset'] == 1) { ?>
+                  <button style="color: red" class="button_small" onclick="window.location.href='../controllers/baja_usuarios_controller.php?dni=<?php echo urlencode($usuario['dni']); ?>'">
+                    <i style="color: red" class="fas fa-trash"></i>
+                    Desactivar
+                  </button>
+                <?php } ?>
+                <?php if ($usuario['asset'] == 0) { ?>
+                  <p style="color:red">Cliente inactivo</p>
+                <?php } ?>
+              </td>
+            </tr>
+          <?php } ?>
+        </tbody>
+      </table>
+    <?php } ?>
+  </div>
+
+  <div class="botonera">
+    <button onclick="location.href='../views/dashboard_view.php'">
+      <i style="padding-right: 10px;" class="fas fa-arrow-left"></i>
+      Volver
+    </button>
+
+    <button onclick="location.href='../views/dashboard_view.php'">
+      <i style="padding-right: 10px;" class="fas fa-home"></i>
+      Inicio
+    </button>
+  </div>
+
+  <script src="../public/js/icons.js"></script>
+  <script src="../public/js/busqueda_usuario.js"></script>
+</body>
+</html>

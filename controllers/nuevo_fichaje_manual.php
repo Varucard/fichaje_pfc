@@ -1,13 +1,18 @@
 <?php
-
 session_start();
+
 require_once '../models/pago_model.php';
 require_once '../models/fichaje_model.php';
 require_once '../models/user_model.php';
+require_once '../models/clase_alumno_model.php';
+require_once '../helpers/url_helper.php';
+
+checkSesion();
 
 $user = new User();
 $pagos = new Pagos();
 $fichaje = new Fichajes();
+$alumnoClase = new ClaseAlumno;
 
 // Captura el DNI del usuario de la URL
 $dni_user = isset($_GET['dni_user']) ? $_GET['dni_user'] : '';
@@ -16,20 +21,20 @@ $dni_user = isset($_GET['dni_user']) ? $_GET['dni_user'] : '';
 $usuario = $user->getUserByDNI($dni_user);
 
 // Si el usuario no existe
-if (empty($usuario[0])) {
-  echo "<script>alert('Usuario inexistente'); window.location.href = '../views/fichaje_view.php';</script>";
+if (empty($usuario)) {
+  echo "<script>alert('Usuario inexistente'); window.location.href = '../views/fichajes_view.php';</script>";
   exit();
 }
 
 // Obtener el ID del usuario
-$id_user = $usuario[0]['id_user'];
+$id_user = $usuario['id_user'];
 
 // Obtener el pago mas actual del Usuario
 $pago = $pagos->getPagoActualByUser($id_user);
 
 // Si el usuario no tiene pagos registrados
 if (empty($pago)) {
-  echo "<script>alert('El usuario no tiene pagos registrados. Debe abonar antes de fichar.'); window.location.href = '../views/fichaje_view.php';</script>";
+  echo "<script>alert('El usuario no tiene pagos registrados. Debe abonar antes de fichar.'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
   exit();
 }
 
@@ -44,17 +49,26 @@ if ($fecha_actual > $fecha_renovacion) {
 
 // Si la fecha de pago está vencida
 if ($fecha_vencida) {
-  echo "<script>alert('La fecha de pago está vencida. Debe abonar antes de fichar.'); window.location.href = '../views/fichaje_view.php';</script>";
+  echo "<script>alert('La fecha de pago está vencida. Debe abonar antes de fichar.'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
+  exit();
+}
+
+// Que el Usuario no sea un profesor y que este en una clase como alumno
+if ($usuario['type_user'] == 1) {
+  echo "<script>alert('Los profesores no pueden fichar'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
+  exit();
+} elseif (!$alumnoClase->getClaseAlumnoByIdAlumno($id_user)) {
+  echo "<script>alert('El alumno aun no se registro en una clase'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . urlencode($usuario['dni']) . "';</script>";
   exit();
 }
 
 $fecha_fichada = $fecha_actual->format('Y-m-d H:i:s');
 
 if ($fichaje->guardarFichada($id_user, $fecha_fichada)) {
-  echo "<script>alert('Fichada registrada exitosamente.'); window.location.href = '../views/fichaje_view.php';</script>";
+  echo "<script>alert('Fichada registrada exitosamente.'); window.location.href = '../views/fichajes_view.php';</script>";
   exit();
 } else {
-  echo "<script>alert('Ocurrio un inconveniente al momento de registrar la fichada del usuario.'); window.location.href = '../views/fichaje_view.php';</script>";
+  echo "<script>alert('Ocurrio un inconveniente al momento de registrar la fichada del usuario.'); window.location.href = '../views/fichajes_view.php';</script>";
   exit();
 }
 ?>

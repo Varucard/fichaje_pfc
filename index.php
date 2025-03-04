@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <link rel="shortcut icon" href="/img/ico_logo.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palillo Fight Club</title>
-</head>
-  <body>
+<?php
+  require_once 'config/config.php';
+  require_once 'helpers/url_helper.php';
 
-    <script>
-      window.location.href = 'views/fichaje_view.php';
-    </script>
-
-  </body>
-</html>
+  // Verificar si el usuario está autenticado
+  if (isset($_SESSION['user_id'])) {
+    // Si está autenticado, redirigir al panel de control
+    redirect('views/dashboard_view.php');
+  } else {
+    // Si no está autenticado, redirigir al formulario de inicio de sesión
+    redirect('views/login_view.php');
+  }
+?>
