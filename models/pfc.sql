@@ -146,7 +146,7 @@ CREATE TABLE `uid_incomes` (
 
 CREATE TABLE `users` (
   `id_user` int(255) NOT NULL,
-  `rfid` longtext NOT NULL DEFAULT 'SIN LLAVERO' COMMENT 'Serial tarjeta de acceso',
+  `rfid` longtext NOT NULL COMMENT 'Serial tarjeta de acceso',
   `dni` int(8) NOT NULL,
   `user_name` varchar(75) NOT NULL,
   `user_surname` varchar(75) DEFAULT NULL,
@@ -168,9 +168,9 @@ INSERT INTO `users` (`id_user`, `rfid`, `dni`, `user_name`, `user_surname`, `pas
 (17, 'SIN LLAVERO', 11111111, 'Patricio Valentin', 'Marquez', NULL, '1996-04-01', 'algo@algo.com', 658963256, 1, 2),
 (18, '133FD513', 20771757, 'Maria Fabriana', 'Garcia de Jalon', NULL, '2015-02-01', 'email@email.com', 2147483647, 1, 2),
 (19, '2a1b9916', 22222222, 'Usuario', 'Prueba', NULL, '2000-02-02', 'prueba@prueba.com', 1155223366, 1, 2),
-(44, 'SIN LLAVERO', 33333333, 'Profesor 1', 'Prueba', NULL, '0000-00-00', 'email@pruba.com', 4875632, 1, 1),
-(45, 'SIN LLAVERO', 44444444, 'Profesor 0', 'Prueba', NULL, '0000-00-00', 'gmail@gmail.com', 7895625, 1, 1),
-(48, 'SIN LLAVERO', 10000000, 'Usuario De Prueba', 'Apellido De Prueba', NULL, '0000-00-00', 'outlook@email.com', 1165892563, 1, 2);
+(44, 'SIN LLAVERO', 33333333, 'Profesor 1', 'Prueba', NULL, '2000-02-10', 'email@pruba.com', 4875632, 1, 1),
+(45, 'SIN LLAVERO', 44444444, 'Profesor 0', 'Prueba', NULL, '2006-03-11', 'gmail@gmail.com', 7895625, 1, 1),
+(48, 'SIN LLAVERO', 10000000, 'Usuario De Prueba', 'Apellido De Prueba', NULL, '2005-10-13', 'outlook@email.com', 1165892563, 1, 2);
 
 -- --------------------------------------------------------
 

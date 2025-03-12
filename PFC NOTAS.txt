@@ -31,7 +31,9 @@ NOTAS:
 
 ERRORES GENERALES:
 - Los buscadores por momento como que se tildan.
+- Revisar que no ingrese basura en RFID Users (BD)
 
 MEJORAS SUPER A FUTURO:
 - Al cargar un Email que te llegue un mensaje y que por este medio te pueda llegar información de las clases o algo de ese estilo.
 - Modulo de Stockeo de insumos para venta.
+- Manejo de promociones (Ejemplo: Abono de 3 meses y 1 gratis).
