@@ -24,11 +24,14 @@ class AuthController {
     $user = $this->userModel->getUserByDNI($dni);
 
     if ($user || password_verify($password, $user->password)) {
+
+      // var_dump($user);
+      // exit;
       // Iniciar sesión y almacenar datos del usuario
       $_SESSION['login'] = true;
-      $_SESSION['user_id'] = $user->id;
-      $_SESSION['user_name'] = $user->nombre;
-      $_SESSION['user_dni'] = $user->dni;
+      $_SESSION['user_id'] = $user['id_user'];
+      $_SESSION['user_name'] = $user['user_name'];
+      $_SESSION['user_dni'] = $user['dni'];
 
       redirect('views/dashboard_view.php');
     } else {

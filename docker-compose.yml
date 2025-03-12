@@ -1,0 +1,51 @@
+services:
+  php:
+    image: php:8.4-apache
+    container_name: php_container
+    ports:
+      - "8080:80"
+    volumes:
+      - "C:/Docker/fichaje_pfc:/var/www/html"
+    networks:
+      - app_network
+    depends_on:
+      - mysql
+    command: bash -c "docker-php-ext-install pdo pdo_mysql && pecl install xdebug && docker-php-ext-enable xdebug && apache2-foreground"
+    env_file:
+      - .env
+    environment:
+      XDEBUG_MODE: debug
+      XDEBUG_CONFIG: client_host=host.docker.internal client_port=9003 start_with_request=yes
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_DB_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+    ports:
+      - "3306:3306"
+    networks:
+      - app_network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_container
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${MYSQL_DB_PASSWORD}
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

@@ -6,15 +6,15 @@ Incluye integración con un **lector RFID basado en Arduino**.
 
 ## 📌 Requisitos  
 ### 🛠️ Versiones para el entorno utilizadas:  
-- **Base de datos:** MariaDB 10.4.32  
-- **Servidor web:** Apache 2.4.58  
-- **PHP:** 8.0.30  
+- **Base de datos:** MariaDB 10.4.32 o ⬆️
+- **Servidor web:** Apache 2.4.58 o ⬆️
+- **PHP:** 8.0.0 o ⬆️  
 
 ---
 
-## 📝 Instalación en XAMPP (7.4.18)  
-Para ejecutar este proyecto, se recomienda instalar **XAMPP 7.4.18**.  
-🔗 [Descargar XAMPP 7.4.18](https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/7.4.18/xampp-windows-x64-7.4.18-0-VC15-installer.exe/download)  
+## 📝 Instalación en XAMPP (8.2.12)  
+Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.  
+🔗 [Descargar XAMPP 8.2.12](https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.2.12/xampp-windows-x64-8.2.12-0-VS16-installer.exe/download)  
 
 ### 🚀 Pasos de Instalación  
 1. **Instalar XAMPP** y asegurarse de que **Apache** y **MySQL** estén en ejecución.
@@ -24,7 +24,7 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 7.4.18**.
      ```ini
      SetEnv MYSQL_DB_HOST "localhost"
      SetEnv MYSQL_DB_USER "root"
-     SetEnv MYSQL_DB_PASSWORD "Mercedes"
+     SetEnv MYSQL_DB_PASSWORD "Password"
      SetEnv MYSQL_DB_NAME "pfc"
      SetEnv MYSQL_DB_PORT "3306"
      ```
@@ -53,7 +53,7 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 7.4.18**.
      ```
       O ejecutar la siguiente consulta para otorgar permisos de ingreso a usuarios
      ```sql
-      GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.1.XX' IDENTIFIED BY 'Usuario';
+      GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.X.XX' IDENTIFIED BY 'Usuario';
       FLUSH PRIVILEGES;  # (Otorga permisos de acceso)
      ```
 
@@ -74,6 +74,63 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 7.4.18**.
 
 ---
 
+## 🚢 Instalación en Docker  
+🔗 [Descargar Docker Desktop](https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe?utm_source=docker&amp;utm_medium=webreferral&amp;utm_campaign=dd-smartbutton&amp;utm_location=module&amp;_gl=1*58yczi*_gcl_au*MTU5NTI1NzI0NC4xNzQxODA1NjU0*_ga*MTI4NzU4MDE4OC4xNzQxODA1NjU0*_ga_XJWPQMJYHQ*MTc0MTgwNTY1My4xLjEuMTc0MTgwNTY2My41MC4wLjA)  
+
+### 🚀 Pasos de Instalación  
+1. **Instalar Docker**, ejecutar el archivo **`docker-compose.yml`** Con la Extensión **`Docker`** en **`VSCode`** o por la consola de **`Docker-Desktop`**.
+
+2. **Clonar el repositorio** dentro de la carpeta de `Docker`.  
+   ```bash
+   git clone https://github.com/varucard/fichaje_pfc.git
+   ```
+4. **Importar la base de datos** en phpMyAdmin:  
+   - Archivo: `fichaje_pfc.sql`  
+   - La BD contiene:  
+     - Un Administrador (🙋🏻‍♂️: 41550112 🔑: 123456789)
+     - Clases  
+     - Profesores  
+     - Alumnos con matriculaciones, pagos y fichadas  
+
+6. **Acceder al sistema** desde `http:8080//localhost/fichaje_pfc/`. 
+
+## En caso de desarrollo el Docker cuenta con debbuger
+
+1. Obtener la extensión **`PHP Debug`**: 
+  ```
+  PHP Debug
+  ID: xdebug.php-debug
+  Descripción: Debug support for PHP with Xdebug
+  Versión: 1.35.0
+  Editor: Xdebug
+  Vínculo de VS Marketplace: https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
+  ```
+2. Generar un nuevo **`launch.json`**
+  ``` json
+  {
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for Xdebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": {
+        "/var/www/html": "${workspaceFolder}"
+      },
+      "xdebugSettings": {
+        "max_children": 256,
+        "max_data": 1024,
+        "max_depth": 3
+      },
+      "log": true
+    }
+  ]
+  }
+  ```
+
+---
+
 ## 💻 Integración con Lector RFID (Arduino)  
 El sistema está diseñado para funcionar con un **lector RFID basado en Arduino**, que permite registrar la asistencia de los usuarios escaneando una tarjeta o llavero RFID.  
 
@@ -85,6 +142,13 @@ El sistema está diseñado para funcionar con un **lector RFID basado en Arduino
 - **Módulo RFID RC522**  
 - **Conexión USB a la PC** 
 - **Cable Ethernet**
+
+### 🖨️ El proyecto cuenta con archivos de un modelo de caja a medida para los componenetes del arduino
+**Archivos** `/Arduino - Impresión 3D/ Caja Arduino PFC/`
+
+- **CUERPO**
+- **TAPA**
+- **TRABA TAPA**
 
 ### 📆 Librerías de Software  
 - Las libreria estan backapeadas dentro de (`Arduino - Impresión 3D/Arduino/Libraries/`)
@@ -128,4 +192,8 @@ Este proyecto es **de código abierto** y está bajo la licencia **MIT**. Puedes
 ---
 
 ## 📞 Contacto  
+
 Si tienes dudas o sugerencias, puedes contactar a arielmolus25@gmail.com  
+
+--- 
+## 🕰️ Ultima modificación: 12-03-2025
