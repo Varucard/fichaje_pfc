@@ -20,7 +20,7 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
 1. **Instalar XAMPP** y asegurarse de que **Apache** y **MySQL** estén en ejecución.
 2. **Configuración de Apache, PHP y MySQL:**  
 
-   - **Apache (`httpd.conf`)** Configurar variables de entorno 
+   - **Apache (`httpd.conf`)** Configurar las variables de entorno al final del archivo
      ```ini
      SetEnv MYSQL_DB_HOST "localhost"
      SetEnv MYSQL_DB_USER "root"
@@ -44,9 +44,12 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
      $cfg['Servers'][$i]['AllowNoPassword'] = false;
      ```
 
-   - **MySQL (`my.ini`)** – Configuración de permisos:  
+   - **MySQL (`my.ini`)** – Configuración de permisos para BD:  
      ```ini
-     skip-grant-tables  # (Evita la comprobación de permisos)
+      [mysqld]
+      skip-grant-tables  # (Evita la comprobación de permisos)
+      port=3306
+      socket="C:/xampp/mysql/mysql.sock"
      ```
       O ejecutar la siguiente consulta para otorgar permisos de ingreso a usuarios
      ```sql
@@ -189,6 +192,7 @@ Este proyecto es **de código abierto** y está bajo la licencia **MIT**. Puedes
 ---
 
 ## 📞 Contacto  
+
 Si tienes dudas o sugerencias, puedes contactar a arielmolus25@gmail.com  
 
 --- 
