@@ -1,6 +1,7 @@
 services:
   php:
-    image: php:8.4-apache
+    build: .
+    image: php_custom:8.4
     container_name: php_container
     ports:
       - "8080:80"
@@ -10,7 +11,6 @@ services:
       - app_network
     depends_on:
       - mysql
-    command: bash -c "docker-php-ext-install pdo pdo_mysql && pecl install xdebug && docker-php-ext-enable xdebug && apache2-foreground"
     env_file:
       - .env
     environment:
