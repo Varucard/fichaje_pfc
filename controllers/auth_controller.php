@@ -14,14 +14,25 @@ class AuthController {
     $dni = trim($_POST['dni']);
     $password = trim($_POST['password']);
 
-    // Valido que no estén vacíos
-    if(empty($dni) || empty($password)) {
+    // Validar que los campos no estén vacíos
+    if (empty($dni) || empty($password)) {
       flash('login_error', 'Por favor, complete todos los campos');
       redirect('views/login_view.php');
     }
 
-    if($this->userModel->login($dni, $password)) {
+    // Intentar iniciar sesión
+    $user = $this->userModel->getUserByDNI($dni);
+
+    if ($user || password_verify($password, $user->password)) {
+
+      // var_dump($user);
+      // exit;
+      // Iniciar sesión y almacenar datos del usuario
       $_SESSION['login'] = true;
+      $_SESSION['user_id'] = $user['id_user'];
+      $_SESSION['user_name'] = $user['user_name'];
+      $_SESSION['user_dni'] = $user['dni'];
+
       redirect('views/dashboard_view.php');
     } else {
       flash('login_error', 'Credenciales incorrectas');

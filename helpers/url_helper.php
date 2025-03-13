@@ -1,10 +1,10 @@
 <?php
 
-require_once dirname(__DIR__) . '../config/config.php';
+require_once dirname(__DIR__) . '/config/config.php';
 
 // Redirige a la página especificada
 function redirect($page) {
-	header('Location:' . URLROOT . '/' . $page);
+	header('Location:' . getenv('URLROOT') . '/' . $page);
 	exit();
 }
 

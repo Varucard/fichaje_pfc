@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-02-2025 a las 20:10:27
+-- Tiempo de generación: 04-03-2025 a las 03:50:24
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -52,9 +52,8 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`id_class`, `name_class`, `price_class`) VALUES
-(6, 'Clase Alguna', 589),
-(7, 'Clase Alguno 2', 56),
-(8, 'Clase de prueba 01', 560);
+(10, 'Kick Boxing', 10000),
+(15, 'Boxeo', 10000);
 
 -- --------------------------------------------------------
 
@@ -73,13 +72,7 @@ CREATE TABLE `incomes` (
 --
 
 INSERT INTO `incomes` (`id_income`, `id_user`, `addmission_date`) VALUES
-(72, 1, '2024-08-07 02:11:50'),
-(81, 1, '2024-08-22 01:20:18'),
-(82, 1, '2024-08-27 22:31:23'),
-(83, 1, '2024-08-27 22:40:57'),
-(84, 1, '2024-08-27 22:47:02'),
-(85, 1, '2024-12-16 00:39:30'),
-(86, 1, '2024-12-16 01:24:49');
+(87, 2, '2025-03-01 23:16:42');
 
 -- --------------------------------------------------------
 
@@ -93,25 +86,6 @@ CREATE TABLE `payments` (
   `discharge_date` date NOT NULL COMMENT 'Fecha de pago de servicio',
   `date_of_renovation` date NOT NULL COMMENT 'Fecha de renovación de servicio'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `payments`
---
-
-INSERT INTO `payments` (`id_payment`, `id_user`, `discharge_date`, `date_of_renovation`) VALUES
-(2, 2, '2024-07-01', '2024-07-01'),
-(29, 1, '2024-08-03', '2024-09-02'),
-(85, 1, '2023-02-02', '2023-03-04'),
-(86, 1, '2025-05-05', '2025-06-04'),
-(87, 1, '2025-05-05', '2025-06-04'),
-(88, 41, '2024-08-22', '2024-09-21'),
-(89, 43, '2024-08-22', '2024-09-21'),
-(90, 44, '2024-08-22', '2024-09-21'),
-(91, 1, '0222-02-02', '0222-03-04'),
-(92, 2, '2024-12-16', '2025-01-15'),
-(93, 17, '2025-02-20', '2025-03-22'),
-(94, 17, '2025-02-20', '2025-03-22'),
-(95, 17, '2025-02-20', '2025-03-22');
 
 -- --------------------------------------------------------
 
@@ -130,8 +104,8 @@ CREATE TABLE `teacher_class` (
 --
 
 INSERT INTO `teacher_class` (`id_teacher_class`, `id_user`, `id_class`) VALUES
-(3, 19, 4),
-(7, 1, 8);
+(22, 44, 10),
+(23, 45, 15);
 
 -- --------------------------------------------------------
 
@@ -189,13 +163,14 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id_user`, `rfid`, `dni`, `user_name`, `user_surname`, `password`, `birth_day`, `email`, `phone_number`, `asset`, `type_user`) VALUES
-(1, '73dcc413', 41550112, 'Cristian Ariel', 'Marquez', '123', '1998-11-08', 'arielmolus25@gmail.com', 1162023318, 1, 1),
-(2, '3a5cf681', 21903130, 'Gustavo Alejandro', 'Marquez', NULL, '2010-07-01', 'pitu702010@gmail.com', 1182153615, 1, 0),
-(17, 'SIN LLAVERO', 15268365, 'Patricio Valentin', 'Marquez', NULL, '0000-00-00', 'algo@algo.com', 0, 1, 2),
-(18, '133FD513', 20771757, 'Maria Fabriana', 'Garcia de Jalon', NULL, '2015-02-01', 'email@email.com', 2147483647, 0, 2),
-(19, '2a1b9916', 12345678, 'Usuario', 'Prueba', NULL, '2000-02-02', 'prueba@prueba.com', 1155223366, 1, 3),
-(44, 'SIN LLAVERO', 15151515, 'Prueba', '', NULL, '0000-00-00', '', 0, 1, 2),
-(45, 'SIN LLAVERO', 18181818, 'Profesor', '', NULL, '0000-00-00', '', 0, 1, 3);
+(1, '73dcc413', 41550112, 'Cristian Ariel', 'Marquez', '$2y$10$jkDBR8rttqPelcQqKwUac.l4PlMNpa6HCScnCDjD4kDv0HepuuOrG', '1998-11-08', 'arielmolus25@gmail.com', 1162023318, 1, 3),
+(2, '3a5cf681', 21903130, 'Gustavo Alejandro', 'Marquez', NULL, '2010-07-01', 'pitu702010@gmail.com', 1182153615, 1, 2),
+(17, 'SIN LLAVERO', 11111111, 'Patricio Valentin', 'Marquez', NULL, '1996-04-01', 'algo@algo.com', 658963256, 1, 2),
+(18, '133FD513', 20771757, 'Maria Fabriana', 'Garcia de Jalon', NULL, '2015-02-01', 'email@email.com', 2147483647, 1, 2),
+(19, '2a1b9916', 22222222, 'Usuario', 'Prueba', NULL, '2000-02-02', 'prueba@prueba.com', 1155223366, 1, 2),
+(44, 'SIN LLAVERO', 33333333, 'Profesor 1', 'Prueba', NULL, '2000-02-10', 'email@pruba.com', 4875632, 1, 1),
+(45, 'SIN LLAVERO', 44444444, 'Profesor 0', 'Prueba', NULL, '2006-03-11', 'gmail@gmail.com', 7895625, 1, 1),
+(48, 'SIN LLAVERO', 10000000, 'Usuario De Prueba', 'Apellido De Prueba', NULL, '2005-10-13', 'outlook@email.com', 1165892563, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -214,9 +189,9 @@ CREATE TABLE `user_class` (
 --
 
 INSERT INTO `user_class` (`id_user_class`, `id_user`, `id_class`) VALUES
-(1, 17, 6),
-(2, 18, 6),
-(8, 17, 8);
+(10, 2, 10),
+(11, 18, 10),
+(12, 17, 15);
 
 --
 -- Índices para tablas volcadas
@@ -300,25 +275,25 @@ ALTER TABLE `a_class`
 -- AUTO_INCREMENT de la tabla `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `id_class` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_class` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `incomes`
 --
 ALTER TABLE `incomes`
-  MODIFY `id_income` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+  MODIFY `id_income` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT de la tabla `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id_payment` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `id_payment` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
 
 --
 -- AUTO_INCREMENT de la tabla `teacher_class`
 --
 ALTER TABLE `teacher_class`
-  MODIFY `id_teacher_class` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_teacher_class` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `types_users`
@@ -336,13 +311,13 @@ ALTER TABLE `uid_incomes`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id_user` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id_user` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT de la tabla `user_class`
 --
 ALTER TABLE `user_class`
-  MODIFY `id_user_class` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_user_class` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

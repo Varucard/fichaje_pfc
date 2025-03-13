@@ -8,7 +8,7 @@ class Database {
   private $pdo;
 
   public function __construct() {
-    $this->host = getenv('MYSQL_DB_HOST') ?? 'localhost';
+    $this->host = getenv('MYSQL_DB_HOST') ?? 'mysql';
     $this->database = getenv('MYSQL_DB_NAME') ?? '';
     $this->username = getenv('MYSQL_DB_USER') ?? '';
     $this->password = getenv('MYSQL_DB_PASSWORD') ?? '';
