@@ -32,6 +32,9 @@ NOTAS:
 ERRORES GENERALES:
 - Los buscadores por momento como que se tildan.
 - Revisar que no ingrese basura en RFID Users (BD)
+- Revisar modelo 3D
+- Crear diagrama conexión Arduino.
+- Fotos del Lector armado.
 
 MEJORAS SUPER A FUTURO:
 - Al cargar un Email que te llegue un mensaje y que por este medio te pueda llegar información de las clases o algo de ese estilo.

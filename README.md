@@ -135,20 +135,56 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
 El sistema está diseñado para funcionar con un **lector RFID basado en Arduino**, que permite registrar la asistencia de los usuarios escaneando una tarjeta o llavero RFID.  
 
 ### 🔧 Requisitos de Hardware  
-- **Arduino Uno / Mega** 
-- **Pantalla LCD 20X4 con adaptador I2C**
+- **Arduino Mega** 
 - **Ethernet Shield 5100**
-- **Leds**
+- **Pantalla LCD 20X4 con adaptador I2C**
+- **4 Leds (Verde - Rojo - Amarillo - Azul)**
 - **Módulo RFID RC522**  
+- **Buzzer Activo**
+- **Adaptador 12V 3A**
+- **Step Down 1.25v - 35v 3a**
+- **Cooler max 12MM a 12V - 5V**
+- **Rejilla Cooler 12MM**
+- **Conexión Ethernet**
 - **Conexión USB a la PC** 
-- **Cable Ethernet**
+
+### 🔌 Diagrama de conexión
+- **Conectar GND Arduino a GND Step Down**
+
+- **Pantalla LCD 20X4 con adaptador I2C**
+  - GND -> GND Step Down
+
+- **Pantalla LCD 20X4 con adaptador I2C**
+  - VCC -> 5V Step Down
+  - GND -> GND Step Down
+  - SDA -> PIN 20
+  - SCL -> PIN 21
+
+- **Leds**
+  - LED VERDE -> PIN 4
+  - LED ROJO -> PIN 5
+  - LED AMARILLO -> PIN 6
+  - LED AZUL -> PIN 7
+  - GND -> GND Arduino
+
+- **Módulo RFID RC522**
+  - VCC -> 3.3V Arduino
+  - GND -> GND Step Down
+  - RST -> PIN 9
+  - SDA -> PIN 53
+  - SCK -> PIN 52
+  - MOSI -> PIN 51
+  - MISO -> PIN 50
+
+- **Buzzer activo**
+  - VCC -> PIN 3
+  - GND -> GND Step Down
 
 ### 🖨️ El proyecto cuenta con archivos de un modelo de caja a medida para los componenetes del arduino
 **Archivos** `/Arduino - Impresión 3D/ Caja Arduino PFC/`
 
 - **CUERPO**
 - **TAPA**
-- **TRABA TAPA**
 
 ### 📆 Librerías de Software  
 - Las libreria estan backapeadas dentro de (`Arduino - Impresión 3D/Arduino/Libraries/`)
