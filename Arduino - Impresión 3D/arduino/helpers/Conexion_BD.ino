@@ -1,13 +1,15 @@
 // Codigo basico para conexión de Arduino con MySql con muestreo de error al conectar
+// Es necesario que previo a esto conectar el Shield Ethernet 5100 para conexión con internet
+// Arduino UNO - MEGA
 #include <SPI.h>
 #include <Ethernet.h>
 #include <MySQL_Connection.h>
 #include <MySQL_Cursor.h>
 
 byte mac_addr[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress server_addr(192, 168, 1, 37);
+IPAddress server_addr(192, 168, XX, XX);
 char user[] = "root";
-char password[] = "Mercedes";
+char password[] = "Clave";
 
 EthernetClient client;
 MySQL_Connection conn((Client *)&client);

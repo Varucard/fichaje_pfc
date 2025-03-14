@@ -138,7 +138,7 @@ El sistema está diseñado para funcionar con un **lector RFID basado en Arduino
 - **Arduino Mega** 
 - **Ethernet Shield 5100**
 - **Pantalla LCD 20X4 con adaptador I2C**
-- **4 Leds (Verde - Rojo - Amarillo - Azul)**
+- **4 Leds (Verde - Rojo - Amarillo - Azul/ Cada uno debe de llevar una resistencia => 220Ω - 330Ω)**
 - **Módulo RFID RC522**  
 - **Buzzer Activo**
 - **Adaptador 12V 3A**
