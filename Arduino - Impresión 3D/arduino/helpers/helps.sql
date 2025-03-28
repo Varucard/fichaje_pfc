@@ -8,7 +8,9 @@ WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('information_schema', '
 
 -- Crear un usuario para la conexión desde Arduino y otorgar privilegios a una IP específica
 -- Otorgar privilegios de acceso para el usuario 'root' desde una IP específica
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.1.XX' IDENTIFIED BY 'claveroot';
+CREATE USER 'root'@'192.168.XX.XX' IDENTIFIED BY 'ClaveRoot';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.XX.XX' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
 
 -- 4. Aplicar los privilegios otorgados
 FLUSH PRIVILEGES;
