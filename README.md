@@ -20,7 +20,7 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
 1. **Instalar XAMPP** y asegurarse de que **Apache** y **MySQL** estén en ejecución.
 2. **Configuración de Apache, PHP y MySQL:**  
 
-   - **Apache (`httpd.conf`)** Configurar las variables de entorno al final del archivo
+   - **Apache (`httpd.conf`)** Configurar las variables de entorno al final del archivo (Tener en cuenta que a mas variables de entornos mas se deben configurar)
      ```ini
      SetEnv MYSQL_DB_HOST "localhost"
      SetEnv MYSQL_DB_USER "root"
@@ -232,4 +232,4 @@ Este proyecto es **de código abierto** y está bajo la licencia **MIT**. Puedes
 Si tienes dudas o sugerencias, puedes contactar a arielmolus25@gmail.com  
 
 --- 
-## 🕰️ Ultima modificación: 12-03-2025
+## 🕰️ Ultima modificación: 28-03-2025
