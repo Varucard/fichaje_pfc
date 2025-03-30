@@ -4,29 +4,26 @@ Incluye integración con un **lector RFID basado en Arduino**.
 
 ---
 
-## 📌 Requisitos  
-### 🛠️ Versiones para el entorno utilizadas:  
+## 📌 Requisitos de Software
 - **Base de datos:** MariaDB 10.4.32 o ⬆️
 - **Servidor web:** Apache 2.4.58 o ⬆️
 - **PHP:** 8.0.0 o ⬆️  
 
----
+## 🛠️ Entornos de desarrollo o producción: 
 
-## 📝 Instalación en XAMPP (8.2.12)  
+### 📝 Instalación en XAMPP (8.2.12 - 01-03-2025)  
 Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.  
-🔗 [Descargar XAMPP 8.2.12](https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.2.12/xampp-windows-x64-8.2.12-0-VS16-installer.exe/download)  
+🔗 [Descargar XAMPP](https://www.apachefriends.org/es/download.html)  
 
 ### 🚀 Pasos de Instalación  
 1. **Instalar XAMPP** y asegurarse de que **Apache** y **MySQL** estén en ejecución.
 2. **Configuración de Apache, PHP y MySQL:**  
 
-   - **Apache (`httpd.conf`)** Configurar las variables de entorno al final del archivo (Tener en cuenta que a mas variables de entornos mas se deben configurar)
+   - **Apache (`httpd.conf`)** Configurar las variables de entorno al final del archivo (Es necesario configurar todas las variables de entorno dentro del archivo)
      ```ini
      SetEnv MYSQL_DB_HOST "localhost"
      SetEnv MYSQL_DB_USER "root"
      SetEnv MYSQL_DB_PASSWORD "Password"
-     SetEnv MYSQL_DB_NAME "pfc"
-     SetEnv MYSQL_DB_PORT "3306"
      ```
 
    - **PHP (`php.ini`)** – Configurar la zona horaria:  
@@ -36,7 +33,7 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
 
    - **phpMyAdmin (`config.inc.php`)** – Configurar acceso:  
      ```php
-     /* Authentication type and info */
+     /* Tipo de autenticación e info */
      $cfg['Servers'][$i]['auth_type'] = 'cookie';
      $cfg['Servers'][$i]['user'] = 'root';
      $cfg['Servers'][$i]['password'] = 'Clave';
@@ -70,7 +67,58 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
      - Alumnos con matriculaciones, pagos y fichadas  
 
 5. **Configurar la conexión a la base de datos** en `.env`.  
-6. **Acceder al sistema** desde `http://localhost/fichaje_pfc/`.  
+6. **Acceder al sistema** desde `http://localhost/proyecto/`.  
+7. **Recorda siempre reiniciar los servicios desde el control de XAMPP**.
+
+## 🔧 Instalar debbuger en XAMPP
+
+1. Obtener la extensión **`PHP Debug`**: 
+    ```
+    PHP Debug
+    ID: xdebug.php-debug
+    Descripción: Debug support for PHP with Xdebug
+    Versión: 1.35.0
+    Editor: Xdebug
+    Vínculo de VS Marketplace: https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
+    ```
+2. Ejecutar un archivo la instrucción de **`phpinfo()`** para obtener toda la información de tu versión de **PHP**
+
+3. Entrar en el siguiente enlace y seguir las instrucciones de la misma 🔗 [XDebug](https://xdebug.org/wizard) para obtener su archivo de **XDebug**
+
+4. Una vez descargado el archivo y guardado donde indique la pagina es necesario configurar el mismo en **XAMPP**, abrir el archivo **`php.ini`** y pegar la siguiente configuración al final del archivo:
+    ```ini
+    [Xdebug]
+    zend_extension = "C:\xampp\php\ext\php_xdebug.dll"
+    xdebug.mode = debug
+    xdebug.start_with_request = yes
+    xdebug.client_host = 127.0.0.1
+    xdebug.client_port = 9003
+    xdebug.log = "C:\xampp\xdebug.log"
+    ```
+5. Generar un nuevo **`launch.json`** (```Ctrl + Shift + D```)
+    ``` json
+    {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Listen for Xdebug",
+        "type": "php",
+        "request": "launch",
+        "port": 9003,
+        "pathMappings": {
+          "C:\\xampp\\htdocs": "${workspaceFolder}"
+        },
+        "xdebugSettings": {
+          "max_children": 256,
+          "max_data": 1024,
+          "max_depth": 3
+        },
+        "log": true
+      }
+    ]
+    }
+    ```
+6. **Recorda siempre reiniciar los servicios desde el control de XAMPP**.
 
 ---
 
@@ -94,40 +142,40 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
 
 6. **Acceder al sistema** desde `http:8080//localhost/fichaje_pfc/`. 
 
-## En caso de desarrollo el Docker cuenta con debbuger
+## 🔧 Instalar debbuger en Docker
 
 1. Obtener la extensión **`PHP Debug`**: 
-  ```
-  PHP Debug
-  ID: xdebug.php-debug
-  Descripción: Debug support for PHP with Xdebug
-  Versión: 1.35.0
-  Editor: Xdebug
-  Vínculo de VS Marketplace: https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
-  ```
-2. Generar un nuevo **`launch.json`**
-  ``` json
-  {
-  "version": "0.2.0",
-  "configurations": [
+    ```
+    PHP Debug
+    ID: xdebug.php-debug
+    Descripción: Debug support for PHP with Xdebug
+    Versión: 1.35.0
+    Editor: Xdebug
+    Vínculo de VS Marketplace: https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
+    ```
+2. Generar un nuevo **`launch.json`** (```Ctrl + Shift + D```)
+    ``` json
     {
-      "name": "Listen for Xdebug",
-      "type": "php",
-      "request": "launch",
-      "port": 9003,
-      "pathMappings": {
-        "/var/www/html": "${workspaceFolder}"
-      },
-      "xdebugSettings": {
-        "max_children": 256,
-        "max_data": 1024,
-        "max_depth": 3
-      },
-      "log": true
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Listen for Xdebug",
+        "type": "php",
+        "request": "launch",
+        "port": 9003,
+        "pathMappings": {
+          "/var/www/html": "${workspaceFolder}"
+        },
+        "xdebugSettings": {
+          "max_children": 256,
+          "max_data": 1024,
+          "max_depth": 3
+        },
+        "log": true
+      }
+    ]
     }
-  ]
-  }
-  ```
+    ```
 
 ---
 
@@ -143,8 +191,8 @@ El sistema está diseñado para funcionar con un **lector RFID basado en Arduino
 - **Buzzer Activo**
 - **Adaptador 12V 3A**
 - **Step Down 1.25v - 35v 3a**
-- **Cooler max 12MM a 12V - 5V**
-- **Rejilla Cooler 12MM**
+- **Cooler max 80MM a 12V - 5V**
+- **Rejilla Cooler 80MM**
 - **Conexión Ethernet**
 - **Conexión USB a la PC** 
 
@@ -232,4 +280,4 @@ Este proyecto es **de código abierto** y está bajo la licencia **MIT**. Puedes
 Si tienes dudas o sugerencias, puedes contactar a arielmolus25@gmail.com  
 
 --- 
-## 🕰️ Ultima modificación: 28-03-2025
+## 🕰️ Ultima modificación: 30-03-2025
