@@ -1,0 +1,257 @@
+:root {
+    --dark-bg: #2c2f33;
+    --dark-light-bg: #3B3F44;
+    --light-text: #ecf0f1;
+    --container-bg: #3a3f44;
+
+    --primary-color: #0F417E;
+    --primary-button-color: #124E97;
+    --primary-second-button-color: #155BB1;
+
+    --secondary-color: #972F12;
+    --secondary-button-color: #972F12;
+    --secondary-second-button-color: #B13715;
+    user-select: none;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.hamburger-icon-internal, .hamburger-icon-external {
+    /* transition: display 1s ease-in-out; */
+    display: block;
+    font-size: 30px;
+    padding: 0px 1rem;
+    cursor: pointer;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear;
+  }
+  .hamburger-icon-external {
+    display: inline;
+  }
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--dark-bg);
+    color: var(--light-text);
+    font-family: Arial, sans-serif;
+    height: 100vh;
+}
+
+.fondo {
+    position: relative;
+    width: 100%;
+}
+
+.fondo::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../img/dino_guantes_rojo.png') center/cover no-repeat;
+    background-size: 35%;
+    opacity: 0.15;
+    z-index: -1;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.welcome {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/***************** SEARCH *****************/
+.search-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 100%;
+    padding-bottom: 1.25rem;
+}
+
+.search {
+    display: flex;
+    position: relative;
+    align-items: center;
+    margin-bottom: 1rem;
+    background-color: var(--dark-light-bg);
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    width: 100%;
+}
+
+.search input {
+    flex: 1;
+    background-color: #485057;
+    color: var(--light-text);
+    border: 1px solid #5e676e;
+    margin: 0;
+    padding-left: 2rem;
+    max-width: 100%;
+}
+
+.search input::placeholder {
+    color: #b0b7bc;
+}
+
+.search i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888; /* Color del ícono */
+  }
+
+  /***************** /. SEARCH *****************/
+
+  /***************** BUTTONS *****************/
+
+
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    white-space: nowrap;
+    padding: 8px;
+    margin-bottom: 1rem;
+}
+
+.button-group button {
+    background-color: var(--primary-button-color);
+}
+
+.button-group-danger {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 9px 14px;
+    border: none;
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin: 0; 
+}
+
+button p {
+    margin: 0px auto;
+    padding: 0px;
+    text-align: center;
+}
+
+button:hover {
+    background-color: var(--primary-second-button-color);
+}
+
+button.danger {
+    background-color: var(--secondary-button-color);
+    border-radius: 5px;
+}
+
+button.danger:hover {
+    background-color: var(--secondary-second-button-color);
+}
+
+button i {
+    font-size: 1.2rem;
+}
+
+/***************** /. BUTTONS *****************/
+
+@media (max-width: 600px) {
+
+    .search {
+        flex-direction: column;
+    }
+
+    .search input {
+        width: 100%;
+    }
+
+    .button-group, .button-group-danger {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    button {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+.search-icon {
+    padding-left: 1rem
+}
+
+.d-none {
+    display: none !important;
+}
+
+.d-flex {
+    display: flex !important;
+}
+
+.bg-transparent {
+    background-color: transparent;
+}
+
+@media (min-width: 904px) {
+    /* .header-button-group {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+    } */
+    .hamburger-icon-internal, .hamburger-icon-external{
+        display: none
+    }
+
+    /* .hamburger-icon-internal, .hamburger-icon-external {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+    } */
+}
+
+.hamburger-icon-internal.hidden, .hamburger-icon-external.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.header-button-group.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+}
+
+hr {
+    width: 100%;
+    border-top: 1px solid var(--dark-light-bg);
+}
