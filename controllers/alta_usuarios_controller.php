@@ -19,7 +19,7 @@ if (empty($_POST['dni']) || empty($_POST['name'])) {
 // Verifico si el Usuario existe, si existe corto la ejecución
 $aux = $user->getUserByDNI($_POST['dni']);
 if ($aux) {
-  if ($aux[0]['asset'] == 1) {
+  if ($aux['asset'] == 1) {
     echo "<script>alert('El Cliente/ Profesor ya se encuentra registrado'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
     exit; 
   } else {
@@ -52,7 +52,7 @@ $apellidoSinProcesar = isset($_POST['surname']) ? $_POST['surname'] : '';
 $nombreNormalizado = ucwords(strtolower($nombreSinProcesar));
 $apellidoNormalizado = ucwords(strtolower($apellidoSinProcesar));
 
-$tipo_usuario = isset($_POST['profesor']) ? 2 : null; // A menos que se indique que es profesor lo usuarios son clientes siempre
+$tipo_usuario = isset($_POST['profesor']) ? 1 : 2; // A menos que se indique que es profesor lo usuarios son clientes siempre
 
 // Obtengo los datos del nuevo usuario
 $nuevoUsuario = [
@@ -75,7 +75,7 @@ if ($user->cargarUsuario($nuevoUsuario)) {
     echo "<script>alert('Profesor cargado exitosamente'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
     exit; 
   } else if (isset($_POST['pago'])) {
-    if (nuevo_pago($usuario[0]['id_user'])) {
+    if (nuevo_pago($usuario['id_user'])) {
       echo "<script>alert('Cliente cargado exitosamente con Pago'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
       exit; 
     } else {

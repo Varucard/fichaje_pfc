@@ -1,6 +1,6 @@
 <?php
 // URL de tu Arduino con el endpoint de reinicio
-$url = 'http://' . getenv('IP_ARDUINO') . '/reiniciar';
+$url = 'http://' . getenv('IP_ARDUINO') . ':8080/reiniciar';
 
 // Usar cURL para enviar la solicitud GET en segundo plano
 $ch = curl_init();

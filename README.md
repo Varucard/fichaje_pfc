@@ -5,7 +5,7 @@ Incluye integración con un **lector RFID basado en Arduino**.
 ---
 
 ## 📌 Requisitos de Software
-- **Base de datos:** MariaDB 10.4.32 o ⬆️
+- **Base de datos:** MariaDB 10.0.0 o MySql 9.0.0 ⬆️
 - **Servidor web:** Apache 2.4.58 o ⬆️
 - **PHP:** 8.0.0 o ⬆️  
 
@@ -30,28 +30,17 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
      ```ini
      date.timezone = "America/Argentina/Buenos_Aires"
      ```
+  - **Modificar la clave del Usuario root**:  
+    - Ingresar a PHPMyAdmin y modificar la clave del Usuario root
 
    - **phpMyAdmin (`config.inc.php`)** – Configurar acceso:  
      ```php
      /* Tipo de autenticación e info */
      $cfg['Servers'][$i]['auth_type'] = 'cookie';
      $cfg['Servers'][$i]['user'] = 'root';
-     $cfg['Servers'][$i]['password'] = 'Clave';
+     $cfg['Servers'][$i]['password'] = 'ClaveRoot';
      $cfg['Servers'][$i]['extension'] = 'mysqli';
      $cfg['Servers'][$i]['AllowNoPassword'] = false;
-     ```
-
-   - **MySQL (`my.ini`)** – Configuración de permisos para BD:  
-     ```ini
-      [mysqld]
-      skip-grant-tables  # (Evita la comprobación de permisos)
-      port=3306
-      socket="C:/xampp/mysql/mysql.sock"
-     ```
-      O ejecutar la siguiente consulta para otorgar permisos de ingreso a usuarios
-     ```sql
-      GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.X.XX' IDENTIFIED BY 'Usuario';
-      FLUSH PRIVILEGES;  # (Otorga permisos de acceso)
      ```
 
 3. **Clonar el repositorio** dentro de la carpeta `htdocs`.  
@@ -132,7 +121,7 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
    ```bash
    git clone https://github.com/varucard/fichaje_pfc.git
    ```
-4. **Importar la base de datos** en phpMyAdmin:  
+3. **Importar la base de datos** en phpMyAdmin:  
    - Archivo: `fichaje_pfc.sql`  
    - La BD contiene:  
      - Un Administrador (🙋🏻‍♂️: 41550112 🔑: 123456789)
@@ -140,7 +129,7 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
      - Profesores  
      - Alumnos con matriculaciones, pagos y fichadas  
 
-6. **Acceder al sistema** desde `http:8080//localhost/fichaje_pfc/`. 
+4. **Acceder al sistema** desde `http:8080//localhost/fichaje_pfc/`. 
 
 ## 🔧 Instalar debbuger en Docker
 
@@ -176,6 +165,18 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
     ]
     }
     ```
+---
+
+# 🔓 Configurar Firewall de Windows para que permita la conexión del Arduino al Equipo
+
+1. Abrir **Firewall de Windows con seguridad avanzada** (`wf.msc`).
+2. Ir a **Reglas de entrada** > **Nueva regla**.
+3. Seleccionar **Puerto**, luego **TCP** y especificar el puerto (por ejemplo, `8080`).
+4. Seleccionar **Permitir la conexión**.
+5. Aplicar a todos los perfiles de red.
+6. Asignar un nombre, por ejemplo: `Arduino HTTP Access`.
+7. Editar la regla creada, ir a la pestaña **Ámbito**.
+8. En **Dirección IP remota**, seleccionar **Estas direcciones IP** y agregar la IP del Arduino.
 
 ---
 

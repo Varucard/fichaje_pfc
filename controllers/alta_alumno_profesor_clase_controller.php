@@ -20,10 +20,8 @@ $user = $userClase->getUserByDNI($dni_user);
 // Verifico que el Usuario exista
 if (!$user) {
   echo "<script>alert('El alumno/ profesor no se encuentra registrado'); window.location.href = '../controllers/detalle_clase_controller.php?id_class=" . htmlspecialchars($id_clase) . "';</script>";
-}
-
-// Verifico que el Usuario ya no este agregado en la clase tanto como profesor o alumno
-if ($alumnoClase->getClaseAlumnoByIdAlumnoAndIdClass($user['id_user'], $id_clase) || $profesorClase->getClaseProfesorByIdProfesorAndIdClass($user['id_user'], $id_clase)) {
+} else if ($alumnoClase->getClaseAlumnoByIdAlumnoAndIdClass($user['id_user'], $id_clase) || $profesorClase->getClaseProfesorByIdProfesorAndIdClass($user['id_user'], $id_clase)) {
+  // Verifico que el Usuario ya no este agregado en la clase tanto como profesor o alumno
   echo "<script>alert('El Profesor o Alumno ya se encuentra registrado en la clase'); window.location.href = '../controllers/detalle_clase_controller.php?id_class=" . htmlspecialchars($id_clase) . "';</script>";
   exit;
 }

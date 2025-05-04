@@ -6,18 +6,6 @@ function formatDate(dateString) {
   return `${day}-${month}-${year}`;
 }
 
-//** Contiene para evitar inconvenientes el checkeador de nuevos UID
-function checkForNewUID() {
-  fetch('../controllers/uid_desconocido_controller.php')
-    .then(response => response.json())
-    .then(data => {
-      if (data.mensaje) {
-        alert(`${data.mensaje}`);
-      }
-    })
-    .catch(error => console.error('Error fetching UID:', error));
-}
-
 function actualizarFichajes() {
   fetch('../controllers/ultimos_fichajes_controller.php')
     .then(response => response.json())
@@ -51,13 +39,6 @@ function formatDateTime(dateString) {
   return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 }
 
-// Long polling
-function longPolling() {
-  actualizarFichajes();
-  checkForNewUID();
-  setTimeout(longPolling, 5000); // Poll every 5 seconds
-}
+setInterval(actualizarFichajes, 5000);
 
-document.addEventListener('DOMContentLoaded', () => {
-  longPolling();
-});
+document.addEventListener('DOMContentLoaded', actualizarFichajes);
