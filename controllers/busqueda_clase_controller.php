@@ -23,3 +23,6 @@ if (isset($_GET['busqueda'])) {
   include '../views/busqueda_clases_view.php';
   exit;
 }
+
+include '../views/busqueda_clases_view.php';
+exit;

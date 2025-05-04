@@ -22,10 +22,11 @@ if (empty($_POST['nombre_clase']) || empty($_POST['precio'])) {
 $nombreClase = ucwords(strtolower(trim($_POST['nombre_clase'])));
 $precio = number_format(floatval($_POST['precio']), 0, ',', '');  // Normaliza el precio
 $profesores = $_POST['profesores'] ?? [];
+$dataClase = $clase->getClaseByNameClase($nombreClase);
 
 // Verifico si la clase existe
-if ($clase->getClaseByNameClase($nombreClase)) {
-  echo "<script>alert('La clase ya se encuentra creada'); window.location.href = '../controllers/detalle_usuario_controller.php?dni=" . htmlspecialchars($_POST['dni']) . "';</script>";
+if ($dataClase) {
+  echo "<script>alert('La clase ya se encuentra creada'); window.location.href = '../controllers/detalle_clase_controller.php?id_class=" . htmlspecialchars($dataClase->id_class) . "';</script>";
   exit; 
 }
 
@@ -53,7 +54,7 @@ if (!empty($profesores)) {
   }
 }
 
-// TODO: Agregar Usuarios al momento de crear una clase
+// TODO: Poder agregar Usuarios al momento de crear una clase
 
 // Mostrar mensaje final al usuario
 if (empty($erroresProfesores)) {

@@ -2,50 +2,32 @@ PFC FICHAJES NOTAS
 
 Vista de Usuario:
 Mejoras:
-- Agregar un botón con el cual poder matricular los Usuarios en una clase.
+- Terminar botón matricular alumno en clase.
 
 Vista creación de clase:
 Mejoras:
-- Poder agregar Usuarios.
+- Poder agregar Usuarios al momento de crear las clases.
 
 Vista busqueda de clases:
 - Terminar vista de busqueda de clases.
 
-Vista de Registro Usuario:
-Mejoras:
-- Poder solo marcar una casilla ya que el profesor no paga clases.
+Vista de busquedas:
+- Que el botón de volver atras muestre lo viejo de la busqueda y si no hay nada que redirija al principal de esa busqueda.
 
-Pagos Alumnos:
-¿Es posible adelantar un pago? ¿Como maneja Palillo el tema de adelanto de pago de meses (Consultar a Palillo).
-Mejoras:
-- Que el usuario no puede tener 2 pagos en una misma clase en un margen de tiempo. (Consultar tiempo Palillo).
-Corregir:
-
-Deuda Alumnos:
-
-Liquidación profesores:
-
-NOTAS:
-- No puedo eliminar una clase con alumnos.
-	- Capaz una opción de eliminar todo de una?.
-
-
-ERRORES GENERALES:
+NOTAS GENERALES/ ERRORES:
 - Los buscadores por momento como que se tildan.
 - Revisar que no ingrese basura en RFID Users (BD)
-- Revisar modelo 3D
-- Crear diagrama conexión Arduino.
-- Fotos del Lector armado.
 
-MEJORAS SUPER A FUTURO:
+MODULOS A CREAR:
+- Deuda Alumnos:
+- Liquidación profesores:
+- STOCK:
+
+MEJORAS A FUTURO (Consultar):
 - Al cargar un Email que te llegue un mensaje y que por este medio te pueda llegar información de las clases o algo de ese estilo.
-- Modulo de Stockeo de insumos para venta.
 - Manejo de promociones (Ejemplo: Abono de 3 meses y 1 gratis).
 - Los profesores si se pueden registrar en mas de una clase mientras esta no se repita, lo mismo con el Usuario.
-
-- No se puede eliminar un alumno que tenga deuda. Ya sea de una clase o del sistema.
-
-
-- Terminada vista de busqueda de clases.
-- Corrección error con los profesores al crear la clase.
-- Los profesores se pueden anotar en mas de una clase.
+PAGOS DE ALUMNOS:
+  - ¿Es posible adelantar un pago? ¿Como maneja Palillo el tema de adelanto de pago de meses? ¿Un usuario no puede tener 2 pagos en una misma clase en un margen de tiempo? (Consultar a Palillo).
+  - No se puede eliminar un alumno que tenga deuda. Ya sea de una clase o del sistema (Consultar a Palillo).
+- Que el Usuario si esta en mas de una clase en sus fichadas se muestren esas clases y que figuren pagos acorde a cada clase que tenga el alumno

@@ -49,7 +49,7 @@ if ($cambioTipoUsuario) {
     exit; 
   }
 
-  if ($type_user == 1) $type_user = 0;
+  if ($type_user == 1) $type_user = 2;
   else $type_user = 1; 
 }
 

@@ -63,6 +63,7 @@
     </form>
 
   <script src="../public/js/icons.js"></script>
+  <script src="../public/js/marcar_un_solo_checkbox.js"></script>
 
 </body>
 </html>

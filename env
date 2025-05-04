@@ -12,3 +12,4 @@ IP_ARDUINO=192.168.0.XX
 URLROOT=http://localhost/proyecto
 SITENAME=Nombre de proyecto
 APPVERSION=1.0.0
+XDEBUG_MODE=debug

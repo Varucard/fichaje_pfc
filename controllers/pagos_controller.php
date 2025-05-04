@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
 
 require_once '../models/pago_model.php';
 require_once '../helpers/url_helper.php';
