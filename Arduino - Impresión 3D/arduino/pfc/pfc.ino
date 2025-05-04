@@ -10,7 +10,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 // LEDs y buzzer
 const int ledVerde = 4, ledRojo = 5, ledAmarillo = 6, ledAzul = 7;
-const int buzzerPin = 13; //MODIFICAR A FUTURO
+const int buzzerPin = 3; //MODIFICAR A FUTURO
 
 // RFID
 #define RST_PIN 9
@@ -111,6 +111,7 @@ void beep(int duration) {
 void showWelcomeMessage() {
   digitalWrite(ledRojo, LOW);
   digitalWrite(ledAzul, HIGH);
+  digitalWrite(ledVerde, HIGH);
   lcd.clear();
   lcd.setCursor(0, 0); lcd.print("Palillo");
   lcd.setCursor(8, 1); lcd.print("Fight");
@@ -239,8 +240,7 @@ void parsearJSON(String json) {
     lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
     digitalWrite(ledVerde, HIGH);
     beep(100); beep(100); beep(100); 
-  }
-  else if (estadoString == "desconocido") {
+  } else if (estadoString == "desconocido") {
     lcd.print("Llavero desconocido");
     lcd.setCursor(0, 1); lcd.print("Contactar Admin");
     lcd.setCursor(0, 3); lcd.print("Gracias! PFC");

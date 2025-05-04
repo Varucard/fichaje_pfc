@@ -23,10 +23,11 @@ MODULOS A CREAR:
 - Liquidación profesores:
 - STOCK:
 
-MEJORAS SUPER A FUTURO (Consultar):
+MEJORAS A FUTURO (Consultar):
 - Al cargar un Email que te llegue un mensaje y que por este medio te pueda llegar información de las clases o algo de ese estilo.
 - Manejo de promociones (Ejemplo: Abono de 3 meses y 1 gratis).
 - Los profesores si se pueden registrar en mas de una clase mientras esta no se repita, lo mismo con el Usuario.
 PAGOS DE ALUMNOS:
   - ¿Es posible adelantar un pago? ¿Como maneja Palillo el tema de adelanto de pago de meses? ¿Un usuario no puede tener 2 pagos en una misma clase en un margen de tiempo? (Consultar a Palillo).
   - No se puede eliminar un alumno que tenga deuda. Ya sea de una clase o del sistema (Consultar a Palillo).
+- Que el Usuario si esta en mas de una clase en sus fichadas se muestren esas clases y que figuren pagos acorde a cada clase que tenga el alumno

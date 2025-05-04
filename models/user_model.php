@@ -14,17 +14,17 @@ class User {
   // Trae un usuario
   public function getUserByID(string $id_user) {
     try {
-      // Preparar la consulta SQL
-      $stmt = $this->pdo->query("SELECT * FROM `users` WHERE `id_user` = $id_user");
-  
-      // Obtengo el Usuario
+      $stmt = $this->pdo->prepare("SELECT * FROM `users` WHERE `id_user` = :id_user");
+      $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+      $stmt->execute();
+
       return $stmt->fetch(PDO::FETCH_ASSOC);
-  
     } catch (PDOException $e) {
       // echo "Error en la consulta: " . $e->getMessage();
       return false;
     }
   }
+
 
   // Trae un usuario
   public function getUserByDNI(string $dni) {
@@ -43,7 +43,7 @@ class User {
     }
   }
 
-  // Trae un usuario por RFID que se encuentre activo
+  // Trae un Usuario con el RFID siempre y cuando este usuario este activo
   public function getUserByRFID(string $rfid) {
     try {
       // Preparar la consulta SQL
@@ -59,6 +59,26 @@ class User {
       return false;
     }
   }
+
+  // Trae el registro mas actual de un Usuario que haya tenido el RFID registrado
+  public function getUltimoRegistroPorRFID(string $rfid) {
+    try {
+      $stmt = $this->pdo->prepare("
+          SELECT * FROM `users`
+          WHERE `rfid` = :rfid
+          ORDER BY `id_user` DESC
+          LIMIT 1
+      ");
+      $stmt->bindParam(':rfid', $rfid, PDO::PARAM_STR);
+      $stmt->execute();
+
+      return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      // echo "Error en la consulta: " . $e->getMessage();
+      return false;
+    }
+  }
+
 
   // Trae un usuario
   public function getUserByName(string $name) {

@@ -3,12 +3,15 @@
 require_once '../models/uid_model.php';
 require_once '../models/user_model.php';
 require_once '../models/pago_model.php';
+require_once '../models/clase_alumno_model.php';
 require_once '../helpers/url_helper.php';
+require_once 'fichaje_uid.php';
 
 header('Content-Type: application/json');
 
 $uidModel = new UID();
 $userModel = new User();
+$classUserModel = new ClaseAlumno();
 $pagoModel = new Pagos();
 
 // Validar el token de acceso del Arduino
@@ -32,44 +35,52 @@ if (!$uidData) {
   exit;
 }
 
-// Buscar el usuario por el UID
+// Buscar el usuario ACTIVO por el UID
 $user = $userModel->getUserByRFID($uidData);
 
-// Sino se encuentra un Usuario con el UID significa que es desconocido, se inserta en la base de datos
 if (!$user) {
-  $uidModel->insertUID($uidData);
-
-  echo json_encode([
-    'estado' => $estado,
-    'nombre' => $nombre,
-    'apellido' => $apellido,
-  ], JSON_UNESCAPED_UNICODE);
+  // Sino se encuentra un ningún registro de un Usuario con el UID es desconocido, se inserta en la base de datos
+  if (!$userModel->getUltimoRegistroPorRFID($uidData)) {
+    $uidModel->insertUID($uidData);
+  
+    echo json_encode([
+      'estado' => $estado,
+      'nombre' => $nombre,
+      'apellido' => $apellido,
+    ], JSON_UNESCAPED_UNICODE);
+  } else {
+    echo json_encode([
+      'estado' => "inactivo",
+      'nombre' => $nombre,
+      'apellido' => $apellido,
+    ], JSON_UNESCAPED_UNICODE);
+  }
 
 } else {
-  // El usuario existe, proceder con el estado del usuario
-  if ($user['asset'] != 1) {
-    $estado = "inactivo";
-  } else {
-    // Usuario activo, verificar si tiene pago pendiente
-    $estado = "activo";
+  $fechaPago = $pagoModel->getUltimaFechaPago($user['id_user']);
+  $fecha_actual = new DateTime();
 
-    //! Agregar que tiene que estar en una clase "sinclase"
-    //! Los Administradores no pasan por clase "admin"
-
-    $fechaPago = $pagoModel->getUltimaFechaPago($user['id_user']);
-    $fecha_actual = new DateTime();
-
-    // Si no tiene ningun pago registrado es moroso tambien
-    if ($fechaPago) {
-      $fechaPago = new DateTime($fechaPago);
-      if ($fecha_actual > $fechaPago) {
-        $estado = "moroso";
-      } else {
-        $estado = "activo";
-      }
-    } else {
+  // Si no tiene ningun pago registrado es moroso tambien
+  if ($fechaPago) {
+    $fechaPago = new DateTime($fechaPago);
+    if ($fecha_actual > $fechaPago) {
       $estado = "moroso";
+    } else {
+      $estado = "activo";
     }
+  } else {
+    $estado = "moroso";
+  }
+
+  // Si el Usuario no es Alumno es un Admin o Profesor, pero vamos a tomarlo como un Admin (Es posible a futuro que esto se utilice para profesores)
+  if ($user['type_user'] != 2) $estado = "admin";
+
+  // Si el Usuario no tiene clases
+  if (!$classUserModel->getClaseAlumnoByIdAlumno($user['id_user'])) $estado = "sinclase";
+
+  // Si todo esta bien (Osea, es un Usuario con todo para fichar) registro su fichada
+  if ($estado === "activo") {
+    registrarFichajeManual($user['dni']);
   }
 
   // Enviar respuesta
@@ -79,4 +90,5 @@ if (!$user) {
     'apellido' => $user['user_surname'],
   ], JSON_UNESCAPED_UNICODE);
 }
+
 ?>

@@ -82,7 +82,7 @@
 
         <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($usuario['email']); ?>">
+          <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($usuario['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
           <label for="phone">Teléfono:</label>
           <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($usuario['phone_number'] ?? ''); ?>">
