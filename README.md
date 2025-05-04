@@ -281,4 +281,4 @@ Este proyecto es **de código abierto** y está bajo la licencia **MIT**. Puedes
 Si tienes dudas o sugerencias, puedes contactar a arielmolus25@gmail.com  
 
 --- 
-## 🕰️ Ultima modificación: 30-03-2025
+## 🕰️ Ultima modificación: 04-05-2025
