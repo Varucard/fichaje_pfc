@@ -1,7 +1,7 @@
 services:
   php:
     build: .
-    image: php_custom:8.4
+    image: php_custom:latest
     container_name: php_container
     ports:
       - "8080:80"

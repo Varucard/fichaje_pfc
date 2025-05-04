@@ -3,6 +3,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <MFRC522.h>
 #include <avr/wdt.h>
+#include <ArduinoJson.h>
 
 // LCD I2C
 LiquidCrystal_I2C lcd(0x27, 20, 4);
@@ -152,7 +153,7 @@ void handleHTTPRequests() {
 
 void consultarServidor(String uid) {
   if (client.connect(server, 8080)) {
-    String url = "/config/get_uid.php?uid=" + uid;
+    String url = "/config/get_uid.php?uid=" + uid + "&auth=ABC123";
     client.println("GET " + url + " HTTP/1.1");
     client.println("Host: 192.168.0.245");
     client.println("Connection: close");
@@ -161,6 +162,7 @@ void consultarServidor(String uid) {
     boolean headersEnded = false;
     String payload = "";
 
+    delay(500);
     while (client.connected()) {
       while (client.available()) {
         String line = client.readStringUntil('\n');
@@ -182,36 +184,67 @@ void consultarServidor(String uid) {
 }
 
 void parsearJSON(String json) {
-  json.replace("{", ""); json.replace("}", ""); json.replace("\"", "");
-  String estado = obtenerValor(json, "status");
-  String nombre = obtenerValor(json, "nombre");
-  String apellido = obtenerValor(json, "apellido");
-  String mensaje = obtenerValor(json, "mensaje");
+  // Crea un objeto para almacenar los datos del JSON
+  StaticJsonDocument<200> doc;  // Ajusta el tamaño según el tamaño del JSON
+
+  // Deserializar el JSON
+  DeserializationError error = deserializeJson(doc, json);
+
+  // Verifica si ocurrió un error
+  if (error) {
+    Serial.println("Error al parsear JSON");
+    return;
+  }
+  
+  // Extraer los valores del JSON
+  const char* estado = doc["estado"];
+  const char* nombre = doc["nombre"];
+  const char* apellido = doc["apellido"];
+
+  // Convierto el tipo de dato para la comparación
+  String estadoString = String(estado);
 
   lcd.clear();
   lcd.setCursor(0, 0);
-  if (estado == "activo") {
+  if (estadoString == "activo") {
     lcd.print("Bienvenido/a!");
     lcd.setCursor(0, 1); lcd.print(nombre);
     lcd.setCursor(0, 2); lcd.print(apellido);
-    lcd.setCursor(0, 3); lcd.print(mensaje);
+    lcd.setCursor(0, 3); lcd.print("Disfrute su clase!");
     digitalWrite(ledVerde, HIGH);
     beep(200);
-  } else if (estado == "moroso") {
-    lcd.print("Abone la cuota");
-    lcd.setCursor(0, 2); lcd.print("Gracias! PFC");
+  } else if (estadoString == "moroso") {
+    lcd.print("POR FAVOR");
+    lcd.setCursor(0, 1); lcd.print("Abonar la cuota");
+    lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, LOW);
     digitalWrite(ledRojo, HIGH);
     beep(600); beep(600);
-  } else if (estado == "inactivo") {
+  } else if (estadoString == "inactivo") {
     lcd.print("Usuario inactivo");
     lcd.setCursor(0, 1); lcd.print("Contactar Admin");
     lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, LOW);
     digitalWrite(ledRojo, HIGH);
     beep(600);
-  } else {
+  } else if (estadoString == "sinclase") {
+    lcd.print("Usuario sin clase");
+    lcd.setCursor(0, 1); lcd.print("Contactar Admin");
+    lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledRojo, HIGH);
+    beep(600);
+  } else if (estadoString == "admin") {
+    lcd.print("Hola Administrador");
+    lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, HIGH);
+    beep(100); beep(100); beep(100); 
+  }
+  else if (estadoString == "desconocido") {
     lcd.print("Llavero desconocido");
     lcd.setCursor(0, 1); lcd.print("Contactar Admin");
     lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, LOW);
     digitalWrite(ledRojo, HIGH);
     beep(600);
   }

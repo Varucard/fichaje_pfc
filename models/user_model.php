@@ -97,10 +97,10 @@ class User {
     $rfid = $user[0];
     $dni = $user[1];
     $name = $user[2];
-    $surname = $user[3] ?? NULL;
-    $birth_day = $user[4] ?? NULL;
-    $email = $user[5] ?? NULL;
-    $phone_number = $user[6] ?? NULL;
+    $surname = ($user[3] == '') ? NULL : $user[3];
+    $birth_day = ($user[4] == '') ? NULL : $user[4];
+    $email = ($user[5] == '') ? NULL : $user[5];
+    $phone_number = ($user[6] == '') ? NULL : $user[6];
     $type_user = $user[7] ?? 2;
 
     try {
@@ -129,16 +129,21 @@ class User {
   // Actualiza un Usuario
   public function actualizarUsuario($datos) {
     try {
+        $surname     = !empty($datos['surname'])     ? $datos['surname']     : null;
+        $birth_day   = !empty($datos['birth_day'])   ? $datos['birth_day']   : null;
+        $email       = !empty($datos['email'])       ? $datos['email']       : null;
+        $phoneNumber = !empty($datos['phone_number'])? $datos['phone_number']: null;
+
         $stmt = $this->pdo->prepare("UPDATE users SET user_name = :name, user_surname = :surname, birth_day = :birth_day, rfid = :rfid, dni = :dni, email = :email, phone_number = :phone, type_user = :type_user WHERE id_user = :id");
-        $stmt->bindParam(':name', $datos['name'], PDO::PARAM_STR);
-        $stmt->bindParam(':surname', $datos['surname'], PDO::PARAM_STR);
-        $stmt->bindParam(':birth_day', $datos['birth_day'], PDO::PARAM_STR);
-        $stmt->bindParam(':rfid', $datos['rfid'], PDO::PARAM_STR);
-        $stmt->bindParam(':dni', $datos['dni'], PDO::PARAM_STR);
-        $stmt->bindParam(':email', $datos['email'], PDO::PARAM_STR);
-        $stmt->bindParam(':phone', $datos['phone_number'], PDO::PARAM_STR);
-        $stmt->bindParam(':type_user', $datos['type_user'], PDO::PARAM_STR);
-        $stmt->bindParam(':id', $datos['id'], PDO::PARAM_INT);
+        $stmt->bindParam(':name',       $datos['name'],        PDO::PARAM_STR);
+        $stmt->bindParam(':surname',    $surname,              PDO::PARAM_STR);
+        $stmt->bindParam(':birth_day',  $birth_day,            PDO::PARAM_STR);
+        $stmt->bindParam(':rfid',       $datos['rfid'],        PDO::PARAM_STR);
+        $stmt->bindParam(':dni',        $datos['dni'],         PDO::PARAM_STR);
+        $stmt->bindParam(':email',      $email,                PDO::PARAM_STR);
+        $stmt->bindParam(':phone',      $phoneNumber,          PDO::PARAM_STR);
+        $stmt->bindParam(':type_user',  $datos['type_user'],   PDO::PARAM_STR);
+        $stmt->bindParam(':id',         $datos['id'],          PDO::PARAM_INT);
 
         return $stmt->execute();
     } catch (PDOException $e) {

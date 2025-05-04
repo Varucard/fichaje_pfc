@@ -1,60 +1,82 @@
 <?php
+
+require_once '../models/uid_model.php';
+require_once '../models/user_model.php';
+require_once '../models/pago_model.php';
+require_once '../helpers/url_helper.php';
+
 header('Content-Type: application/json');
 
-// Obtener UID enviado por el Arduino
-$uid = isset($_GET['uid']) ? $_GET['uid'] : null;
+$uidModel = new UID();
+$userModel = new User();
+$pagoModel = new Pagos();
 
-if (!$uid) {
-    http_response_code(400);
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'UID no proporcionado'
-    ]);
-    exit;
+// Validar el token de acceso del Arduino
+if (!isset($_GET['auth']) || $_GET['auth'] !== 'ABC123') {
+  http_response_code(403);
+  echo json_encode(['status' => 'error', 'message' => 'Acceso denegado']);
+  exit;
 }
 
-// -------------------------------------------------------------------
-// Acá va tu lógica para consultar la base de datos o archivos, etc.
-// Según el UID, tenés que obtener estos campos:
-// - estado: "activo", "moroso", "inactivo", o cualquier otro
-// - nombre
-// - apellido
-// - mensaje (opcional, por ejemplo: "Buen día" o lo que quieras mostrar)
-// -------------------------------------------------------------------
+$uidData = isset($_GET['uid']) ? $_GET['uid'] : null;
+$estado = "desconocido";
+$nombre = "";
+$apellido = "";
 
-// EJEMPLO SIMULADO (reemplazar esto con tu lógica real):
-switch ($uid) {
-    case "1234567890":
-        $estado = "activo";
-        $nombre = "Juan";
-        $apellido = "Pérez";
-        $mensaje = "Buen día!";
-        break;
-    case "9876543210":
-        $estado = "moroso";
-        $nombre = "";
-        $apellido = "";
-        $mensaje = "";
-        break;
-    case "5555555555":
-        $estado = "inactivo";
-        $nombre = "";
-        $apellido = "";
-        $mensaje = "";
-        break;
-    default:
-        $estado = "desconocido";
-        $nombre = "";
-        $apellido = "";
-        $mensaje = "";
-        break;
+if (!$uidData) {
+  http_response_code(400);
+  echo json_encode([
+    'status' => 'error',
+    'message' => 'UID no proporcionado'
+  ]);
+  exit;
 }
 
-// Respuesta al Arduino
-echo json_encode([
-    'status' => 'ok',
+// Buscar el usuario por el UID
+$user = $userModel->getUserByRFID($uidData);
+
+// Sino se encuentra un Usuario con el UID significa que es desconocido, se inserta en la base de datos
+if (!$user) {
+  $uidModel->insertUID($uidData);
+
+  echo json_encode([
     'estado' => $estado,
     'nombre' => $nombre,
     'apellido' => $apellido,
-    'mensaje' => $mensaje
-]);
+  ], JSON_UNESCAPED_UNICODE);
+
+} else {
+  // El usuario existe, proceder con el estado del usuario
+  if ($user['asset'] != 1) {
+    $estado = "inactivo";
+  } else {
+    // Usuario activo, verificar si tiene pago pendiente
+    $estado = "activo";
+
+    //! Agregar que tiene que estar en una clase "sinclase"
+    //! Los Administradores no pasan por clase "admin"
+
+    $fechaPago = $pagoModel->getUltimaFechaPago($user['id_user']);
+    $fecha_actual = new DateTime();
+
+    // Si no tiene ningun pago registrado es moroso tambien
+    if ($fechaPago) {
+      $fechaPago = new DateTime($fechaPago);
+      if ($fecha_actual > $fechaPago) {
+        $estado = "moroso";
+      } else {
+        $estado = "activo";
+      }
+    } else {
+      $estado = "moroso";
+    }
+  }
+
+  // Enviar respuesta
+  echo json_encode([
+    'estado' => $estado,
+    'nombre' => $user['user_name'],
+    'apellido' => $user['user_surname'],
+  ], JSON_UNESCAPED_UNICODE);
+}
+?>
