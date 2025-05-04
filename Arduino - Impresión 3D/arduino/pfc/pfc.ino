@@ -1,304 +1,106 @@
-// Libreria de Ethernet
-#include <Ethernet.h>
 #include <SPI.h>
-// Libreria de SQL
-#include <MySQL_Connection.h>
-#include <MySQL_Cursor.h>
-// Libreria Pantalla
+#include <Ethernet.h>
 #include <LiquidCrystal_I2C.h>
-// Libreria lector RFID
 #include <MFRC522.h>
-// Libreria registro de eventos
-#include <avr/wdt.h>  // Librería para el Watchdog Timer
+#include <avr/wdt.h>
+#include <ArduinoJson.h>
 
-// Configuración de la pantalla LCD I2C
+// LCD I2C
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
-// Configuración de los LEDs
-const int ledVerde = 4;
-const int ledRojo = 5;
-const int ledAmarillo = 6;
-const int ledAzul = 7;
+// LEDs y buzzer
+const int ledVerde = 4, ledRojo = 5, ledAmarillo = 6, ledAzul = 7;
+const int buzzerPin = 3; //MODIFICAR A FUTURO
 
-// Configuración del buzzerc:\xampp\htdocs\fichaje_pfc\Arduino - Impresión 3D\Arduino viejo\src\main.cpp
-const int buzzerPin = 13; // Modificar a futuro
+// RFID
+#define RST_PIN 9
+#define SS_PIN 53
+MFRC522 mfrc522(SS_PIN, RST_PIN);
 
-// Configuración del lector RFID
-#define RST_PIN         9  // Configurable, ver el esquema de pines
-#define SS_PIN          53 // Configurable, ver el esquema de pines
-MFRC522 mfrc522(SS_PIN, RST_PIN);   // Crear instancia del MFRC522
-
-// Datos de configuración de Internet y MySQL
-byte mac_addr[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress server_addr(192, 168, 0, 49); // IP del MySQL *server*
-IPAddress ip(192, 168, 0, 36);          // IP de Arduino
-IPAddress subnet(255, 255, 255, 0);     // Sub-Mascara Arduino
-IPAddress gateway(192, 168, 0, 1);      // Puerta de acceso Arduino
-unsigned int port = 3306;               // Puerto MySQL
-char user[] = "root";                   // MySQL username
-char password[] = "Mercedes";           // MySQL password
+// Red
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 0, 36);
+IPAddress gateway(192, 168, 0, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress server(192, 168, 0, 245); // IP de tu servidor PHP
 
 EthernetClient client;
-MySQL_Connection conn((Client *)&client);
-MySQL_Cursor* cursor;
+EthernetServer httpServer(8080);
 
-unsigned long lastMessageTime = 0;  // Último tiempo en que se mostró el mensaje de bienvenida
-const unsigned long messageInterval = 10000;  // Intervalo para mostrar el mensaje de bienvenida en milisegundos
-
-// Configuración del servidor HTTP
-EthernetServer httpServer(80);
+unsigned long lastMessageTime = 0;
+const unsigned long messageInterval = 10000;
 
 void setup() {
   Serial.begin(9600);
-
-  // Iniciar la pantalla LCD
   lcd.init();
   lcd.backlight();
 
-  // Configurar LEDs y buzzer
   pinMode(ledVerde, OUTPUT);
   pinMode(ledRojo, OUTPUT);
   pinMode(ledAmarillo, OUTPUT);
   pinMode(ledAzul, OUTPUT);
   pinMode(buzzerPin, OUTPUT);
-  
-  digitalWrite(ledVerde, LOW);
-  digitalWrite(ledRojo, LOW);
-  digitalWrite(ledAmarillo, HIGH);
-  digitalWrite(ledAzul, LOW);
 
-  // Emitir pitido inicial largo
+  digitalWrite(ledAmarillo, HIGH);
   beep(1000);
 
-  // Mostrar mensaje inicial
-  lcd.setCursor(0, 0);
-  lcd.print("Palillo");
-  lcd.setCursor(8, 1);
-  lcd.print("Fight");
-  lcd.setCursor(14, 2);
-  lcd.print("Club!");
-  lcd.setCursor(0, 3);
-  lcd.print("Bienvenido/a Admin!");
+  lcd.setCursor(0, 0); lcd.print("Palillo");
+  lcd.setCursor(8, 1); lcd.print("Fight");
+  lcd.setCursor(14, 2); lcd.print("Club!");
+  lcd.setCursor(0, 3); lcd.print("Bienvenido/a Admin!");
   delay(3000);
 
-  // Iniciar la conexión con la red
   lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Intentando");
-  lcd.setCursor(0, 1);
-  lcd.print("Conectar a la Red");
-  delay(3000);
-
-  Ethernet.begin(mac_addr, ip, gateway, gateway, subnet); // Configurar Ethernet manualmente
+  lcd.setCursor(0, 0); lcd.print("Conectando Red...");
+  lcd.setCursor(0, 1); lcd.print("Aguarde por favor...");
+  Ethernet.begin(mac, ip, gateway, gateway, subnet);
   delay(2000);
 
-  // Mostrar datos conexión a la red
   lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Conectado a la red");
-  lcd.setCursor(0, 1);
-  lcd.print("IP Arduino: ");
-  lcd.setCursor(0, 2);
-  lcd.print(Ethernet.localIP());
+  lcd.setCursor(0, 0); lcd.print("Conectado:");
+  lcd.setCursor(0, 1); lcd.print(Ethernet.localIP());
+  digitalWrite(ledVerde, HIGH);
   delay(3000);
-  
-  // Iniciar el servidor HTTP
+
   httpServer.begin();
-
-  // Intentar conectar a MySQL
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Conectando a MySQL");
-  lcd.setCursor(0, 1);
-  lcd.print("Aguarde por favor");
-  delay(300);
-  
-  if (conn.connect(server_addr, port, user, password)) {
-    lcd.setCursor(0, 3);
-    lcd.print("Conexion a MySQL OK");
-    digitalWrite(ledVerde, HIGH);
-    // Emitir dos pitidos cortos
-    beep(200);
-    beep(200);
-  } else {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Error conexion MySQL");
-    lcd.setCursor(0, 2);
-    lcd.print("Por favor, reinicie");
-    digitalWrite(ledRojo, HIGH);
-    // Emitir tres pitidos medios largos
-    beep(600);
-    beep(600);
-    beep(600);
-    delay(60000);
-  }
-  
-  conn.close();
-  delay(3000);
-
-  // Iniciar SPI y el lector RFID
   SPI.begin();
   mfrc522.PCD_Init();
 
-  cursor = new MySQL_Cursor(&conn);
-
-  // Mostrar mensaje de bienvenida inicial
   showWelcomeMessage();
-  lastMessageTime = millis();  // Guardar el tiempo actual
+  lastMessageTime = millis();
 }
 
 void loop() {
-  handleHTTPRequests(); // Manejar solicitudes HTTP
+  handleHTTPRequests();
 
-  // Verificar si hay una nueva tarjeta presente
   if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
     digitalWrite(ledAzul, LOW);
-
-    // Leer el UID de la tarjeta
     String uid = "";
     for (byte i = 0; i < mfrc522.uid.size; i++) {
-      uid += String(mfrc522.uid.uidByte[i] < 0x10 ? "0" : "");
+      uid += (mfrc522.uid.uidByte[i] < 0x10 ? "0" : "");
       uid += String(mfrc522.uid.uidByte[i], HEX);
     }
-    uid.toUpperCase();  // Convertir a mayúsculas para consistencia
+    uid.toUpperCase();
 
-    // Mostrar el UID en la pantalla LCD
     lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Leyendo, aguarde...");
-    lcd.setCursor(0, 2);
-    lcd.print("Llavero: ");
-    lcd.setCursor(0, 3);
-    lcd.print(uid);
-    delay(3000);
+    lcd.setCursor(0, 0); lcd.print("Leyendo...");
+    lcd.setCursor(0, 2); lcd.print("Llavero: ");
+    lcd.setCursor(0, 3); lcd.print(uid);
+    delay(2000);
 
-    // Conectar a MySQL
-    if (conn.connect(server_addr, port, user, password)) {
-      // Consulta SQL para verificar si el UID existe y obtener estado de activo/inactivo
-      String query = "SELECT u.id_user, u.name, u.surname, u.asset, "
-                     "COALESCE( "
-                     "(SELECT date_of_renovation "
-                     " FROM pfc.payments p "
-                     " WHERE p.id_user = u.id_user "
-                     " ORDER BY p.date_of_renovation DESC "
-                     " LIMIT 1), "
-                     "'2010-01-01 00:00:00') AS last_payment_date, "
-                     "NOW() AS current_date_time "
-                     "FROM pfc.users u "
-                     "WHERE u.rfid = '" + uid + "'";
+    consultarServidor(uid);
 
-      cursor->execute(query.c_str());
-
-      // Obtener el resultado de la consulta
-      column_names *cols = cursor->get_columns();
-      row_values *row = NULL;
-      if ((row = cursor->get_next_row()) != NULL) {
-        // UID encontrado, obtener id_user, nombre y apellido
-        int userId = atoi(row->values[0]);
-        String nombre = row->values[1];
-        String apellido = row->values[2];
-        int asset = atoi(row->values[3]);
-        String fechaRenovacion = row->values[4];
-        String fechaActual = row->values[5];
-
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Bienvenido/a!");
-        lcd.setCursor(0, 1);
-        lcd.print(nombre);
-        lcd.setCursor(0, 2);
-        lcd.print(apellido);
-        delay(2000);
-
-        // Verificar el estado de activo/inactivo del usuario
-        if (asset == 1) {
-          // Usuario activo, comparar la fecha de renovación con la fecha actual
-          if (fechaActual < fechaRenovacion) {
-            // La fecha de renovación es mayor o igual a la fecha actual
-            lcd.setCursor(0, 3);
-            lcd.print("Disfrute su clase!");
-            beep(200);
-
-            // Registrar la fichada en la tabla incomes
-            String insertQuery = "INSERT INTO pfc.incomes (id_user, addmission_date) VALUES (" + String(userId) + ", NOW())";
-            cursor->execute(insertQuery.c_str());
-          } else {
-            // La fecha de renovación es menor que la fecha actual
-            lcd.clear();
-            lcd.setCursor(0, 0);
-            lcd.print("Por favor");
-            lcd.setCursor(0, 1);
-            lcd.print("Abone la cuota!");
-            lcd.setCursor(0, 3);
-            lcd.print("Gracias! PFC");
-            beep(600);
-            beep(600);
-            beep(600);
-
-            // Registrar el UID del deudor en la BD
-            String insertQueryUIDDeudor = "INSERT INTO pfc.uid_incomes (uid) VALUES ('" + uid + "')";
-            cursor->execute(insertQueryUIDDeudor.c_str());
-          }
-        } else {
-          // Usuario inactivo, mostrar mensaje y registrar UID en pfc.uid_incomes
-          lcd.clear();
-          lcd.setCursor(0, 0);
-          lcd.print("Usuario inactivo");
-          lcd.setCursor(0, 1);
-          lcd.print("Contactar Admin");
-          lcd.setCursor(0, 3);
-          lcd.print("Gracias! PFC");
-          beep(600);
-
-          // Registrar el UID del usuario inactivo en la BD
-          String insertQueryUIDInactivo = "INSERT INTO pfc.uid_incomes (uid) VALUES ('" + uid + "')";
-          cursor->execute(insertQueryUIDInactivo.c_str());
-        }
-
-      } else {
-        // Registrar el UID desconocido en la BD
-        String insertQueryUID = "INSERT INTO pfc.uid_incomes (uid) VALUES ('" + uid + "')";
-        cursor->execute(insertQueryUID.c_str());
-
-        // UID no encontrado
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Llavero desconocido");
-        lcd.setCursor(0, 1);
-        lcd.print("Contactar Admin");
-        lcd.setCursor(0, 3);
-        lcd.print("Gracias! PFC");
-        beep(600);
-      }
-      conn.close();
-    } else {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Error MySQL");
-      lcd.setCursor(0, 2);
-      lcd.print("Por favor, reinicie");
-      digitalWrite(ledRojo, HIGH);
-      beep(600);
-    }
-
-    // Detener la tarjeta
     mfrc522.PICC_HaltA();
     mfrc522.PCD_StopCrypto1();
-
-    // Actualizar el tiempo de la última muestra del mensaje de bienvenida
     lastMessageTime = millis();
   }
 
-  // Mostrar el mensaje de bienvenida si ha pasado el intervalo de tiempo
   if (millis() - lastMessageTime >= messageInterval) {
     showWelcomeMessage();
-    lastMessageTime = millis();  // Actualizar el tiempo de la última muestra del mensaje de bienvenida
+    lastMessageTime = millis();
   }
 }
 
-
-// Función para emitir un pitido
 void beep(int duration) {
   digitalWrite(buzzerPin, HIGH);
   delay(duration);
@@ -306,31 +108,25 @@ void beep(int duration) {
   delay(duration);
 }
 
-// Función para mostrar el mensaje de Sistema
 void showWelcomeMessage() {
+  digitalWrite(ledRojo, LOW);
   digitalWrite(ledAzul, HIGH);
+  digitalWrite(ledVerde, HIGH);
   lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Palillo");
-  lcd.setCursor(8, 1);
-  lcd.print("Fight");
-  lcd.setCursor(14, 2);
-  lcd.print("Club!");
-  lcd.setCursor(0, 3);
-  lcd.print("Bienvenidos!");
+  lcd.setCursor(0, 0); lcd.print("Palillo");
+  lcd.setCursor(8, 1); lcd.print("Fight");
+  lcd.setCursor(14, 2); lcd.print("Club!");
+  lcd.setCursor(0, 3); lcd.print("Bienvenidos!");
 }
 
-// Función para reiniciar el Arduino
 void reiniciarArduino() {
   Serial.println("Reiniciando...");
-  wdt_enable(WDTO_15MS); // Habilitar el Watchdog Timer con un tiempo de espera de 15ms
-  while (1) {} // Esperar a que el Watchdog Timer reinicie el Arduino
+  wdt_enable(WDTO_15MS);
+  while (1) {}
 }
 
-// Función para manejar solicitudes HTTP
 void handleHTTPRequests() {
-  EthernetClient client = httpServer.available(); // Escuchar clientes entrantes
-
+  EthernetClient client = httpServer.available();
   if (client) {
     boolean currentLineIsBlank = true;
     String request = "";
@@ -341,7 +137,7 @@ void handleHTTPRequests() {
 
       if (c == '\n' && currentLineIsBlank) {
         if (request.indexOf("GET /reiniciar HTTP/1.1") >= 0) {
-          reiniciarArduino(); // Llama a la función para reiniciar el Arduino
+          reiniciarArduino();
         }
       }
 
@@ -351,8 +147,114 @@ void handleHTTPRequests() {
         currentLineIsBlank = false;
       }
     }
-
     delay(1);
-    client.stop(); // Cerrar la conexión
+    client.stop();
   }
+}
+
+void consultarServidor(String uid) {
+  if (client.connect(server, 8080)) {
+    String url = "/config/get_uid.php?uid=" + uid + "&auth=ABC123";
+    client.println("GET " + url + " HTTP/1.1");
+    client.println("Host: 192.168.0.245");
+    client.println("Connection: close");
+    client.println();
+
+    boolean headersEnded = false;
+    String payload = "";
+
+    delay(500);
+    while (client.connected()) {
+      while (client.available()) {
+        String line = client.readStringUntil('\n');
+        if (!headersEnded && line == "\r") {
+          headersEnded = true;
+        } else if (headersEnded) {
+          payload += line;
+        }
+      }
+    }
+    client.stop();
+
+    parsearJSON(payload);
+  } else {
+    lcd.clear();
+    lcd.setCursor(0, 0); lcd.print("Error servidor");
+    beep(600);
+  }
+}
+
+void parsearJSON(String json) {
+  // Crea un objeto para almacenar los datos del JSON
+  StaticJsonDocument<200> doc;  // Ajusta el tamaño según el tamaño del JSON
+
+  // Deserializar el JSON
+  DeserializationError error = deserializeJson(doc, json);
+
+  // Verifica si ocurrió un error
+  if (error) {
+    Serial.println("Error al parsear JSON");
+    return;
+  }
+  
+  // Extraer los valores del JSON
+  const char* estado = doc["estado"];
+  const char* nombre = doc["nombre"];
+  const char* apellido = doc["apellido"];
+
+  // Convierto el tipo de dato para la comparación
+  String estadoString = String(estado);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  if (estadoString == "activo") {
+    lcd.print("Bienvenido/a!");
+    lcd.setCursor(0, 1); lcd.print(nombre);
+    lcd.setCursor(0, 2); lcd.print(apellido);
+    lcd.setCursor(0, 3); lcd.print("Disfrute su clase!");
+    digitalWrite(ledVerde, HIGH);
+    beep(200);
+  } else if (estadoString == "moroso") {
+    lcd.print("POR FAVOR");
+    lcd.setCursor(0, 1); lcd.print("Abonar la cuota");
+    lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledRojo, HIGH);
+    beep(600); beep(600);
+  } else if (estadoString == "inactivo") {
+    lcd.print("Usuario inactivo");
+    lcd.setCursor(0, 1); lcd.print("Contactar Admin");
+    lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledRojo, HIGH);
+    beep(600);
+  } else if (estadoString == "sinclase") {
+    lcd.print("Usuario sin clase");
+    lcd.setCursor(0, 1); lcd.print("Contactar Admin");
+    lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledRojo, HIGH);
+    beep(600);
+  } else if (estadoString == "admin") {
+    lcd.print("Hola Administrador");
+    lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, HIGH);
+    beep(100); beep(100); beep(100); 
+  } else if (estadoString == "desconocido") {
+    lcd.print("Llavero desconocido");
+    lcd.setCursor(0, 1); lcd.print("Contactar Admin");
+    lcd.setCursor(0, 3); lcd.print("Gracias! PFC");
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledRojo, HIGH);
+    beep(600);
+  }
+}
+
+String obtenerValor(String json, String clave) {
+  int i = json.indexOf(clave + ":");
+  if (i == -1) return "";
+  int inicio = json.indexOf(":", i) + 1;
+  int fin = json.indexOf(",", inicio);
+  if (fin == -1) fin = json.length();
+  return json.substring(inicio, fin);
 }

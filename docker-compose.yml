@@ -1,7 +1,7 @@
 services:
   php:
     build: .
-    image: php_custom:8.4
+    image: php_custom:latest
     container_name: php_container
     ports:
       - "8080:80"
@@ -29,7 +29,6 @@ services:
       - app_network
     volumes:
       - mysql_data:/var/lib/mysql
-    # command: --default-authentication-plugin=mysql_native_password --bind-address=0.0.0.0
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

@@ -77,15 +77,15 @@
           <input type="text" id="surname" name="surname" value="<?php echo htmlspecialchars($usuario['user_surname']); ?>">
 
           <label for="birth_day">Fecha de Nacimiento:</label>
-          <input type="date" id="birth_day" name="birth_day" value="<?php echo htmlspecialchars($usuario['birth_day']); ?>">
+          <input type="date" id="birth_day" name="birth_day" value="<?php echo htmlspecialchars($usuario['birth_day'] ?? ''); ?>">
         </div>
 
         <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($usuario['email']); ?>">
+          <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($usuario['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
           <label for="phone">Teléfono:</label>
-          <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($usuario['phone_number']); ?>">
+          <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($usuario['phone_number'] ?? ''); ?>">
         </div>
       </form>
 
@@ -101,6 +101,10 @@
             <i class="fas fa-wallet"></i>
             <i style="padding-right: 10px;" class="fas fa-hand-paper"></i>
             Pago manual
+          </button>
+          <button onclick="location.href=''">
+            <i style="padding-right: 10px;" class="fas fa-user-plus"></i>
+            Matricular en clase
           </button>
         <?php endif; ?>
         <button onclick="location.href='../views/dashboard_view.php'">
