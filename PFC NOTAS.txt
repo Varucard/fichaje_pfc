@@ -1,22 +1,16 @@
 PFC FICHAJES NOTAS
 
-Vista de Usuario:
-Mejoras:
-- Terminar botón matricular alumno en clase.
-
-Vista creación de clase:
-Mejoras:
-- Poder agregar Usuarios al momento de crear las clases.
-
-Vista busqueda de clases:
-- Terminar vista de busqueda de clases.
-
 Vista de busquedas:
 - Que el botón de volver atras muestre lo viejo de la busqueda y si no hay nada que redirija al principal de esa busqueda.
 
 NOTAS GENERALES/ ERRORES:
 - Los buscadores por momento como que se tildan.
-- Revisar que no ingrese basura en RFID Users (BD)
+- Revisar que no ingrese basura en RFID Users (BD) => Hacer que por defecto sea "SIN LLAVERO" para dar de alta a un Usuario.
+- ARDUINO =>Corregir tiempo admin - no clases (Cuando el Arduino pregunta debo revisar el tiempo de las preguntas).
+- La fecha cuando hago una renovación de pago automatica falla.
+- Agregar un botón de copiar al RFID entrante.
+- Revisar los cumpleañeros.
+- Revisar si los adeudores cambian de color en las fichadas.
 
 MODULOS A CREAR:
 - Deuda Alumnos:
@@ -31,3 +25,5 @@ PAGOS DE ALUMNOS:
   - ¿Es posible adelantar un pago? ¿Como maneja Palillo el tema de adelanto de pago de meses? ¿Un usuario no puede tener 2 pagos en una misma clase en un margen de tiempo? (Consultar a Palillo).
   - No se puede eliminar un alumno que tenga deuda. Ya sea de una clase o del sistema (Consultar a Palillo).
 - Que el Usuario si esta en mas de una clase en sus fichadas se muestren esas clases y que figuren pagos acorde a cada clase que tenga el alumno
+- Que el Usuario en su vista tenga sus ultimo fichajes?
+- Agregar iconos a los mensajes de aviso.

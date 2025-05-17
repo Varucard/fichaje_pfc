@@ -74,7 +74,7 @@
 
         <div class="form-group">
           <label for="surname">Apellido:</label>
-          <input type="text" id="surname" name="surname" value="<?php echo htmlspecialchars($usuario['user_surname']); ?>">
+          <input type="text" id="surname" name="surname" value="<?php echo isset($usuario['user_surname']) ? htmlspecialchars($usuario['user_surname']) : ''; ?>"
 
           <label for="birth_day">Fecha de Nacimiento:</label>
           <input type="date" id="birth_day" name="birth_day" value="<?php echo htmlspecialchars($usuario['birth_day'] ?? ''); ?>">
@@ -102,7 +102,7 @@
             <i style="padding-right: 10px;" class="fas fa-hand-paper"></i>
             Pago manual
           </button>
-          <button onclick="location.href=''">
+          <button onclick="location.href='../controllers/lista_clases_controller.php'">
             <i style="padding-right: 10px;" class="fas fa-user-plus"></i>
             Matricular en clase
           </button>
@@ -186,5 +186,31 @@
 
   <script src="../public/js/pago_manual.js"></script>
   <script src="../public/js/icons.js"></script>
+
+  <div style="height: 100px;"></div> 
+
+  <div style="height: 100px;"></div> 
+
+  <footer style="
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background-color: rgb(17, 17, 50) !important;
+    color: #eee !important; /* letras claras */
+    text-align: center !important;
+    padding: 40px 10px 20px 10px !important; /* Aumenté padding-top a 40px */
+    font-size: 0.9rem !important;
+    border-top: 1px solid #444 !important; /* borde un poco más oscuro para no destacar demasiado */
+    font-family: Arial, sans-serif !important;
+    z-index: 9999 !important;
+  ">
+    <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Palillo Fight Club. Todos los derechos reservados.</p>
+    <p style="margin: 0;">
+      Desarrollado por
+      <a href="https://tusitio.dev" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
+    </p>
+  </footer>
+  
 </body>
 </html>

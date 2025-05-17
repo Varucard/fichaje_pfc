@@ -78,12 +78,18 @@
   <div class="">
     <div class="botonera-2">
       <i style="color: red;" class="fas fa-sync-alt"></i>
-      <button style="color: red;" onclick="window.location.href='../config/reiniciar_arduino.php'" >Reiniciar Arduino</button>
+      <button style="color: red;" onclick="window.location.href='../config/reiniciar_arduino.php'">Reiniciar Arduino</button>
     </div>
     <div class="botonera-2">
       <i style="color: red;" class="fas fa-sign-out-alt"></i>
       <form action="../controllers/auth_controller.php?action=logout" method="POST">
         <button style="color: red;">Cerrar Sesión</button>
+      </form>
+    </div>
+    <div class="botonera-2">
+      <i style="color: red;" class="fas fa-save"></i>
+      <form action="../config/bkp_bd.php" method="POST">
+        <button style="color: red;">Backapear BD</button>
       </form>
     </div>
   </div>
@@ -104,5 +110,29 @@
   <script src="../public/js/icons.js"></script>
   <script src="../public/js/pago_manual_user.js"></script>
   <script src="../public/js/rfid_nuevos.js"></script>
+
+  <div style="height: 100px;"></div> 
+
+ <footer style="
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background-color: rgb(17, 17, 50) !important;
+    color: #eee !important; /* letras claras */
+    text-align: center !important;
+    padding: 20px 10px !important;
+    font-size: 0.9rem !important;
+    border-top: 1px solid #444 !important; /* borde un poco más oscuro para no destacar demasiado */
+    font-family: Arial, sans-serif !important;
+    z-index: 9999 !important;
+  ">
+    <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Palillo Fight Club. Todos los derechos reservados.</p>
+    <p style="margin: 0;">
+      Desarrollado por
+      <a href="https://tusitio.dev" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
+    </p>
+  </footer>
+
 </body>
 </html>

@@ -1,0 +1,10 @@
+VERSION 2.1.0
+
+- Se corrigio la vista de crear clases por que al no tener profesores cargados mostraba un error grafico, tambien se implemento que solo muestre profesores activos.
+- Agregado un BKP de la BD dentro del proyecto con ruta configurable desde .env.
+- Agregado en la vista de Usuario un botón que te envia al listado de clases.
+- Cambios en la vista: Lista de Clases - Lista de Ingresos (Corregimos error al no tener nada que mostrar).
+- Agregado un FOOTER.
+- Corrección de excepciones por valores NULL no admitidos en actualización PHP 8.0 o Superior.
+- Finalizada la vista de BUSQUEDA DE CLASES.
+- Corregido error al crear clases sin profesores.

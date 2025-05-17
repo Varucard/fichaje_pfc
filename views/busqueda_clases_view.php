@@ -34,8 +34,18 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
           <?php foreach ($clases as $c): ?>
             <tr>
               <td><?php echo htmlspecialchars($c->name_class); ?></td>
-              <td><?php echo htmlspecialchars($c->price_class); ?></td>
-              <td class="diminuto">Nombre del profesor tanto</td>
+              <td><?php echo '$' . number_format($c->price_class, 0, ',', '.'); ?></td>
+              <td class="diminuto">
+                <?php
+                  $nombresProfesores = [];
+                  if (!empty($profesoresPorClase[$c->id_class])) {
+                    foreach ($profesoresPorClase[$c->id_class] as $profesor) {
+                      $nombresProfesores[] = htmlspecialchars($profesor['user_name']);
+                    }
+                  }
+                  echo implode(', ', $nombresProfesores);
+                ?>
+              </td>
               <td class="diminuto">
                 <button class="button_small" onclick="window.location.href='../controllers/detalle_clase_controller.php?id_class=<?php echo urlencode($c->id_class); ?>'">
                   <i class="fas fa-eye"></i>
@@ -71,5 +81,29 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
 
   <script src="../public/js/icons.js"></script>
   <script src="../public/js/busqueda_clase.js"></script>
+
+  <div style="height: 100px;"></div> 
+
+  <footer style="
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background-color: rgb(17, 17, 50) !important;
+    color: #eee !important; /* letras claras */
+    text-align: center !important;
+    padding: 20px 10px !important;
+    font-size: 0.9rem !important;
+    border-top: 1px solid #444 !important; /* borde un poco más oscuro para no destacar demasiado */
+    font-family: Arial, sans-serif !important;
+    z-index: 9999 !important;
+  ">
+    <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Palillo Fight Club. Todos los derechos reservados.</p>
+    <p style="margin: 0;">
+      Desarrollado por
+      <a href="https://tusitio.dev" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
+    </p>
+  </footer>
+  
 </body>
 </html>

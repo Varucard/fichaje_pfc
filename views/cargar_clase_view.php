@@ -24,16 +24,20 @@
       <input type="number" id="precio" min="0" name="precio" placeholder="$" required><br>     
     </div>
 
-    <div class="form-group">
-      <label for="profesor">Profesor/es:</label>
-      <select id="profesor" name="profesores[]" size="<?= min(count($profesores), 5) ?>" multiple>
-        <?php foreach ($profesores as $profesor): ?>
-          <option style="padding-right: 150px;" value="<?= $profesor->id_user ?>"><?= htmlspecialchars($profesor->user_name) ?></option>
-        <?php endforeach; ?>
-      </select><br>
-    </div>
+    <?php if (!empty($profesoresActivos)): ?>
+      <div class="form-group">
+        <label for="profesor">Profesor/es:</label>
+        <select id="profesor" name="profesores[]" size="<?= min(count($profesoresActivos), 5) ?>" multiple>
+          <?php foreach ($profesoresActivos as $profesor): ?>
+            <option style="padding-right: 150px;" value="<?= $profesor->id_user ?>">
+              <?= htmlspecialchars($profesor->user_name) ?>
+            </option>
+          <?php endforeach; ?>
+        </select><br>
+      </div>
+    <?php endif; ?>
 
-    <div style="padding-top: 30px">
+    <div style="padding-top: 150px">
       <button type="submit">
         <i style="padding-right: 10px;" class="fas fa-chalkboard-teacher"></i>
         Registrar Clase
@@ -47,6 +51,29 @@
   </form>
 
   <script src="../public/js/icons.js"></script>
+
+  <div style="height: 100px;"></div> 
+
+  <footer style="
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background-color: rgb(17, 17, 50) !important;
+    color: #eee !important; /* letras claras */
+    text-align: center !important;
+    padding: 20px 10px !important;
+    font-size: 0.9rem !important;
+    border-top: 1px solid #444 !important; /* borde un poco más oscuro para no destacar demasiado */
+    font-family: Arial, sans-serif !important;
+    z-index: 9999 !important;
+  ">
+    <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Palillo Fight Club. Todos los derechos reservados.</p>
+    <p style="margin: 0;">
+      Desarrollado por
+      <a href="https://tusitio.dev" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
+    </p>
+  </footer>
 
 </body>
 </html>
