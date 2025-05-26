@@ -28,7 +28,7 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   </div>
   
   <div class="tabla">
-    <?php if (empty($resultados)) { ?>
+    <?php if (!$resultados[0]) { ?>
       <p>No se encontraron resultados</p>
     <?php } else { ?>
       <table>
@@ -104,7 +104,7 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
     <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Palillo Fight Club. Todos los derechos reservados.</p>
     <p style="margin: 0;">
       Desarrollado por
-      <a href="https://tusitio.dev" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
+      <a href="#" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
     </p>
   </footer>
   

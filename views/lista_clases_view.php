@@ -88,7 +88,7 @@
     <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Palillo Fight Club. Todos los derechos reservados.</p>
     <p style="margin: 0;">
       Desarrollado por
-      <a href="https://tusitio.dev" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
+      <a href="#" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
     </p>
   </footer>
   

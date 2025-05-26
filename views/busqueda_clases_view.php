@@ -20,6 +20,9 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   </div>
   
   <div class="tabla">
+    <?php if (empty($clases)) { ?>
+      <p>No se encontraron resultados</p>
+    <?php } else { ?>
     <table id="tabla-fichajes-busqueda">
       <thead>
         <tr>
@@ -30,7 +33,6 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
         </tr>
       </thead>
       <tbody>
-        <?php if (!empty($clases)): ?>
           <?php foreach ($clases as $c): ?>
             <tr>
               <td><?php echo htmlspecialchars($c->name_class); ?></td>
@@ -58,17 +60,13 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
               </td>
             </tr>
           <?php endforeach; ?>
-        <?php else: ?>
-          <tr>
-            <td colspan="5">No se encontraron resultados</td>
-          </tr>
-        <?php endif; ?>
+        <?php } ?>
       </tbody>
     </table>
   </div>
 
   <div class="botonera">
-    <button onclick="location.href='../controllers/busqueda_clase_controller.php'">
+    <button onclick="location.href='../views/dashboard_view.php'">
       <i style="padding-right: 10px;" class="fas fa-arrow-left"></i>
       Volver
     </button>
@@ -101,7 +99,7 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
     <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Palillo Fight Club. Todos los derechos reservados.</p>
     <p style="margin: 0;">
       Desarrollado por
-      <a href="https://tusitio.dev" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
+      <a href="#" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
     </p>
   </footer>
   

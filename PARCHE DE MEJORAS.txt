@@ -8,3 +8,5 @@ VERSION 2.1.0
 - Corrección de excepciones por valores NULL no admitidos en actualización PHP 8.0 o Superior.
 - Finalizada la vista de BUSQUEDA DE CLASES.
 - Corregido error al crear clases sin profesores.
+- Corregido error al generar un pago automatico.
+- Corregido y mejoras visuales en el Model de cumpleañeros.

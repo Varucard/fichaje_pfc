@@ -29,6 +29,9 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   </div>
   
   <div class="tabla">
+    <?php if (empty($resultados)) { ?>
+      <p>No se encontraron resultados</p>
+    <?php } else { ?>
     <table id="tabla-fichajes-busqueda">
       <thead>
         <tr>
@@ -40,7 +43,6 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
         </tr>
       </thead>
       <tbody>
-        <?php if (!empty($resultados)): ?>
           <?php foreach ($resultados as $fichaje): ?>
             <tr>
               <td><?php echo htmlspecialchars($fichaje['rfid']); ?></td>
@@ -50,11 +52,7 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
               <td class="<?php echo $fichaje['pago_cerca'] ? 'cerca-de-vencer' : ''; ?>"><?php echo htmlspecialchars(explode(' ', $fichaje['date_of_renovation'])[0]); ?></td>
             </tr>
           <?php endforeach; ?>
-        <?php else: ?>
-          <tr>
-            <td colspan="5">No se encontraron resultados</td>
-          </tr>
-        <?php endif; ?>
+        <?php } ?>
       </tbody>
     </table>
   </div>
@@ -94,7 +92,7 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
     <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Palillo Fight Club. Todos los derechos reservados.</p>
     <p style="margin: 0;">
       Desarrollado por
-      <a href="https://tusitio.dev" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
+      <a href="#" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
     </p>
   </footer>
   

@@ -247,28 +247,3 @@ button .fas {
   gap: 20px; /* Espacio entre las tablas */
   margin-top: 20px;
 }
-
-/* Ajusta las tablas */
-/* Cada tabla ocupa aproximadamente la mitad del contenedor */
-
-/* .tabla {
-  width: 48%; 
-  color: white;
-} */
-
-/* Estilos generales para las tablas */
-/* .tabla table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tabla th, .tabla td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-}
-
-.tabla th {
-  background-color: black;
-  color: white;
-} */
