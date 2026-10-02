@@ -33,6 +33,9 @@ Para ejecutar este proyecto, se recomienda instalar **XAMPP 8.2.12** o Superior.
   - **Modificar la clave del Usuario root**:  
     - Ingresar a PHPMyAdmin y modificar la clave del Usuario root
 
+  - **Crear Usuario para el sistema**:  
+    - Ingresar a PHPMyAdmin creando un Usuario para el proyecto
+
    - **phpMyAdmin (`config.inc.php`)** – Configurar acceso:  
      ```php
      /* Tipo de autenticación e info */
@@ -235,17 +238,15 @@ El sistema está diseñado para funcionar con un **lector RFID basado en Arduino
 - **CUERPO**
 - **TAPA**
 
-### 📆 Librerías de Software  
-- Las libreria estan backapeadas dentro de (`Arduino - Impresión 3D/Arduino/Libraries/`)
-  En caso de querer utilizarlas copiar las carpetas y volcarlas en la carpeta de `libraries` de su instalación de Arduino IDE
+| 📚 Librería              | 🔗 Enlace                                                                     | 👤 Autor(es)       | 📌 Función                      | 🛠️ Versión |
+| ------------------------ | ----------------------------------------------------------------------------- | ------------------ | ------------------------------- | ----------- |
+| SPI                      | [Docs](https://www.arduino.cc/en/Reference/SPI)                               | Arduino Team       | Comunicación SPI                | Incluida    |
+| Ethernet                 | [Docs](https://docs.arduino.cc/libraries/ethernet/)                           | Varios             | Administrar red Ethernet        | 2.0.2       |
+| LiquidCrystal I2C        | [GitHub](https://github.com/johnrickman/LiquidCrystal_I2C)                    | Frank de Brabander | Control de pantalla LCD I2C     | 1.1.2       |
+| MFRC522                  | [GitHub](https://github.com/miguelbalboa/rfid)                                | GitHub Community   | Control de lector RFID          | 1.4.12      |
+| avr/wdt (Watchdog Timer) | [Docs](https://www.nongnu.org/avr-libc/user-manual/group__avr__watchdog.html) | Atmel / AVR Libc   | Reseteo automático del sistema  | Incluida    |
+| ArduinoJson              | [Web](https://arduinojson.org/)                                               | Benoît Blanchon    | Manejo de datos en formato JSON | 6.x         |
 
-| 📚 Librería | 🔗 Enlace | 👤 Autor(es) | 📌 Funcón | 🛠️ Versión |
-|----------------------|------------|-------------|-----------|------------|
-| Ethernet | [Docs](https://docs.arduino.cc/libraries/ethernet/) | Varios | Administrar red Ethernet | 2.0.2 |
-| ALog | [GitHub](https://github.com/NorthernWidget/ALog) | Andrew Wickert | Registro de datos | 0.3.2 |
-| LiquidCrystal I2C | [GitHub](https://github.com/johnrickman/LiquidCrystal_I2C) | Frank de Brabander | Administrar pantalla LCD I2C | 1.1.2 |
-| MFRC522 | [GitHub](https://github.com/miguelbalboa/rfid) | GitHub Community | Control lector RFID | 1.4.12 |
-| MySQL Connector Arduino | [GitHub](https://github.com/ChuckBell/MySQL_Connector_Arduino/wiki) | Dr. Charles Bell | Conexión con MySQL | 1.2.0 |
 
 ### 🔌 Configuración del Lector RFID  
 1. **Conectar el Arduino** a la PC mediante USB.  

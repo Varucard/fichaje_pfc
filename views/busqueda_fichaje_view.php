@@ -29,6 +29,9 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   </div>
   
   <div class="tabla">
+    <?php if (empty($resultados)) { ?>
+      <p>No se encontraron resultados</p>
+    <?php } else { ?>
     <table id="tabla-fichajes-busqueda">
       <thead>
         <tr>
@@ -40,7 +43,6 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
         </tr>
       </thead>
       <tbody>
-        <?php if (!empty($resultados)): ?>
           <?php foreach ($resultados as $fichaje): ?>
             <tr>
               <td><?php echo htmlspecialchars($fichaje['rfid']); ?></td>
@@ -50,11 +52,7 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
               <td class="<?php echo $fichaje['pago_cerca'] ? 'cerca-de-vencer' : ''; ?>"><?php echo htmlspecialchars(explode(' ', $fichaje['date_of_renovation'])[0]); ?></td>
             </tr>
           <?php endforeach; ?>
-        <?php else: ?>
-          <tr>
-            <td colspan="5">No se encontraron resultados</td>
-          </tr>
-        <?php endif; ?>
+        <?php } ?>
       </tbody>
     </table>
   </div>
@@ -74,5 +72,29 @@ $resultados = isset($_SESSION['resultados_busqueda']) ? $_SESSION['resultados_bu
   <script src="../public/js/icons.js"></script>
   <script src="../public/js/busqueda_fichaje.js"></script>
   <script src="../public/js/fichaje_manual.js"></script>
+
+  <div style="height: 100px;"></div> 
+
+  <footer style="
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background-color: rgb(17, 17, 50) !important;
+    color: #eee !important; /* letras claras */
+    text-align: center !important;
+    padding: 20px 10px !important;
+    font-size: 0.9rem !important;
+    border-top: 1px solid #444 !important; /* borde un poco más oscuro para no destacar demasiado */
+    font-family: Arial, sans-serif !important;
+    z-index: 9999 !important;
+  ">
+    <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Palillo Fight Club. Todos los derechos reservados.</p>
+    <p style="margin: 0;">
+      Desarrollado por
+      <a href="#" target="_blank" style="color: #66aaff; text-decoration: none;">PC Fighter</a>
+    </p>
+  </footer>
+  
 </body>
 </html>

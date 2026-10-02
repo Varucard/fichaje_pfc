@@ -40,9 +40,10 @@ if (!$nuevaClase) {
 
 // Asignar profesores a la clase, si hay profesores seleccionados
 $erroresProfesores = [];
-if (!empty($profesores)) {
-  $nuevaClase = $clase->getClaseByNameClase($nombreClase);
 
+$nuevaClase = $clase->getClaseByNameClase($nombreClase);
+
+if (!empty($profesores)) {
   foreach ($profesores as $profesorId) {
     $profesor = $user->getUserByID($profesorId);
 
@@ -52,9 +53,9 @@ if (!empty($profesores)) {
       $erroresProfesores[] = "El usuario con ID $profesorId no es un profesor.";
     }
   }
+} else {
+  echo "<script>alert('Clase creada'); window.location.href = '../controllers/detalle_clase_controller.php?id_class=" . htmlspecialchars($nuevaClase->id_class) . "';</script>";
 }
-
-// TODO: Poder agregar Usuarios al momento de crear una clase
 
 // Mostrar mensaje final al usuario
 if (empty($erroresProfesores)) {

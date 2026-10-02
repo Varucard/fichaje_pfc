@@ -11,8 +11,18 @@ function actualizarFichajes() {
     .then(response => response.json())
     .then(data => {
       const tbody = document.querySelector('#tabla-fichajes tbody');
+      const tabla = document.getElementById('contenedor-tabla');
+      const mensaje = document.getElementById('mensaje-vacio');
+
       tbody.innerHTML = '';
 
+      if (data.length === 0) {
+        tabla.style.display = 'none';
+        mensaje.style.display = 'block';
+        return;
+      }
+
+      // Si hay datos
       data.forEach(fichaje => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -24,9 +34,13 @@ function actualizarFichajes() {
         `;
         tbody.appendChild(row);
       });
+
+      mensaje.style.display = 'none';
+      tabla.style.display = 'block';
     })
     .catch(error => console.error('Error fetching fichajes:', error));
 }
+
 
 function formatDateTime(dateString) {
   const date = new Date(dateString);
