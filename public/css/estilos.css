@@ -1,274 +1,322 @@
-/* Estilos Cabecera*/
+/*
+ * Estilos propios del panel. Se apoyan en water.css (tema claro/oscuro automático).
+ * Reemplazan los estilos inline que estaban repartidos en las vistas.
+ */
+
+:root {
+  --pfc-peligro: #e5484d;
+  --pfc-exito: #2f9e44;
+  --pfc-aviso: #f08c00;
+  --pfc-pie: rgb(17, 17, 50);
+}
+
+body {
+  padding-bottom: 110px; /* espacio para el pie fijo */
+}
+
+/* Utilidades */
+.oculto { display: none !important; }
+.centrado { text-align: center; }
+.diminuto { font-size: 0.9em; padding: 2px 5px; }
+.destacado { color: var(--pfc-peligro); }
+.texto-peligro { color: var(--pfc-peligro); }
+.cerca-de-vencer { color: var(--pfc-peligro); font-weight: 600; }
+
+/* Enlaces con aspecto de botón */
+a.boton {
+  display: inline-block;
+  color: var(--form-text);
+  background-color: var(--button-base);
+  padding: 10px 30px;
+  margin: 0 6px 6px 0;
+  border-radius: 6px;
+  text-decoration: none;
+  line-height: normal;
+}
+a.boton:hover { background-color: var(--button-hover); text-decoration: none; }
+
+button .fas, a.boton .fas { margin-right: 6px; font-size: 12px; }
+button.peligro, button.peligro .fas { color: var(--pfc-peligro); }
+
+.button_small,
+a.boton.button_small {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+/* Cabecera */
 .cabecera {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   padding-bottom: 30px;
-}  
-.cabecera img {
-  margin-right: 5px;
 }
-.cabecera input {
+.cabecera h1 { flex: 1; margin: 0; }
+.cabecera-buscador { margin: 0; max-width: 240px; }
+.cabecera-acciones { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.cabecera-acciones form { margin: 0; }
+.cabecera-dashboard { justify-content: center; }
+.cabecera-dashboard h1 { flex: 0 1 auto; }
+
+/* Acciones / botoneras */
+.acciones {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 25px;
 }
-.cabecera button {
+.acciones button, .acciones a.boton { margin: 0; }
+.acciones-sistema { justify-content: center; }
+.acciones-sistema form { margin: 0; }
+
+.botonera {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 30px;
 }
 
-/* Estilos para la cabecera de la tabla de fichajes */
-.cabecera_tabla {
+/* Buscadores del dashboard */
+.buscadores {
   display: flex;
-  align-items: center;
-  padding-bottom: 10px;
-}  
-.cabecera_tabla button {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-  margin-left: 10px;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin: 30px 0;
+}
+.search-container {
+  position: relative;
+  display: inline-block;
+}
+.search-container input { padding-left: 36px; margin: 0; }
+.search-container i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
 }
 
-/* Estilos De la Tabla Fichajes*/
-.tabla th, .tabla td{
-  padding-bottom: 100px;
+/* Tablas */
+.tabla table,
+.detalle table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.tabla th, .tabla td,
+.detalle th, .detalle td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
 }
-.tabla th {
-  background-color: black;
+.tabla th, .detalle th { background-color: black; color: #fff; }
+tr.inactivo td { opacity: 0.6; }
+.celda-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
 }
-.diminuto {
-  font-size: 0.9em;
-}
-.diminuto {
-  padding: 2px 5px;
-}
+.celda-acciones form, .celda-acciones a.boton, .celda-acciones button { margin: 0; }
 
-/* Estilos Alta Fomulario*/
+.tabla-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+}
+.tabla-container .tabla { flex: 1 1 300px; }
+
+/* Formularios */
 .form-container {
   display: flex;
   flex-wrap: wrap;
 }
 .form-group {
-  flex: 1 1 30%; 
+  flex: 1 1 30%;
   padding: 10px;
 }
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-.form-group input {
+.form-group label { display: block; margin-bottom: 5px; }
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
 }
+.form-botones {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 20px 10px 0;
+}
+.form-botones label { display: flex; gap: 6px; align-items: center; }
+.form-botones input[type='checkbox'] { display: inline-block; margin: 0; }
+
+.form-en-linea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 15px 0;
+}
+.form-en-linea input, .form-en-linea select, .form-en-linea button { margin: 0; }
+
+.opciones-alta {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 10px;
+  border: none;
+}
+.opciones-alta label { display: flex; align-items: center; gap: 6px; }
+.opciones-alta input { display: inline-block; margin: 0; }
+
+.acciones-pago {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.acciones-pago form { margin: 0; }
+
+.estado-inactivo {
+  color: var(--pfc-peligro);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 @media (max-width: 768px) {
-  .form-group {
-      flex: 1 1 45%;
-  }
+  .form-group { flex: 1 1 45%; }
 }
 @media (max-width: 480px) {
-  .form-group {
-      flex: 1 1 100%;
-  }
+  .form-group { flex: 1 1 100%; }
+  .cabecera-buscador { max-width: none; flex: 1 1 100%; }
 }
 
-/* Estilos vista Busqueda Usuario*/
-.button_small {
-  padding: 5px 10px;
-  font-size: 14px;
-}
-/* Ajustar el tamaño del ícono dentro del botón vista Busqueda Usuario*/
-button .fas {
-  font-size: 12px;
-}
-
-/* Estilo por estado de la cuota*/
-.cerca-de-vencer {
-  color: red;
-}
-
-/* Estilos para la tabla de Pagos vista de Usuarios */
-.detalle-usuario table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-.detalle-usuario th, .detalle-usuario td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-}
-.detalle-usuario th {
-  background-color: black;
-}
-
-/* Estilo para cuando exceptuar algo */
-.exceptuado {
+/* Mensajes flash */
+.flash {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  color: red;
-  padding: 0px;
-  width: 50%;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border-left: 5px solid;
+  background: var(--background-alt);
+}
+.flash span { flex: 1; }
+.flash-exito { border-color: var(--pfc-exito); }
+.flash-exito i { color: var(--pfc-exito); }
+.flash-error { border-color: var(--pfc-peligro); }
+.flash-error i { color: var(--pfc-peligro); }
+.flash-aviso { border-color: var(--pfc-aviso); }
+.flash-aviso i { color: var(--pfc-aviso); }
+.flash-cerrar {
+  background: none;
+  margin: 0;
+  padding: 0 4px;
+  font-size: 1.3em;
+  line-height: 1;
 }
 
-/* Estilos para el Login*/
-.login-container {
+/* Avisos flotantes (llaveros desconocidos) */
+.avisos {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 10px;
+  max-width: 360px;
+}
+.aviso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 5px solid var(--pfc-aviso);
+  background: var(--background-alt);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.aviso button { margin: 0 0 0 6px; }
+.aviso-cerrar { background: none; padding: 0 4px; font-size: 1.2em; }
+
+/* Modal de cumpleaños */
+.modal {
+  display: none;
+  position: fixed;
+  right: 20px;
+  bottom: 110px;
+  z-index: 10;
+}
+.modal-content {
+  background-color: #272222;
+  color: #fff;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 220px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.modal .close {
+  float: right;
+  background: none;
+  color: #aaa;
+  margin: 0;
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+.modal .close:hover { color: #fff; }
+#cumpleanosTexto {
+  text-align: center;
+  margin-top: 5px;
+}
+
+/* Login y errores */
+.login-container,
+.pagina-error {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   text-align: center;
   padding: 2rem;
   border-radius: 8px;
-  background-color: #3e4a61;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  height: 80;
   margin: 0 auto;
 }
-
-.login-container img {
-  width: 200px;
-  margin-bottom: 1rem;
-}
-
-.login-container h1 {
-  margin-bottom: 1rem;
-  color: #ffffff;
-}
-
+.login-container { background-color: #3e4a61; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+.login-container img { width: 200px; margin-bottom: 1rem; }
+.login-container h1, .login-container label { color: #fff; }
 .login-container form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 30%;
+  width: min(100%, 300px);
 }
+.login-container form div { margin-bottom: 1rem; width: 100%; text-align: left; }
+.login-container form label { display: block; margin-bottom: 0.5rem; }
+.login-container form input { width: 100%; box-sizing: border-box; }
+.login-container button:hover { background-color: #4c56da; }
 
-.login-container form div {
-  margin-bottom: 1rem;
+/* Pie de página */
+.pie {
+  position: fixed;
+  bottom: 0;
+  left: 0;
   width: 100%;
-}
-
-.login-container form div label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #ffffff;
-}
-
-.login-container form div input {
-  width: 100%;
-  padding: 0.5rem;
-  box-sizing: border-box;
-}
-
-.login-container button:hover {
-  background-color: #4c56da;
-}
-
-.login-container p {
-  color: red;
-}
-
-/* Estilo para inputs con icono de Lupa*/
-.search-container {
-  position: relative;
-  display: inline-block;
-  left: 2.5%;
-}
-.search-container input {
-  margin-top: 50px;
-  margin-bottom: 50px;
-  padding-left: 50px; /* Espacio para el ícono */
-}
-.search-container i {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #888; /* Color del ícono */
-}
-
-/* Estilos Botones Dashboard*/
-.botonera-1 {
-  position: relative;
-  display: inline-block;
-}
-.botonera-1 button {
-  margin-bottom: 50px;
-  padding-left: 50px;
-}
-.botonera-1 i {
-  position: absolute;
-  left: 10px;
-  top: 25%;
-  transform: translateY(-50%);
-  color: #888;
-}
-.botonera-2 {
-  position: relative;
-  display: inline-block;
-  left: 25%;
-}
-.botonera-2 button {
-  padding-left: 50px;
-}
-.botonera-2 i {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #888;
-}
-
-/* Estilos para los datos de la clase */
-.detalle-clase table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-.detalle-clase th, .detalle-clase td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  background-color: var(--pfc-pie);
+  color: #eee;
   text-align: center;
+  padding: 14px 10px;
+  font-size: 0.85rem;
+  border-top: 1px solid #444;
+  z-index: 9999;
 }
-.detalle-clase th {
-  background-color: black;
-}
-
-/* Contenedor de las tablas */
-.tabla-container {
-  display: flex;
-  justify-content: space-between; /* Para separar las tablas */
-  gap: 20px; /* Espacio entre las tablas */
-  margin-top: 20px;
-}
-
-/* Ajusta las tablas */
-/* Cada tabla ocupa aproximadamente la mitad del contenedor */
-
-/* .tabla {
-  width: 48%; 
-  color: white;
-} */
-
-/* Estilos generales para las tablas */
-/* .tabla table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tabla th, .tabla td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-}
-
-.tabla th {
-  background-color: black;
-  color: white;
-} */
+.pie p { margin: 0; }
+.pie-autor { color: #66aaff; }

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, mbstring
+          coverage: none
+
+      - name: Instalar dependencias
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Verificar sintaxis
+        run: composer lint
+
+      - name: Tests
+        run: composer test
+
+  firmware:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: arduino/setup-arduino-cli@v2
+
+      - name: Instalar core y librerías
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+          arduino-cli lib install "Ethernet@2.0.2" "LiquidCrystal I2C@1.1.2" "MFRC522@1.4.12" "ArduinoJson@7.4.1"
+
+      - name: Compilar firmware
+        run: |
+          cp firmware/pfc/config.example.h firmware/pfc/config.h
+          arduino-cli compile -b arduino:avr:mega --warnings default firmware/pfc

@@ -1,51 +1,61 @@
+# Entorno de desarrollo: app en http://localhost:8080, phpMyAdmin en http://localhost:8081
 services:
   php:
-    build: .
-    image: php_custom:latest
-    container_name: php_container
+    build:
+      context: .
+      args:
+        XDEBUG: ${XDEBUG:-0}
+    container_name: pfc_php
     ports:
-      - "8080:80"
+      - "8080:80" # El lector Arduino se conecta a este puerto
     volumes:
-      - "C:/Docker/fichaje_pfc:/var/www/html"
-    networks:
-      - app_network
-    depends_on:
-      - mysql
+      - .:/var/www/html
+      - vendor:/var/www/html/vendor
     env_file:
       - .env
     environment:
-      XDEBUG_MODE: debug
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
       XDEBUG_CONFIG: client_host=host.docker.internal client_port=9003 start_with_request=yes
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
 
   mysql:
-    image: mysql:latest
-    container_name: mysql_container
+    image: mysql:8.4
+    container_name: pfc_mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DB_NAME}
+      MYSQL_USER: ${MYSQL_DB_USER}
+      MYSQL_PASSWORD: ${MYSQL_DB_PASSWORD}
+      TZ: America/Argentina/Buenos_Aires
     ports:
       - "3306:3306"
-    networks:
-      - app_network
     volumes:
       - mysql_data:/var/lib/mysql
+      # Solo se ejecutan la primera vez (base vacía)
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin_container
+    image: phpmyadmin:5
+    container_name: pfc_phpmyadmin
     environment:
       PMA_HOST: mysql
-      MYSQL_ROOT_PASSWORD: ${MYSQL_DB_PASSWORD}
     ports:
       - "8081:80"
     depends_on:
       - mysql
-    networks:
-      - app_network
-
-networks:
-  app_network:
-    driver: bridge
 
 volumes:
   mysql_data:
+  vendor:
