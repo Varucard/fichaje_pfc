@@ -62,17 +62,15 @@ final class LiquidacionController extends Controller
   /** Modo de liquidación del profesor (porcentaje o asistencia) y su valor. */
   public function configuracion(Request $request, string $id): void
   {
-    $valor = trim(str_replace(['%', '$', ' '], '', (string) $request->input('valor', '')));
-    if (str_contains($valor, ',')) {
-      $valor = str_replace(['.', ','], ['', '.'], $valor);
-    }
+    $texto = trim(str_replace('%', '', (string) $request->input('valor', '')));
+    $valor = monto_desde_texto($texto);
     $periodo = $request->input('periodo');
 
     try {
-      if ($valor !== '' && !is_numeric($valor)) {
+      if ($texto !== '' && $valor === null) {
         throw new ValidacionException('El valor no es válido.');
       }
-      $this->liquidaciones->actualizarConfiguracion((int) $id, (string) $request->input('modo', ''), $valor === '' ? null : (float) $valor);
+      $this->liquidaciones->actualizarConfiguracion((int) $id, (string) $request->input('modo', ''), $valor);
     } catch (ValidacionException $e) {
       $this->error($e->getMessage(), $this->volver($periodo));
     }

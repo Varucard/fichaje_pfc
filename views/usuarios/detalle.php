@@ -146,6 +146,8 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
       </div>
       <?php if ($deuda['renovacion'] && $deuda['meses'] === 0): ?>
         <p class="diminuto">💡 La cuota está al día hasta el <?= e(fecha($deuda['renovacion'])) ?>: si paga ahora, los meses se suman desde esa fecha (no pierde días).</p>
+      <?php elseif ($deuda['meses'] > 0): ?>
+        <p class="diminuto">💡 Adeuda <?= (int) $deuda['meses'] ?> cuota(s): el próximo pago cubre primero la cuota más vieja adeudada.</p>
       <?php endif; ?>
       <?php if ($deuda['cuota'] <= 0): ?>
         <p class="diminuto texto-peligro">El alumno no está en ninguna clase: su cuota es $0.</p>
@@ -164,6 +166,7 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
           </tr>
         </thead>
         <tbody>
+          <?php $idUltimoPago = max(array_map('intval', array_column($pagos, 'id_payment'))); ?>
           <?php foreach ($pagos as $pago): ?>
             <tr>
               <td><?= e(fecha($pago['discharge_date'])) ?></td>
@@ -185,12 +188,14 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
               </td>
               <td class="celda-acciones">
                 <a class="boton button_small" href="<?= url('/pagos/' . $pago['id_payment'] . '/comprobante') ?>" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> Comprobante</a>
-                <form action="<?= url('/pagos/' . $pago['id_payment'] . '/eliminar') ?>" method="post"
-                  data-confirmar="¿Eliminar el pago del <?= e(fecha($pago['discharge_date'])) ?>?">
-                  <?= csrf_field() ?>
-                  <input type="hidden" name="volver" value="<?= e($rutaUsuario) ?>">
-                  <button type="submit" class="button_small peligro"><i class="fas fa-trash"></i> Eliminar pago</button>
-                </form>
+                <?php if ((int) $pago['id_payment'] === $idUltimoPago): ?>
+                  <form action="<?= url('/pagos/' . $pago['id_payment'] . '/eliminar') ?>" method="post"
+                    data-confirmar="¿Eliminar el pago del <?= e(fecha($pago['discharge_date'])) ?>?">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="volver" value="<?= e($rutaUsuario) ?>">
+                    <button type="submit" class="button_small peligro"><i class="fas fa-trash"></i> Eliminar pago</button>
+                  </form>
+                <?php endif; ?>
               </td>
             </tr>
           <?php endforeach; ?>

@@ -35,11 +35,33 @@ final class PlanesYAdelantosTest extends TestCase
     self::assertSame('2025-08-20', $vence->format('Y-m-d'));
   }
 
-  public function testSiYaVencioSeCuentaDesdeElPago(): void
+  public function testPagoTardioCubreElMesMasViejoAdeudado(): void
   {
-    $vence = PagoService::calcularVencimiento(new DateTimeImmutable('2025-05-25'), '2025-05-20', 1);
-    self::assertSame('2025-06-25', $vence->format('Y-m-d'));
+    // Venció el 10/03 y paga el 15/06: cubre del 10/03 al 10/04 (sigue debiendo).
+    $vence = PagoService::calcularVencimiento(new DateTimeImmutable('2025-06-15'), '2025-03-10', 1);
+    self::assertSame('2025-04-10', $vence->format('Y-m-d'));
+  }
+
+  public function testPrimerPagoCuentaDesdeLaFechaDePago(): void
+  {
     self::assertSame('2025-06-25', PagoService::calcularVencimiento(new DateTimeImmutable('2025-05-25'), null, 1)->format('Y-m-d'));
+  }
+
+  public function testReactivadoSeCobraDesdeLaReactivacion(): void
+  {
+    // Su último vencimiento fue el 10/01, estuvo inactivo y se lo reactivó el 05/06.
+    $vence = PagoService::calcularVencimiento(new DateTimeImmutable('2025-06-07'), '2025-01-10', 1, '2025-06-05');
+    self::assertSame('2025-07-05', $vence->format('Y-m-d'));
+  }
+
+  public function testElDiaAnclaNoArrastraElFinDeMes(): void
+  {
+    // Pagó el 31/01 (ancla 31): 28/02 y luego 31/03, no 28/03.
+    $febrero = PagoService::calcularVencimiento(new DateTimeImmutable('2025-01-31'), null, 1);
+    $marzo = PagoService::calcularVencimiento(new DateTimeImmutable('2025-02-20'), $febrero->format('Y-m-d'), 1, null, 31);
+    $abril = PagoService::calcularVencimiento(new DateTimeImmutable('2025-03-20'), $marzo->format('Y-m-d'), 1, null, 31);
+
+    self::assertSame(['2025-02-28', '2025-03-31', '2025-04-30'], [$febrero->format('Y-m-d'), $marzo->format('Y-m-d'), $abril->format('Y-m-d')]);
   }
 
   public function testPrecioYMesesDeUnaPromocion(): void

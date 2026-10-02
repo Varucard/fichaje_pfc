@@ -59,6 +59,11 @@ final class AuditoriaService
         'ip' => $_SERVER['REMOTE_ADDR'] ?? null,
       ]);
     } catch (Throwable $e) {
+      // Un error de base de datos dentro de una transacción (ej. deadlock) ya la revirtió:
+      // hay que propagarlo para que la operación no se informe como exitosa.
+      if ($e instanceof \PDOException && $this->auditoria->enTransaccion()) {
+        throw $e;
+      }
       Log::error("No se pudo registrar la auditoría de {$accion}", $e, ['descripcion' => $descripcion]);
     }
   }

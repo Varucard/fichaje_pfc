@@ -223,20 +223,17 @@ final class StockService
 
   private function monto(mixed $valor, bool $opcional = false): ?float
   {
-    $valor = str_replace(['$', ' '], '', (string) $valor);
-    if ($valor === '') {
+    if (trim((string) $valor) === '') {
       if ($opcional) {
         return null;
       }
       throw new ValidacionException('Ingresá el precio.');
     }
-    if (str_contains($valor, ',')) {
-      $valor = str_replace(['.', ','], ['', '.'], $valor);
-    }
-    if (!is_numeric($valor) || (float) $valor < 0) {
+    $numero = monto_desde_texto((string) $valor);
+    if ($numero === null || $numero < 0) {
       throw new ValidacionException('El precio no es válido.');
     }
-    return round((float) $valor, 2);
+    return round($numero, 2);
   }
 
   private function entero(mixed $valor, string $campo): int

@@ -31,13 +31,41 @@ final class PagoRepository extends Repository
     return $valor === null ? null : (string) $valor;
   }
 
-  /** Suma de lo que quedó sin cobrar en pagos parciales (cuota - monto). */
+  /**
+   * Saldo pendiente de pagos parciales, neteado: lo que se debió cobrar menos lo cobrado
+   * en todos los pagos con monto. Un pago mayor al precio cancela saldos anteriores.
+   */
+  private const SALDO_NETO = 'GREATEST(COALESCE(SUM(CASE WHEN monto IS NOT NULL AND monto_cuota IS NOT NULL THEN monto_cuota END), 0)
+      - COALESCE(SUM(CASE WHEN monto IS NOT NULL AND monto_cuota IS NOT NULL THEN monto END), 0), 0)';
+
   public function saldoPendiente(int $idUsuario): float
   {
-    return (float) $this->valor(
-      'SELECT COALESCE(SUM(GREATEST(monto_cuota - monto, 0)), 0) FROM payments
-        WHERE id_user = ? AND monto IS NOT NULL AND monto_cuota IS NOT NULL',
+    return (float) $this->valor('SELECT ' . self::SALDO_NETO . ' FROM payments WHERE id_user = ?', [$idUsuario]);
+  }
+
+  /** @return array{renovacion: string, dia_ancla: ?int}|null Vencimiento vigente y día ancla del alumno. */
+  public function ultimoPago(int $idUsuario): ?array
+  {
+    $fila = $this->uno(
+      'SELECT date_of_renovation AS renovacion, dia_ancla FROM payments WHERE id_user = ?
+        ORDER BY date_of_renovation DESC, id_payment DESC LIMIT 1',
       [$idUsuario]
+    );
+    return $fila ? ['renovacion' => (string) $fila['renovacion'], 'dia_ancla' => $fila['dia_ancla'] !== null ? (int) $fila['dia_ancla'] : null] : null;
+  }
+
+  public function idUltimoPago(int $idUsuario): ?int
+  {
+    $id = $this->valor('SELECT MAX(id_payment) FROM payments WHERE id_user = ?', [$idUsuario]);
+    return $id === null ? null : (int) $id;
+  }
+
+  /** ¿Se registró un pago para el alumno en los últimos N segundos? (doble envío) */
+  public function hayPagoReciente(int $idUsuario, int $segundos): bool
+  {
+    return (bool) $this->valor(
+      'SELECT EXISTS(SELECT 1 FROM payments WHERE id_user = ? AND creado_en >= NOW() - INTERVAL ? SECOND)',
+      [$idUsuario, $segundos]
     );
   }
 
@@ -49,10 +77,11 @@ final class PagoRepository extends Repository
   public function resumenPorAlumno(): array
   {
     $filas = $this->todos(
-      'SELECT id_user, MAX(date_of_renovation) AS renovacion,
-          COALESCE(SUM(CASE WHEN monto IS NOT NULL AND monto_cuota IS NOT NULL
-                            THEN GREATEST(monto_cuota - monto, 0) END), 0) AS saldo
-        FROM payments GROUP BY id_user'
+      'SELECT p.id_user, p.renovacion, p.saldo,
+          (SELECT x.dia_ancla FROM payments x WHERE x.id_user = p.id_user
+            ORDER BY x.date_of_renovation DESC, x.id_payment DESC LIMIT 1) AS dia_ancla
+        FROM (SELECT id_user, MAX(date_of_renovation) AS renovacion, ' . self::SALDO_NETO . ' AS saldo
+              FROM payments GROUP BY id_user) p'
     );
     $resumen = [];
     foreach ($filas as $fila) {
@@ -60,6 +89,7 @@ final class PagoRepository extends Repository
         'id_user' => (int) $fila['id_user'],
         'renovacion' => $fila['renovacion'],
         'saldo' => (float) $fila['saldo'],
+        'dia_ancla' => $fila['dia_ancla'] !== null ? (int) $fila['dia_ancla'] : null,
       ];
     }
     return $resumen;
@@ -88,11 +118,17 @@ final class PagoRepository extends Repository
     float $cuota,
     int $mesesCubiertos = 1,
     ?int $idPromocion = null,
+    ?DateTimeInterface $cubreDesde = null,
+    ?int $diaAncla = null,
   ): int {
     $this->ejecutar(
-      'INSERT INTO payments (id_user, discharge_date, date_of_renovation, monto, monto_cuota, meses_cubiertos, id_promocion)
-        VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [$idUsuario, $fechaPago->format('Y-m-d'), $fechaRenovacion->format('Y-m-d'), $monto, $cuota, $mesesCubiertos, $idPromocion]
+      'INSERT INTO payments
+          (id_user, discharge_date, date_of_renovation, monto, monto_cuota, meses_cubiertos, id_promocion, cubre_desde, dia_ancla, creado_en)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())',
+      [
+        $idUsuario, $fechaPago->format('Y-m-d'), $fechaRenovacion->format('Y-m-d'), $monto, $cuota, $mesesCubiertos, $idPromocion,
+        ($cubreDesde ?? $fechaPago)->format('Y-m-d'), $diaAncla ?? (int) $fechaRenovacion->format('d'),
+      ]
     );
     return (int) $this->pdo->lastInsertId();
   }
@@ -109,7 +145,8 @@ final class PagoRepository extends Repository
   /**
    * Lo cobrado por cada clase que corresponde a un mes (AAAA-MM).
    * Un pago de varios meses se reparte en partes iguales entre los meses que cubre,
-   * empezando por el mes del pago (un pago de 3 meses suma 1/3 a cada mes).
+   * empezando por el mes en que empieza su cobertura (cubre_desde): un adelanto se imputa
+   * a los meses que paga, no al mes en que se cobró.
    *
    * @return array<int, float> id_class => monto
    */
@@ -120,8 +157,8 @@ final class PagoRepository extends Repository
       'SELECT pc.id_class, SUM(pc.monto / p.meses_cubiertos) AS total
         FROM payment_classes pc JOIN payments p ON p.id_payment = pc.id_payment
         WHERE pc.id_class IS NOT NULL
-          AND ? BETWEEN (YEAR(p.discharge_date) * 12 + MONTH(p.discharge_date))
-                    AND (YEAR(p.discharge_date) * 12 + MONTH(p.discharge_date) + p.meses_cubiertos - 1)
+          AND ? BETWEEN (YEAR(COALESCE(p.cubre_desde, p.discharge_date)) * 12 + MONTH(COALESCE(p.cubre_desde, p.discharge_date)))
+                    AND (YEAR(COALESCE(p.cubre_desde, p.discharge_date)) * 12 + MONTH(COALESCE(p.cubre_desde, p.discharge_date)) + p.meses_cubiertos - 1)
         GROUP BY pc.id_class',
       [$anio * 12 + $mes]
     );

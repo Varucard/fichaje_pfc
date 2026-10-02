@@ -47,6 +47,11 @@ abstract class Repository
     return $stmt->rowCount();
   }
 
+  public function enTransaccion(): bool
+  {
+    return $this->pdo->inTransaction();
+  }
+
   /**
    * @template T
    * @param callable(): T $operacion

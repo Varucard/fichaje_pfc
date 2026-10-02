@@ -121,6 +121,6 @@ final class ExportController extends Controller
 
   private function fecha(?string $valor, string $defecto): DateTimeImmutable
   {
-    return ($valor ? DateTimeImmutable::createFromFormat('!Y-m-d', $valor) : false) ?: new DateTimeImmutable($defecto);
+    return fecha_valida($valor) ?? new DateTimeImmutable($defecto);
   }
 }

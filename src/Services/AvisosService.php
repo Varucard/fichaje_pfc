@@ -80,7 +80,14 @@ final class AvisosService
       $id = (int) $alumno['id_user'];
       $cuota = $cuotas[$id] ?? 0.0;
       $renovacion = $resumenPagos[$id]['renovacion'] ?? null;
-      $deuda = DeudaService::calcular($cuota, $renovacion, $resumenPagos[$id]['saldo'] ?? 0.0, $hoy->setTime(12, 0));
+      $deuda = DeudaService::calcular(
+        $cuota,
+        $renovacion,
+        $resumenPagos[$id]['saldo'] ?? 0.0,
+        $hoy,
+        $resumenPagos[$id]['dia_ancla'] ?? null,
+        $alumno['cuota_desde'] ?? null,
+      );
 
       if ($cuota > 0 && $this->config->activo('aviso.vencimiento.activo')) {
         $dias = self::correspondeVencimiento($renovacion, $hoy, $this->config->entero('aviso.vencimiento.dias'));

@@ -82,6 +82,32 @@ function redirigir(string $ruta): never
   exit;
 }
 
+/** Fecha AAAA-MM-DD estricta: rechaza fechas imposibles como 2025-02-30 (que PHP "corrige"). */
+function fecha_valida(?string $valor): ?DateTimeImmutable
+{
+  $valor = trim((string) $valor);
+  $fecha = DateTimeImmutable::createFromFormat('!Y-m-d', $valor);
+  return $fecha && $fecha->format('Y-m-d') === $valor ? $fecha : null;
+}
+
+/**
+ * Monto escrito a mano: "12500", "12.500", "12.500,50", "12500,5" o "12500.50".
+ * El punto con grupos de 3 dígitos es separador de miles; la coma, decimal.
+ */
+function monto_desde_texto(?string $valor): ?float
+{
+  $valor = str_replace(['$', ' '], '', trim((string) $valor));
+  if ($valor === '') {
+    return null;
+  }
+  if (str_contains($valor, ',')) {
+    $valor = str_replace(['.', ','], ['', '.'], $valor);
+  } elseif (preg_match('/^\d{1,3}(\.\d{3})+$/', $valor)) {
+    $valor = str_replace('.', '', $valor);
+  }
+  return is_numeric($valor) ? (float) $valor : null;
+}
+
 function fecha(?string $valor, string $formato = 'd-m-Y'): string
 {
   if ($valor === null || $valor === '') {

@@ -152,6 +152,12 @@ final class EmailService
     return $this->emails->reintentar($id) > 0;
   }
 
+  /** Cancela un email todavía no enviado (ej: el comprobante de un pago eliminado). */
+  public function cancelarPorClave(string $claveUnica): void
+  {
+    $this->emails->cancelarPorClave($claveUnica);
+  }
+
   public function cancelar(int $id): bool
   {
     return $this->emails->cancelar($id) > 0;
@@ -202,7 +208,11 @@ final class EmailService
       }
       return $encolado;
     } catch (Throwable $e) {
-      // Un problema con el email nunca debe romper la operación que lo originó.
+      // Un error de base de datos dentro de una transacción ya la revirtió: se propaga.
+      if ($e instanceof \PDOException && $this->emails->enTransaccion()) {
+        throw $e;
+      }
+      // Cualquier otro problema con el email nunca debe romper la operación que lo originó.
       Log::error("No se pudo encolar el email {$tipo}", $e, ['para' => $email]);
       return false;
     }

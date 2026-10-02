@@ -28,11 +28,19 @@ final class AvisosTest extends TestCase
     $lunes = new DateTimeImmutable('2025-05-05');
     $bloque = AvisosService::bloqueDeDias($lunes, 7);
 
-    $mismoBloque = 0;
-    for ($i = 0; $i < 7; $i++) {
-      $mismoBloque += AvisosService::bloqueDeDias($lunes->modify("+{$i} days"), 7) === $bloque ? 1 : 0;
+    // Cada bloque (= un recordatorio como máximo) abarca 7 días consecutivos, nunca más.
+    $diasPorBloque = [];
+    $anterior = null;
+    $cambios = 0;
+    for ($i = 0; $i < 70; $i++) {
+      $actual = AvisosService::bloqueDeDias($lunes->modify("+{$i} days"), 7);
+      $diasPorBloque[$actual] = ($diasPorBloque[$actual] ?? 0) + 1;
+      $cambios += $anterior !== null && $actual !== $anterior ? 1 : 0;
+      $anterior = $actual;
     }
-    self::assertGreaterThanOrEqual(1, $mismoBloque);
+    self::assertLessThanOrEqual(7, max($diasPorBloque));
+    self::assertSame(count($diasPorBloque) - 1, $cambios, 'Los días de un bloque son consecutivos');
+    self::assertContains(count($diasPorBloque), [10, 11], '70 días = 10 u 11 bloques según dónde arranque');
     self::assertNotSame($bloque, AvisosService::bloqueDeDias($lunes->modify('+7 days'), 7), 'A los 7 días cambia el bloque');
   }
 

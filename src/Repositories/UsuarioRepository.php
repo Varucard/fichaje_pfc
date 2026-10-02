@@ -105,6 +105,18 @@ final class UsuarioRepository extends Repository
     );
   }
 
+  /** Bloquea la fila del usuario hasta el fin de la transacción (serializa sus pagos). */
+  public function bloquearParaActualizar(int $id): void
+  {
+    $this->uno('SELECT id_user FROM users WHERE id_user = ? FOR UPDATE', [$id]);
+  }
+
+  /** Desde cuándo se le vuelve a cobrar la cuota (al reactivarlo). */
+  public function establecerCuotaDesde(int $id, ?string $fecha): void
+  {
+    $this->ejecutar('UPDATE users SET cuota_desde = ? WHERE id_user = ?', [$fecha, $id]);
+  }
+
   public function asignarTokenBaja(int $id, string $token): void
   {
     $this->ejecutar('UPDATE users SET token_baja = ? WHERE id_user = ? AND token_baja IS NULL', [$token, $id]);

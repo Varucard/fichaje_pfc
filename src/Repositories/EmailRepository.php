@@ -12,11 +12,12 @@ final class EmailRepository extends Repository
   public function encolar(array $email): bool
   {
     return $this->ejecutar(
-      'INSERT IGNORE INTO emails_cola
+      'INSERT INTO emails_cola
           (tipo, id_usuario, destinatario, nombre_destinatario, asunto, cuerpo_html, cuerpo_texto, adjunto, clave_unica, creado_en, enviar_desde)
-        VALUES (:tipo, :id_usuario, :destinatario, :nombre_destinatario, :asunto, :cuerpo_html, :cuerpo_texto, :adjunto, :clave_unica, NOW(), NOW())',
-      $email
-    ) > 0;
+        VALUES (:tipo, :id_usuario, :destinatario, :nombre_destinatario, :asunto, :cuerpo_html, :cuerpo_texto, :adjunto, :clave_unica, NOW(), NOW())
+        ON DUPLICATE KEY UPDATE id = id',
+      ['asunto' => mb_substr($email['asunto'], 0, 200)] + $email
+    ) === 1;
   }
 
   public function yaExiste(string $claveUnica): bool
@@ -57,6 +58,11 @@ final class EmailRepository extends Repository
       "UPDATE emails_cola SET estado = 'pendiente', intentos = 0, enviar_desde = NOW() WHERE id = ? AND estado IN ('error', 'cancelado')",
       [$id]
     );
+  }
+
+  public function cancelarPorClave(string $claveUnica): int
+  {
+    return $this->ejecutar("UPDATE emails_cola SET estado = 'cancelado' WHERE clave_unica = ? AND estado = 'pendiente'", [$claveUnica]);
   }
 
   public function cancelar(int $id): int

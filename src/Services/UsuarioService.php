@@ -242,6 +242,10 @@ final class UsuarioService
     }
 
     $this->usuarios->cambiarEstado($id, true);
+    if (TipoUsuario::deUsuario($usuario) === TipoUsuario::Alumno) {
+      // La cuota se vuelve a cobrar desde hoy, no desde su último vencimiento.
+      $this->usuarios->establecerCuotaDesde($id, date('Y-m-d'));
+    }
     $this->auditoria->registrar(
       'usuario.reactivacion',
       "Reactivación de {$usuario['user_name']} {$usuario['user_surname']} (DNI {$dni})" . ($llaveroQuitado ? ' — se le quitó el llavero por estar asignado a otra persona' : ''),
@@ -286,7 +290,7 @@ final class UsuarioService
     }
 
     $nacimiento = trim((string) ($entrada['birth_day'] ?? ''));
-    if ($nacimiento !== '' && DateTimeImmutable::createFromFormat('!Y-m-d', $nacimiento) === false) {
+    if ($nacimiento !== '' && fecha_valida($nacimiento) === null) {
       throw new ValidacionException('La fecha de nacimiento no es válida.');
     }
 
