@@ -63,6 +63,16 @@ final class PagoRepository extends Repository
     return $resumen;
   }
 
+  /** @return array{cantidad: int, total: float} Pagos registrados entre dos fechas. */
+  public function totalEntre(DateTimeInterface $desde, DateTimeInterface $hasta): array
+  {
+    $fila = $this->uno(
+      'SELECT COUNT(*) AS cantidad, COALESCE(SUM(monto), 0) AS total FROM payments WHERE discharge_date BETWEEN ? AND ?',
+      [$desde->format('Y-m-d'), $hasta->format('Y-m-d')]
+    );
+    return ['cantidad' => (int) $fila['cantidad'], 'total' => (float) $fila['total']];
+  }
+
   public function buscarPorId(int $id): ?array
   {
     return $this->uno('SELECT * FROM payments WHERE id_payment = ?', [$id]);
@@ -106,6 +116,12 @@ final class PagoRepository extends Repository
       [$desde->format('Y-m-d'), $hasta->format('Y-m-d')]
     );
     return array_column(array_map(fn ($f) => ['id' => (int) $f['id_class'], 'total' => (float) $f['total']], $filas), 'total', 'id');
+  }
+
+  /** Reparto del pago por clase. */
+  public function detalle(int $idPago): array
+  {
+    return $this->todos('SELECT nombre_clase, precio_clase, monto FROM payment_classes WHERE id_payment = ? ORDER BY id_payment_class', [$idPago]);
   }
 
   public function eliminar(int $id): void

@@ -21,6 +21,13 @@ final class LiquidacionRepository extends Repository
     );
   }
 
+  /** @return array{cantidad: int, total: float}|null Liquidaciones registradas sin pagar. */
+  public function pendientesDePago(): ?array
+  {
+    $fila = $this->uno('SELECT COUNT(*) AS cantidad, COALESCE(SUM(monto), 0) AS total FROM liquidaciones WHERE pagada = 0');
+    return (int) $fila['cantidad'] > 0 ? ['cantidad' => (int) $fila['cantidad'], 'total' => (float) $fila['total']] : null;
+  }
+
   public function buscarPorId(int $id): ?array
   {
     return $this->uno(

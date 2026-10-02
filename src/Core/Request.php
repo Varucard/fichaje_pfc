@@ -54,6 +54,12 @@ final class Request
     return is_string($valor) ? trim($valor) : $default;
   }
 
+  /** Todos los campos del formulario (POST). */
+  public function todos(): array
+  {
+    return $this->post;
+  }
+
   /** @return array<int, string> */
   public function inputArray(string $clave): array
   {

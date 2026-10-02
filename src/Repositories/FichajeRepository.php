@@ -44,6 +44,21 @@ final class FichajeRepository extends Repository
     return $stmt->fetchAll();
   }
 
+  /** @return array<int, string> id_user => fecha y hora de su última fichada */
+  public function ultimaPorUsuario(): array
+  {
+    $filas = $this->todos('SELECT id_user, MAX(addmission_date) AS ultima FROM incomes GROUP BY id_user');
+    return array_column($filas, 'ultima', 'id_user');
+  }
+
+  public function contarEntre(DateTimeInterface $desde, DateTimeInterface $hasta): int
+  {
+    return (int) $this->valor(
+      'SELECT COUNT(*) FROM incomes WHERE addmission_date BETWEEN ? AND ?',
+      [$desde->format('Y-m-d 00:00:00'), $hasta->format('Y-m-d 23:59:59')]
+    );
+  }
+
   /** Últimos ingresos de un usuario. */
   public function deUsuario(int $idUsuario, int $limite = 10): array
   {

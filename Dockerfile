@@ -2,8 +2,9 @@ FROM php:8.4-apache
 
 # Extensiones de PHP y cliente MySQL (mysqldump para los respaldos)
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends unzip default-mysql-client \
-  && docker-php-ext-install pdo_mysql \
+  && apt-get install -y --no-install-recommends unzip default-mysql-client libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
+  && docker-php-ext-configure gd --with-jpeg --with-freetype \
+  && docker-php-ext-install pdo_mysql gd \
   && rm -rf /var/lib/apt/lists/*
 
 # Xdebug solo si se construye con --build-arg XDEBUG=1

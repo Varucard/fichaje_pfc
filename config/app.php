@@ -55,6 +55,21 @@ return [
     'dias_aviso_vencimiento' => (int) Env::get('DIAS_AVISO_VENCIMIENTO', '5'),
   ],
 
+  'mail' => [
+    // smtp = envía de verdad | log = guarda los mails en storage/emails (desarrollo)
+    'modo' => Env::get('MAIL_MODO', Env::get('MAIL_HOST') ? 'smtp' : 'log'),
+    'host' => Env::get('MAIL_HOST', 'smtp.gmail.com'),
+    'puerto' => (int) Env::get('MAIL_PUERTO', '587'),
+    // tls (puerto 587), ssl (puerto 465) o ninguna (sin cifrado, ej: Mailpit en desarrollo)
+    'seguridad' => strtolower((string) Env::get('MAIL_SEGURIDAD', 'tls')) === 'ninguna' ? '' : Env::get('MAIL_SEGURIDAD', 'tls'),
+    'usuario' => Env::get('MAIL_USUARIO', ''),
+    'password' => Env::get('MAIL_PASSWORD', ''),
+    'remitente' => Env::get('MAIL_REMITENTE', Env::get('MAIL_USUARIO', '')),
+    'remitente_nombre' => Env::get('MAIL_REMITENTE_NOMBRE', Env::get('SITENAME', 'Palillo Fight Club')),
+    // Reintentos ante error de envío antes de marcar el mail como fallido
+    'max_intentos' => (int) Env::get('MAIL_MAX_INTENTOS', '3'),
+  ],
+
   'log' => [
     // Nivel mínimo a registrar: debug | info | warning | error
     'nivel' => Env::get('LOG_NIVEL', 'info'),

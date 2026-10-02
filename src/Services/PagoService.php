@@ -28,6 +28,7 @@ final class PagoService
     private readonly UsuarioRepository $usuarios,
     private readonly MatriculaRepository $matriculas,
     private readonly AuditoriaService $auditoria,
+    private readonly AvisosService $avisos,
   ) {
   }
 
@@ -152,6 +153,7 @@ final class PagoService
         $usuario['dni'],
         ['id_pago' => $idPago, 'monto' => $monto, 'cuota' => $cuota],
       );
+      $this->avisos->comprobante($idPago, $usuario);
     });
 
     return $usuario;

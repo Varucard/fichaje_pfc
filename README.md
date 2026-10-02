@@ -8,6 +8,7 @@ Sistema de control de asistencia, pagos de cuotas y clases para el **Palillo Fig
 - Fichadas automáticas con llavero RFID o manuales desde el panel.
 - Control de deuda y liquidación mensual de profesores.
 - Stock de productos con ventas, entradas y ajustes de inventario.
+- Emails automáticos (vencimiento, deuda, cumpleaños, inactividad, bienvenida, resumen semanal) y comprobante de pago en PDF.
 - Aviso de cumpleaños, llaveros desconocidos y cuotas por vencer.
 - Auditoría de acciones y logs técnicos.
 - Respaldo de la base de datos y reinicio remoto del lector.
@@ -32,11 +33,13 @@ fichaje_pfc/
 │   └── Support/         Helpers de vistas y log
 ├── views/               Plantillas: solo presentación
 │   ├── layouts/  partials/
-│   └── auth/ dashboard/ usuarios/ clases/ fichajes/ deudas/ liquidaciones/ stock/ sistema/ errors/
+│   ├── emails/          Plantillas de los emails (layout + una por tipo) y panel
+│   ├── comprobantes/    PDF del comprobante de pago
+│   └── auth/ dashboard/ usuarios/ clases/ fichajes/ deudas/ liquidaciones/ stock/ sistema/ publico/ errors/
 ├── config/              app.php (configuración) y routes.php (mapa de URLs)
 ├── database/            schema.sql, seed.sql (datos ficticios) y migrations/
 ├── storage/             logs/ y backups/ (generados, no se versionan)
-├── bin/                 Scripts de consola (migrar.php, crear-admin.php)
+├── bin/                 Scripts de consola (migrar.php, crear-admin.php, procesar-emails.php)
 ├── tests/               Tests de PHPUnit
 ├── firmware/            Código del Arduino, carcasa 3D e imágenes → ver firmware/README.md
 └── docker/  Dockerfile  docker-compose.yml
@@ -71,6 +74,9 @@ docker compose exec php php bin/crear-admin.php
 
 - App: http://localhost:8080
 - phpMyAdmin: http://localhost:8081
+- Mailpit (buzón de prueba para ver los emails sin enviarlos): http://localhost:8025
+
+El servicio `tareas` corre `bin/procesar-emails.php` cada 15 minutos.
 
 La primera vez se crea la base con `database/schema.sql` y los **datos ficticios** de `database/seed.sql`. Para empezar con la base vacía, hay que quitar la línea del seed en `docker-compose.yml` antes del primer `up`.
 
@@ -144,6 +150,42 @@ Panel → *Stock*. El botón muestra un contador rojo cuando hay productos en su
 
 ---
 
+## ✉️ Emails
+
+Los emails se **encolan** (tabla `emails_cola`) y se envían en segundo plano con `bin/procesar-emails.php`. Así una operación nunca espera ni falla por el correo, y si el envío falla se reintenta (hasta `MAIL_MAX_INTENTOS`, con espera creciente).
+
+| Email | Cuándo | Tipo |
+|---|---|---|
+| Vencimiento próximo | N días antes de que venza la cuota (por defecto 3) | Aviso |
+| Cuota vencida / deuda | Mientras tenga deuda, como máximo uno cada N días (por defecto 7) | Aviso |
+| Te extrañamos | Alumno al día que no viene hace N días (por defecto 14), uno por ausencia | Aviso |
+| Cumpleaños | El día del cumpleaños | Aviso |
+| Bienvenida | Al dar de alta un cliente | Aviso |
+| Comprobante de pago | Al registrar un pago, con el PDF adjunto | Transaccional |
+| Resumen semanal | El día elegido, al email del administrador: ingresos, pagos, altas, ventas, deudores, stock bajo y liquidaciones pendientes | Transaccional |
+
+- Cada email se activa o desactiva y se configura en **panel → Emails**. Ahí también se ve la cola (enviados, pendientes y con error, con el detalle del error), se puede previsualizar cada mail, reintentar o cancelar, mandar uno de prueba o procesar en el momento.
+- **Baja:** los avisos incluyen un link (y el encabezado `List-Unsubscribe`, que Gmail muestra como "Anular suscripción") para dejar de recibirlos. Los comprobantes se envían igual. La preferencia también se cambia desde la ficha del cliente.
+- Nunca se manda dos veces el mismo aviso: cada uno tiene una clave única (por ejemplo, un aviso por vencimiento o un saludo por año), así que el proceso se puede ejecutar todas las veces que se quiera.
+- Solo reciben emails los clientes con email cargado. Conviene pedirlo en el alta.
+
+**Comprobante de pago:** PDF (A5) con los datos del gimnasio, el cliente, el período cubierto y el detalle por clase. Se descarga desde el historial de pagos de la ficha. **No es una factura**: la factura electrónica de ARCA es un desarrollo aparte.
+
+### Configurar Gmail
+
+1. En la cuenta de Gmail del gimnasio, activar la **verificación en 2 pasos**.
+2. Crear una **contraseña de aplicación** en https://myaccount.google.com/apppasswords.
+3. Completar en el `.env`: `MAIL_USUARIO` y `MAIL_REMITENTE` con la cuenta, y `MAIL_PASSWORD` con la contraseña de aplicación (16 letras, sin espacios). Gmail admite unos 500 envíos por día.
+4. En el panel → Emails, cargar el email del administrador para el resumen y la dirección y el teléfono del gimnasio, y probar con *Enviar prueba*.
+
+### Programar el envío
+
+- **Docker:** ya lo hace el servicio `tareas`.
+- **Linux:** con cron, `0,15,30,45 * * * * php /ruta/al/proyecto/bin/procesar-emails.php`.
+- **Windows / XAMPP:** en el Programador de tareas, ejecutar `C:\xampp\php\php.exe C:\xampp\htdocs\fichaje_pfc\bin\procesar-emails.php` cada 15 minutos.
+
+---
+
 ## 🗃️ Migraciones
 
 Los cambios de estructura de la base viven en `database/migrations/NNN_descripcion.sql` y se aplican con:
@@ -164,6 +206,8 @@ Cada migración aplicada se registra en la tabla `migraciones`, así que es segu
 | 005 | Monto y cuota en `payments`; reparto por clase en `payment_classes` |
 | 006 | Porcentaje de liquidación en `users` y tabla `liquidaciones` |
 | 007 | Tablas `productos` y `movimientos_stock` |
+| 008 | Emails: `emails_cola`, `configuracion` y preferencia de avisos en `users` |
+| 009 | Horarios de clases (`clase_horarios`) y clase de cada fichada (`incomes.id_class`) |
 
 ---
 
@@ -222,6 +266,8 @@ Convenciones:
 | `payment_classes` | Parte de cada pago asignada a cada clase |
 | `liquidaciones` | Liquidaciones mensuales de profesores (una por profesor y período) |
 | `productos` / `movimientos_stock` | Productos y su historial de entradas, ventas y ajustes |
+| `emails_cola` | Emails encolados, enviados o con error |
+| `configuracion` | Opciones editables desde el panel (avisos y datos del gimnasio) |
 | `incomes` | Fichadas (ingresos) |
 | `uid_incomes` | Llaveros desconocidos pendientes de mostrar en el panel |
 | `types_users` | Catálogo de tipos de usuario |

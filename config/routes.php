@@ -9,6 +9,7 @@ use App\Controllers\AuthController;
 use App\Controllers\ClaseController;
 use App\Controllers\DashboardController;
 use App\Controllers\DeudaController;
+use App\Controllers\EmailController;
 use App\Controllers\FichajeController;
 use App\Controllers\LiquidacionController;
 use App\Controllers\PagoController;
@@ -33,6 +34,10 @@ return function (Router $r): void {
   // Compatibilidad con lectores que todavía tienen el firmware anterior.
   $r->get('/config/get_uid.php', [ArduinoController::class, 'lectura']);
 
+  // Baja de avisos por email (link público incluido en cada aviso)
+  $r->get('/emails/baja/{token:[0-9a-f]{32}}', [EmailController::class, 'mostrarBaja']);
+  $r->post('/emails/baja/{token:[0-9a-f]{32}}', [EmailController::class, 'confirmarBaja']);
+
   $r->grupo(['auth'], function (Router $r): void {
     $r->post('/logout', [AuthController::class, 'logout']);
     $r->get('/dashboard', [DashboardController::class, 'index']);
@@ -54,6 +59,7 @@ return function (Router $r): void {
     $r->post('/usuarios/{dni:\d+}/pagos', [PagoController::class, 'renovar']);
     $r->post('/pagos/manual', [PagoController::class, 'manual']);
     $r->post('/pagos/{id:\d+}/eliminar', [PagoController::class, 'eliminar']);
+    $r->get('/pagos/{id:\d+}/comprobante', [PagoController::class, 'comprobante']);
 
     // Deudas
     $r->get('/deudores', [DeudaController::class, 'index']);
@@ -89,6 +95,16 @@ return function (Router $r): void {
     $r->get('/fichajes', [FichajeController::class, 'index']);
     $r->get('/fichajes/buscar', [FichajeController::class, 'buscar']);
     $r->post('/fichajes/manual', [FichajeController::class, 'manual']);
+
+    // Emails
+    $r->get('/emails', [EmailController::class, 'index']);
+    $r->post('/emails/configuracion', [EmailController::class, 'guardarConfiguracion']);
+    $r->post('/emails/prueba', [EmailController::class, 'prueba']);
+    $r->post('/emails/procesar', [EmailController::class, 'procesar']);
+    $r->get('/emails/{id:\d+}', [EmailController::class, 'ver']);
+    $r->post('/emails/{id:\d+}/reintentar', [EmailController::class, 'reintentar']);
+    $r->post('/emails/{id:\d+}/cancelar', [EmailController::class, 'cancelar']);
+    $r->post('/usuarios/{dni:\d+}/emails', [EmailController::class, 'preferencia']);
 
     // Auditoría y logs
     $r->get('/auditoria', [AuditoriaController::class, 'index']);

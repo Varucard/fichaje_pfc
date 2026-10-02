@@ -93,6 +93,30 @@ final class UsuarioRepository extends Repository
     $this->ejecutar('UPDATE users SET porcentaje_liquidacion = ? WHERE id_user = ?', [$porcentaje, $id]);
   }
 
+  /** Alumnos activos con email que aceptan avisos. */
+  public function alumnosParaAvisos(): array
+  {
+    return $this->todos(
+      "SELECT * FROM users WHERE type_user = ? AND asset = 1 AND acepta_emails = 1 AND email IS NOT NULL AND email <> ''",
+      [TipoUsuario::Alumno->value]
+    );
+  }
+
+  public function asignarTokenBaja(int $id, string $token): void
+  {
+    $this->ejecutar('UPDATE users SET token_baja = ? WHERE id_user = ? AND token_baja IS NULL', [$token, $id]);
+  }
+
+  public function buscarPorTokenBaja(string $token): ?array
+  {
+    return $this->uno('SELECT * FROM users WHERE token_baja = ?', [$token]);
+  }
+
+  public function cambiarAceptaEmails(int $id, bool $acepta): void
+  {
+    $this->ejecutar('UPDATE users SET acepta_emails = ? WHERE id_user = ?', [$acepta ? 1 : 0, $id]);
+  }
+
   public function actualizarPassword(int $id, string $hash): void
   {
     $this->ejecutar('UPDATE users SET password = ? WHERE id_user = ?', [$hash, $id]);

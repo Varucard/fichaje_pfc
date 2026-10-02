@@ -8,8 +8,10 @@ firmware/pfc/config.h
 # Archivos generados en ejecución
 /storage/logs/*
 /storage/backups/*
+/storage/emails/*
 !/storage/logs/.gitkeep
 !/storage/backups/.gitkeep
+!/storage/emails/.gitkeep
 backups/
 
 # Herramientas

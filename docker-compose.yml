@@ -1,4 +1,5 @@
-# Entorno de desarrollo: app en http://localhost:8080, phpMyAdmin en http://localhost:8081
+# Entorno de desarrollo: app en http://localhost:8080, phpMyAdmin en http://localhost:8081,
+# buzón de prueba (Mailpit) en http://localhost:8025
 services:
   php:
     build:
@@ -45,6 +46,29 @@ services:
       timeout: 5s
       retries: 20
     restart: unless-stopped
+
+  # Tareas programadas: genera los avisos y envía la cola de emails cada 15 minutos.
+  tareas:
+    build: .
+    container_name: pfc_tareas
+    command: ["sh", "-c", "while true; do php bin/procesar-emails.php; sleep 900; done"]
+    volumes:
+      - .:/var/www/html
+      - vendor:/var/www/html/vendor
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Buzón de prueba para desarrollo: atrapa todos los emails sin enviarlos.
+  # Usar en el .env: MAIL_HOST=mailpit, MAIL_PUERTO=1025, MAIL_SEGURIDAD=ninguna, MAIL_USUARIO= (vacío)
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: pfc_mailpit
+    ports:
+      - "8025:8025"
 
   phpmyadmin:
     image: phpmyadmin:5
