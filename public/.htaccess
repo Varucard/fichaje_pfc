@@ -1,0 +1,7 @@
+# Todas las URLs que no son archivos reales van al front controller.
+Options -Indexes -MultiViews
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]

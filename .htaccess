@@ -1,0 +1,10 @@
+# Para instalaciones en XAMPP donde la carpeta del proyecto queda dentro de htdocs
+# (ej: http://localhost/fichaje_pfc). Solo se expone la carpeta public/;
+# el código fuente, la configuración y el .env quedan inaccesibles desde el navegador.
+Options -Indexes
+RewriteEngine On
+
+RewriteRule ^(\.env|\.git|composer\.(json|lock)|vendor|src|config|views|storage|database|bin|tests|firmware|docker)(/|$) - [F,L]
+RewriteRule ^$ public/ [L]
+RewriteCond %{REQUEST_URI} !/public/
+RewriteRule ^(.*)$ public/$1 [L]
