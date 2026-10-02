@@ -14,6 +14,10 @@
   <div class="resumen-dato peligro"><span>Deuda total</span><strong><?= e(dinero($total)) ?></strong></div>
 </div>
 
+<div class="acciones">
+  <a class="boton" href="<?= url('/exportar/deudores.csv') ?>"><i class="fas fa-file-excel"></i> Exportar a Excel</a>
+</div>
+
 <p class="diminuto">
   Deuda = meses vencidos × cuota mensual (suma de sus clases) + saldos de pagos parciales.
 </p>

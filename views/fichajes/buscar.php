@@ -49,3 +49,4 @@
 </div>
 
 <?= $this->renderParcial('partials/navegacion', ['volver' => '/fichajes']) ?>
+<?= $this->renderParcial('partials/dialogos') ?>

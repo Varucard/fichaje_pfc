@@ -7,6 +7,7 @@
  * @var string $textoAgregar
  * @var string|null $termino
  * @var bool|null $ocultarLlavero
+ * @var string|null $exportar clientes | profesores
  */
 use App\Domain\TipoUsuario;
 
@@ -21,6 +22,9 @@ $ocultarLlavero ??= false;
 
 <div class="acciones">
   <a class="boton" href="<?= url('/usuarios/nuevo') ?>"><i class="fas fa-user-plus"></i> <?= e($textoAgregar) ?></a>
+  <?php if (!empty($exportar)): ?>
+    <a class="boton" href="<?= url('/exportar/' . $exportar . '.csv') ?>"><i class="fas fa-file-excel"></i> Exportar a Excel</a>
+  <?php endif; ?>
 </div>
 
 <div class="tabla">

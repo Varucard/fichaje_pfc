@@ -17,7 +17,47 @@ final class SistemaService
   public function __construct(
     private readonly PDO $pdo,
     private readonly AuditoriaService $auditoria,
+    private readonly ConfiguracionService $config,
   ) {
+  }
+
+  /** Lo llama el endpoint del lector en cada lectura, para mostrar la última en el panel. */
+  public function registrarLecturaDelLector(): void
+  {
+    $this->config->establecer('lector.ultima_lectura', date('Y-m-d H:i:s'));
+  }
+
+  /**
+   * ¿Responde el lector? Abre una conexión a su puerto HTTP (timeout corto) y le pide
+   * una ruta inexistente: el firmware contesta al instante, sin frenar las lecturas.
+   *
+   * @return array{configurado: bool, ip: string, en_linea: bool, latencia_ms: ?int, ultima_lectura: ?string}
+   */
+  public function estadoLector(): array
+  {
+    $ip = (string) Config::get('arduino.ip');
+    $ultima = $this->config->get('lector.ultima_lectura') ?: null;
+    if ($ip === '') {
+      return ['configurado' => false, 'ip' => '', 'en_linea' => false, 'latencia_ms' => null, 'ultima_lectura' => $ultima];
+    }
+
+    $inicio = microtime(true);
+    $conexion = @fsockopen($ip, (int) Config::get('arduino.puerto'), $codigo, $error, 1.5);
+    $enLinea = is_resource($conexion);
+    if ($enLinea) {
+      stream_set_timeout($conexion, 1);
+      fwrite($conexion, "GET /estado HTTP/1.0\r\nConnection: close\r\n\r\n");
+      fgets($conexion);
+      fclose($conexion);
+    }
+
+    return [
+      'configurado' => true,
+      'ip' => $ip,
+      'en_linea' => $enLinea,
+      'latencia_ms' => $enLinea ? (int) round((microtime(true) - $inicio) * 1000) : null,
+      'ultima_lectura' => $ultima,
+    ];
   }
 
   public function reiniciarArduino(): void
@@ -63,6 +103,64 @@ final class SistemaService
     Log::info('Respaldo generado', ['archivo' => $archivo]);
     $this->auditoria->registrar('sistema.backup', 'Respaldo de la base de datos: ' . basename($archivo));
     return $archivo;
+  }
+
+  private const PATRON_BACKUP = '/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql$/';
+
+  /** @return array<int, array{nombre: string, tamanio: int, fecha: string}> del más nuevo al más viejo */
+  public function listarBackups(): array
+  {
+    $backups = [];
+    foreach (glob($this->directorioBackups() . '/backup_*.sql') ?: [] as $archivo) {
+      if (preg_match(self::PATRON_BACKUP, basename($archivo))) {
+        $backups[] = ['nombre' => basename($archivo), 'tamanio' => (int) filesize($archivo), 'fecha' => date('Y-m-d H:i:s', (int) filemtime($archivo))];
+      }
+    }
+    usort($backups, fn ($a, $b) => strcmp($b['nombre'], $a['nombre']));
+    return $backups;
+  }
+
+  /** Ruta de un backup para descargarlo. Solo acepta nombres generados por el sistema. */
+  public function rutaBackup(string $nombre): string
+  {
+    $ruta = $this->directorioBackups() . '/' . $nombre;
+    if (!preg_match(self::PATRON_BACKUP, $nombre) || !is_file($ruta)) {
+      throw new ValidacionException('El respaldo no existe.');
+    }
+    return $ruta;
+  }
+
+  public function hayBackupDeHoy(): bool
+  {
+    return (bool) glob($this->directorioBackups() . '/backup_' . date('Y-m-d') . '_*.sql');
+  }
+
+  /**
+   * Borra los backups más viejos que $dias, conservando siempre los $minimo más recientes.
+   * Devuelve la cantidad borrada.
+   */
+  public function limpiarBackups(int $dias, int $minimo = 3): int
+  {
+    if ($dias <= 0) {
+      return 0;
+    }
+    $limite = time() - $dias * 86400;
+    $borrados = 0;
+    foreach (array_slice($this->listarBackups(), $minimo) as $backup) {
+      $ruta = $this->directorioBackups() . '/' . $backup['nombre'];
+      if (filemtime($ruta) < $limite && @unlink($ruta)) {
+        $borrados++;
+      }
+    }
+    if ($borrados) {
+      Log::info('Backups viejos eliminados', ['cantidad' => $borrados, 'dias_retencion' => $dias]);
+    }
+    return $borrados;
+  }
+
+  private function directorioBackups(): string
+  {
+    return rtrim((string) Config::get('backup_dir'), '/');
   }
 
   private function backupConMysqldump(string $archivo): bool

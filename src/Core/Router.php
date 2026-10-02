@@ -96,7 +96,7 @@ final class Router
     foreach ($middleware as $nombre) {
       switch ($nombre) {
         case 'auth':
-          if (!Auth::check()) {
+          if (!Auth::mantenerVigente(registrarActividad: !$request->esApi())) {
             if ($request->esApi()) {
               throw new HttpException(401, 'No autenticado');
             }

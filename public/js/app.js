@@ -3,7 +3,7 @@
  * - Buscadores: <input data-buscar="usuarios|fichajes|clases">
  * - Confirmaciones: <form data-confirmar="¿Seguro?">
  * - Botón volver: <button data-volver="/ruta-alternativa">
- * - Acciones rápidas: <button data-accion="fichaje-manual|pago-manual">
+ * - Acciones rápidas: <button data-accion="fichaje-manual|pago-manual"> (abren una ventana <dialog>)
  */
 (function () {
   'use strict';
@@ -16,6 +16,20 @@
 
     /** Ruta actual relativa a la app, para volver después de una acción. */
     rutaActual: () => location.pathname.slice(BASE.length) + location.search || '/dashboard',
+
+    /**
+     * GET a un endpoint JSON del panel. Si la sesión venció (401), vuelve al login.
+     * @returns {Promise<any>}
+     */
+    json(ruta) {
+      return fetch(PFC.url(ruta), { headers: { Accept: 'application/json' }, credentials: 'same-origin' }).then((r) => {
+        if (r.status === 401) {
+          location.href = PFC.url('/login');
+          return new Promise(() => {});
+        }
+        return r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`));
+      });
+    },
 
     /** Envía un POST como formulario normal (incluye el token CSRF). */
     enviar(ruta, datos) {
@@ -82,34 +96,6 @@
         console.warn('No se pudo reproducir el sonido:', error);
       }
     },
-
-    pedirDni(mensaje) {
-      const dni = prompt(mensaje);
-      if (dni === null) return null;
-      if (!/^\d{7,8}$/.test(dni.trim())) {
-        alert('Ingresá un DNI válido (7 u 8 dígitos, sin puntos).');
-        return null;
-      }
-      return dni.trim();
-    },
-
-    /** Pide una fecha DD-MM-YYYY y la devuelve como YYYY-MM-DD. */
-    pedirFecha(mensaje) {
-      const hoy = new Date();
-      const sugerida = [hoy.getDate(), hoy.getMonth() + 1, hoy.getFullYear()]
-        .map((n) => String(n).padStart(2, '0')).join('-');
-      const texto = prompt(mensaje, sugerida);
-      if (texto === null) return null;
-
-      const partes = texto.trim().split(/[-/]/).map((p) => parseInt(p, 10));
-      const [dia, mes, anio] = partes;
-      const fecha = new Date(anio, mes - 1, dia);
-      if (partes.length !== 3 || fecha.getFullYear() !== anio || fecha.getMonth() !== mes - 1 || fecha.getDate() !== dia) {
-        alert('Fecha inválida. Usá el formato DD-MM-AAAA.');
-        return null;
-      }
-      return `${anio}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-    },
   });
 
   // Buscadores
@@ -148,19 +134,19 @@
     boton.addEventListener('click', () => boton.closest('.flash')?.remove());
   });
 
-  // Acciones rápidas
+  // Acciones rápidas: abren su ventana (<dialog id="dialogo-ACCION">)
   const ACCIONES = {
-    'fichaje-manual'() {
-      const dni = PFC.pedirDni('Ingrese el DNI del alumno:');
-      if (dni) PFC.enviar('/fichajes/manual', { dni, volver: PFC.rutaActual() });
-    },
-    'pago-manual'() {
-      const dni = PFC.pedirDni('Ingrese el DNI del cliente:');
-      if (!dni) return;
-      const fecha = PFC.pedirFecha('Ingrese la fecha del pago (DD-MM-AAAA):');
-      if (fecha) PFC.enviar('/pagos/manual', { dni, fecha, volver: PFC.rutaActual() });
-    },
+    'fichaje-manual': 'dialogo-fichaje-manual',
+    'pago-manual': 'dialogo-pago-manual',
   };
+
+  document.querySelectorAll('dialog.dialogo').forEach((dialogo) => {
+    dialogo.querySelectorAll('[data-cerrar-dialogo]').forEach((b) => b.addEventListener('click', () => dialogo.close()));
+    // Click en el fondo oscuro: cerrar
+    dialogo.addEventListener('click', (evento) => {
+      if (evento.target === dialogo) dialogo.close();
+    });
+  });
 
   // Filtro de opciones en selects múltiples largos: <input data-filtrar-select="idDelSelect">
   document.querySelectorAll('[data-filtrar-select]').forEach((input) => {
@@ -197,6 +183,12 @@
   });
 
   document.querySelectorAll('[data-accion]').forEach((boton) => {
-    boton.addEventListener('click', () => ACCIONES[boton.dataset.accion]?.(boton));
+    boton.addEventListener('click', () => {
+      const dialogo = document.getElementById(ACCIONES[boton.dataset.accion]);
+      if (!dialogo) return;
+      dialogo.querySelector('form')?.reset();
+      dialogo.querySelectorAll('[data-volver-actual]').forEach((input) => (input.value = PFC.rutaActual()));
+      dialogo.showModal();
+    });
   });
 })();

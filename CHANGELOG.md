@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.4.0] - 2026-10-02
+
+### Operación
+- **Backups automáticos** diarios con retención configurable, alerta por email si fallan y pantalla de backups con descarga.
+- `bin/tareas.php` reúne las tareas programadas: emails, backup diario y control del lector. `procesar-emails.php` se mantiene por compatibilidad.
+- **Estado del lector** en el dashboard (en línea o sin respuesta, latencia y última lectura) y alerta por email si deja de responder.
+
+### Reportes
+- **Reporte de caja** mensual (cuotas + ventas) con gráfico, variación interanual y detalle por clase y por producto.
+- **Exportación a CSV para Excel**: deudores, clientes, profesores, pagos, liquidaciones y caja. Protegida contra inyección de fórmulas y auditada.
+
+### Seguridad
+- Bloqueo temporal por intentos fallidos de inicio de sesión (por DNI y por IP).
+- Cierre de sesión por inactividad. El polling de las pantallas no mantiene viva la sesión, y si vence vuelve al login.
+- Gestión de administradores desde el panel y "Mi cuenta" para cambiar la contraseña. Desde la búsqueda de clientes ya no se puede desactivar un administrador.
+
+### Interfaz
+- "Registrar fichada" y "Abonar clase" usan ventanas propias en lugar de `prompt()`. Abonar permite elegir el plan o la promoción.
+
 ## [3.3.0] - 2026-10-02
 
 ### Pagos

@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 use App\Controllers\Api\ArduinoController;
 use App\Controllers\Api\PanelApiController;
+use App\Controllers\AdministradorController;
 use App\Controllers\AuditoriaController;
 use App\Controllers\AuthController;
 use App\Controllers\ClaseController;
 use App\Controllers\DashboardController;
 use App\Controllers\DeudaController;
 use App\Controllers\EmailController;
+use App\Controllers\ExportController;
 use App\Controllers\FichajeController;
 use App\Controllers\LiquidacionController;
 use App\Controllers\PagoController;
 use App\Controllers\PromocionController;
+use App\Controllers\ReporteController;
 use App\Controllers\SistemaController;
 use App\Controllers\StockController;
 use App\Controllers\UsuarioController;
@@ -114,6 +117,22 @@ return function (Router $r): void {
     $r->post('/emails/{id:\d+}/cancelar', [EmailController::class, 'cancelar']);
     $r->post('/usuarios/{dni:\d+}/emails', [EmailController::class, 'preferencia']);
 
+    // Reportes y exportaciones (CSV para Excel)
+    $r->get('/reportes/caja', [ReporteController::class, 'caja']);
+    $r->get('/exportar/deudores.csv', [ExportController::class, 'deudores']);
+    $r->get('/exportar/{tipo:clientes|profesores}.csv', [ExportController::class, 'usuarios']);
+    $r->get('/exportar/pagos.csv', [ExportController::class, 'pagos']);
+    $r->get('/exportar/liquidaciones.csv', [ExportController::class, 'liquidaciones']);
+    $r->get('/exportar/caja.csv', [ExportController::class, 'caja']);
+
+    // Administradores y cuenta propia
+    $r->get('/administradores', [AdministradorController::class, 'index']);
+    $r->post('/administradores', [AdministradorController::class, 'guardar']);
+    $r->post('/administradores/{id:\d+}/password', [AdministradorController::class, 'password']);
+    $r->post('/administradores/{id:\d+}/activo', [AdministradorController::class, 'cambiarActivo']);
+    $r->get('/mi-cuenta', [AdministradorController::class, 'miCuenta']);
+    $r->post('/mi-cuenta/password', [AdministradorController::class, 'miPassword']);
+
     // Auditoría y logs
     $r->get('/auditoria', [AuditoriaController::class, 'index']);
     $r->get('/sistema/logs', [AuditoriaController::class, 'logs']);
@@ -121,6 +140,9 @@ return function (Router $r): void {
     // Mantenimiento
     $r->post('/sistema/reiniciar-arduino', [SistemaController::class, 'reiniciarArduino']);
     $r->post('/sistema/backup', [SistemaController::class, 'backup']);
+    $r->get('/sistema/backups', [SistemaController::class, 'backups']);
+    $r->get('/sistema/backups/{nombre:backup_[0-9_-]+\.sql}', [SistemaController::class, 'descargarBackup']);
+    $r->get('/api/lector/estado', [SistemaController::class, 'estadoLector']);
 
     // API interna del panel (JSON)
     $r->get('/api/fichajes/ultimos', [PanelApiController::class, 'ultimosFichajes']);

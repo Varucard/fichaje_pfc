@@ -9,6 +9,7 @@ use App\Core\Config;
 use App\Core\Request;
 use App\Exceptions\HttpException;
 use App\Services\FichajeService;
+use App\Services\SistemaService;
 
 /**
  * Endpoint que consulta el lector RFID cada vez que se pasa un llavero.
@@ -17,8 +18,10 @@ use App\Services\FichajeService;
  */
 final class ArduinoController extends Controller
 {
-  public function __construct(private readonly FichajeService $fichajes)
-  {
+  public function __construct(
+    private readonly FichajeService $fichajes,
+    private readonly SistemaService $sistema,
+  ) {
   }
 
   public function lectura(Request $request): void
@@ -36,6 +39,7 @@ final class ArduinoController extends Controller
       throw new HttpException(400, 'UID no proporcionado o inválido');
     }
 
+    $this->sistema->registrarLecturaDelLector();
     $respuesta = $this->fichajes->procesarLectura($uid);
     $respuesta['nombre'] = self::textoLcd($respuesta['nombre']);
     $respuesta['apellido'] = self::textoLcd($respuesta['apellido']);

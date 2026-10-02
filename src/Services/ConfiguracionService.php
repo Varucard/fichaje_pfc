@@ -29,7 +29,7 @@ final class ConfiguracionService
     'aviso.comprobante.activo' => ['1', 'bool', 'Comprobante de pago (PDF)'],
     'aviso.resumen.activo' => ['1', 'bool', 'Resumen semanal para el administrador'],
     'aviso.resumen.dia' => ['1', 'dia_semana', 'Día del resumen semanal'],
-    'aviso.resumen.destinatario' => ['', 'email', 'Email que recibe el resumen'],
+    'aviso.resumen.destinatario' => ['', 'email', 'Email del administrador (resumen y alertas)'],
     'gimnasio.direccion' => ['', 'texto', 'Dirección (aparece en mails y comprobantes)'],
     'gimnasio.telefono' => ['', 'texto', 'Teléfono / WhatsApp'],
   ];
@@ -68,6 +68,15 @@ final class ConfiguracionService
       $valores[$clave] = $this->get($clave);
     }
     return $valores;
+  }
+
+  /** Guarda un valor interno del sistema (no editable desde el panel, sin auditoría). */
+  public function establecer(string $clave, string $valor): void
+  {
+    $this->pdo->prepare('REPLACE INTO configuracion (clave, valor) VALUES (?, ?)')->execute([$clave, $valor]);
+    if ($this->valores !== null) {
+      $this->valores[$clave] = $valor;
+    }
   }
 
   /** Guarda las opciones del formulario del panel. Los checkboxes ausentes se toman como apagados. */

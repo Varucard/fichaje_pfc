@@ -29,8 +29,7 @@
   }
 
   function consultar() {
-    fetch(PFC.url('/api/llaveros/pendientes'), { headers: { Accept: 'application/json' } })
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+    PFC.json('/api/llaveros/pendientes')
       .then((datos) => (datos.llaveros ?? []).forEach(avisar))
       .catch((error) => console.error('No se pudieron consultar los llaveros:', error));
   }

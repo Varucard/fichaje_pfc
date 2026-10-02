@@ -18,7 +18,7 @@ $basePath = $urlApp !== ''
 return [
   'app' => [
     'nombre' => Env::get('SITENAME', 'Palillo Fight Club'),
-    'version' => Env::get('APPVERSION', '3.3.0'),
+    'version' => Env::get('APPVERSION', '3.4.0'),
     'url' => $urlApp,
     'base_path' => $basePath,
     'debug' => Env::bool('APP_DEBUG'),
@@ -57,6 +57,16 @@ return [
     'dias_aviso_vencimiento' => (int) Env::get('DIAS_AVISO_VENCIMIENTO', '5'),
   ],
 
+  'login' => [
+    // Bloqueo temporal por intentos fallidos (por DNI y por IP)
+    'max_intentos_dni' => (int) Env::get('LOGIN_MAX_INTENTOS', '5'),
+    'max_intentos_ip' => (int) Env::get('LOGIN_MAX_INTENTOS_IP', '20'),
+    'ventana_minutos' => (int) Env::get('LOGIN_VENTANA_MINUTOS', '15'),
+    'bloqueo_minutos' => (int) Env::get('LOGIN_BLOQUEO_MINUTOS', '15'),
+    // Cierre de sesión por inactividad (0 = nunca)
+    'inactividad_minutos' => (int) Env::get('SESION_INACTIVIDAD_MINUTOS', '120'),
+  ],
+
   'mail' => [
     // smtp = envía de verdad | log = guarda los mails en storage/emails (desarrollo)
     'modo' => Env::get('MAIL_MODO', Env::get('MAIL_HOST') ? 'smtp' : 'log'),
@@ -80,4 +90,13 @@ return [
   ],
 
   'backup_dir' => Env::get('BACKUP_DIR', base_path('storage/backups')),
+
+  'backups' => [
+    // Backup diario automático (lo hace bin/tareas.php)
+    'automatico' => Env::bool('BACKUP_AUTOMATICO', true),
+    // A partir de esta hora del día se genera el backup diario
+    'hora' => (int) Env::get('BACKUP_HORA', '3'),
+    // Se borran los backups más viejos (siempre quedan los 3 últimos). 0 = no borrar
+    'dias_retencion' => (int) Env::get('BACKUP_DIAS_RETENCION', '30'),
+  ],
 ];
