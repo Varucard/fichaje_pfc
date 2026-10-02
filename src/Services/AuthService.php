@@ -21,6 +21,16 @@ final class AuthService
   ) {
   }
 
+  /** "30111222" o "30.111.222" => "30111222"; cualquier otro formato => null. */
+  public static function normalizarDni(string $dni): ?string
+  {
+    $dni = str_replace(['.', ' '], '', trim($dni));
+    if (!preg_match('/^\d{7,8}$/', $dni)) {
+      return null;
+    }
+    return (string) (int) $dni;
+  }
+
   /**
    * Valida las credenciales y devuelve el usuario.
    * Solo pueden ingresar usuarios activos que tengan contraseña asignada.
@@ -32,9 +42,24 @@ final class AuthService
     }
 
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'cli';
+
+    // Un DNI con formato inválido nunca se guarda tal cual (auditoría, logs, contador):
+    // evita inyectar contenido en el panel y saltear el límite con variantes del mismo DNI.
+    $dni = self::normalizarDni($dni);
+    if ($dni === null) {
+      $this->limite->fallo(null, $ip);
+      $this->auditoria->registrar('sesion.fallida', 'Intento de inicio de sesión con un DNI de formato inválido', actor: 'Desconocido');
+      throw new ValidacionException('Credenciales incorrectas.');
+    }
+
     $minutos = $this->limite->bloqueo($dni, $ip);
     if ($minutos > 0) {
       throw new ValidacionException("Demasiados intentos fallidos. Probá de nuevo en {$minutos} minuto(s).");
+    }
+    // El intento se cuenta antes de comparar la contraseña (ver LimiteIntentosService).
+    $intento = $this->limite->reservarIntento($dni, $ip);
+    if ($intento['excedido']) {
+      throw new ValidacionException('Demasiados intentos fallidos. Probá de nuevo en ' . (int) Config::get('login.bloqueo_minutos', 15) . ' minutos.');
     }
 
     $usuario = $this->usuarios->buscarPorDni($dni);
@@ -43,7 +68,7 @@ final class AuthService
     if (!password_verify($password, $hash ?: self::HASH_FICTICIO) || !$hash || !(int) $usuario['asset']) {
       $this->auditoria->registrar('sesion.fallida', "Intento de inicio de sesión fallido con el DNI {$dni}", 'usuario', $dni, actor: "DNI {$dni}");
       Log::warning('Inicio de sesión fallido', ['dni' => $dni]);
-      if ($this->limite->fallo($dni, $ip)) {
+      if ($intento['bloqueado']) {
         $this->auditoria->registrar('sesion.bloqueo', "Inicio de sesión bloqueado temporalmente por intentos fallidos (DNI {$dni}, IP {$ip})", 'usuario', $dni, actor: "DNI {$dni}");
         Log::warning('Inicio de sesión bloqueado por intentos fallidos', ['dni' => $dni]);
         throw new ValidacionException('Demasiados intentos fallidos. El acceso quedó bloqueado por ' . (int) Config::get('login.bloqueo_minutos', 15) . ' minutos.');

@@ -63,10 +63,19 @@ function old(string $campo, mixed $default = ''): mixed
   return $viejos[$campo] ?? $default;
 }
 
+/**
+ * ¿Es una ruta interna de la app? Debe empezar con una sola "/" y no tener barras
+ * invertidas ni caracteres de control (los navegadores tratan "/\\sitio" como "//sitio").
+ */
+function es_ruta_interna(string $ruta): bool
+{
+  return (bool) preg_match('#^/(?![/\\\\])[^\\\\\x00-\x1f\x7f]*$#', $ruta);
+}
+
 /** Redirige a una ruta interna de la app. Rutas externas se ignoran (evita open redirect). */
 function redirigir(string $ruta): never
 {
-  if (!str_starts_with($ruta, '/') || str_starts_with($ruta, '//')) {
+  if (!es_ruta_interna($ruta)) {
     $ruta = '/dashboard';
   }
   header('Location: ' . url($ruta));

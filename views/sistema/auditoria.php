@@ -51,8 +51,8 @@
             <td class="diminuto"><code><?= e($fila['accion']) ?></code></td>
             <td class="texto-izquierda">
               <?= e($fila['descripcion']) ?>
-              <?php if ($fila['entidad'] === 'usuario' && $fila['entidad_id']): ?>
-                · <a href="<?= url('/usuarios/' . $fila['entidad_id']) ?>">ver</a>
+              <?php if ($fila['entidad'] === 'usuario' && ctype_digit((string) $fila['entidad_id'])): ?>
+                · <a href="<?= e(url('/usuarios/' . $fila['entidad_id'])) ?>">ver</a>
               <?php endif; ?>
               <?php if (!empty($fila['datos'])): ?>
                 <details><summary class="diminuto">Datos</summary><pre><?= e(json_encode(json_decode($fila['datos']), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) ?></pre></details>
