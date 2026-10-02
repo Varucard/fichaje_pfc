@@ -13,6 +13,7 @@
 <form method="get" class="filtros">
   <label>Período <input type="month" name="periodo" value="<?= e($periodo) ?>" max="<?= date('Y-m') ?>"></label>
   <button type="submit"><i class="fas fa-calendar-alt"></i> Ver</button>
+  <a class="boton" href="<?= url('/exportar/liquidaciones.csv', ['periodo' => $periodo]) ?>"><i class="fas fa-file-excel"></i> Exportar registradas</a>
 </form>
 
 <div class="resumen">

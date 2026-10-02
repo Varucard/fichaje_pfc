@@ -47,11 +47,11 @@ services:
       retries: 20
     restart: unless-stopped
 
-  # Tareas programadas: genera los avisos y envía la cola de emails cada 15 minutos.
+  # Tareas programadas cada 15 minutos (bin/tareas.php): emails, backup diario y control del lector.
   tareas:
     build: .
     container_name: pfc_tareas
-    command: ["sh", "-c", "while true; do php bin/procesar-emails.php; sleep 900; done"]
+    command: ["sh", "-c", "while true; do php bin/tareas.php; sleep 900; done"]
     volumes:
       - .:/var/www/html
       - vendor:/var/www/html/vendor

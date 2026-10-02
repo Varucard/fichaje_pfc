@@ -203,6 +203,9 @@ final class UsuarioService
     $usuario = $this->usuarios->buscarPorDni($dni)
       ?? throw new ValidacionException('El usuario no existe.');
 
+    if (TipoUsuario::deUsuario($usuario) === TipoUsuario::Administrador) {
+      throw new ValidacionException('Los administradores se gestionan desde Sistema → Administradores.');
+    }
     if (TipoUsuario::deUsuario($usuario) === TipoUsuario::Alumno) {
       $deuda = $this->deudas->deudaDe((int) $usuario['id_user']);
       if ($deuda['total'] > 0) {

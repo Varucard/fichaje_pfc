@@ -7,8 +7,7 @@
   const modal = document.getElementById('cumpleanosModal');
   if (!modal) return;
 
-  fetch(PFC.url('/api/usuarios/cumpleaneros'), { headers: { Accept: 'application/json' } })
-    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+  PFC.json('/api/usuarios/cumpleaneros')
     .then((usuarios) => {
       if (!usuarios.length) return;
 

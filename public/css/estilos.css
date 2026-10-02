@@ -445,3 +445,76 @@ tr.resaltada td:first-child { box-shadow: inset 4px 0 0 #1c7ed6; }
 
 .form-group-ancho { flex: 1 1 100%; }
 .form-group select[multiple] { width: 100%; }
+
+/* Indicador del lector */
+.estado-lector { font-size: 0.9em; color: var(--text-muted); margin-top: -8px; }
+.estado-lector .punto {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #888;
+  vertical-align: middle;
+}
+.estado-lector.en-linea .punto { background: var(--pfc-exito); box-shadow: 0 0 6px var(--pfc-exito); }
+.estado-lector.sin-respuesta { color: var(--pfc-peligro); font-weight: 600; }
+.estado-lector.sin-respuesta .punto { background: var(--pfc-peligro); }
+
+/* Gráfico de caja (barras apiladas). Colores validados contra el fondo de cada modo. */
+:root { --serie-cuotas: #2a78d6; --serie-ventas: #eb6834; }
+@media (prefers-color-scheme: dark) {
+  :root { --serie-cuotas: #3987e5; --serie-ventas: #d95926; }
+}
+.grafico-caja { position: relative; margin: 10px 0 20px; }
+.grafico-caja figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-weight: 600; margin-bottom: 10px; }
+.leyenda { display: flex; gap: 14px; font-weight: normal; font-size: 0.9em; }
+.muestra { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; }
+.serie-cuotas { background: var(--serie-cuotas); }
+.serie-ventas { background: var(--serie-ventas); }
+.grafico-area { display: flex; gap: 8px; height: 240px; }
+.grafico-escala { display: flex; flex-direction: column; justify-content: space-between; font-size: 0.75em; color: var(--text-muted); padding-bottom: 22px; text-align: right; min-width: 70px; }
+.grafico-barras {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  background: repeating-linear-gradient(to top, transparent 0, transparent calc(50% - 1px), var(--border) calc(50% - 1px), var(--border) 50%) 0 0 / 100% calc(100% - 22px) no-repeat;
+}
+.columna { display: flex; flex-direction: column; text-decoration: none; color: inherit; outline-offset: 2px; }
+.columna .pila { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; }
+.columna .segmento { display: block; min-height: 2px; }
+.columna .pila .segmento:first-child { border-radius: 4px 4px 0 0; }
+.columna .etiqueta-mes { height: 22px; line-height: 22px; text-align: center; font-size: 0.75em; color: var(--text-muted); }
+.columna:hover .pila, .columna:focus .pila { filter: brightness(1.12); }
+.columna.elegida .etiqueta-mes { color: var(--text-main); font-weight: 700; }
+.columna.futuro { opacity: 0.35; pointer-events: none; }
+.grafico-tooltip {
+  position: absolute;
+  z-index: 5;
+  white-space: pre-line;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.85em;
+  background: var(--background-body);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+/* Ventanas de acciones rápidas */
+.dialogo {
+  width: min(420px, 92vw);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  background: var(--background-body);
+  color: var(--text-main);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.dialogo::backdrop { background: rgba(0, 0, 0, 0.55); }
+.dialogo h3 { margin-top: 0; }
+.dialogo label { display: block; margin: 10px 0 4px; font-size: 0.9em; }
+.dialogo input, .dialogo select { width: 100%; box-sizing: border-box; margin: 0; }
+.dialogo-botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.dialogo-botones button { margin: 0; }

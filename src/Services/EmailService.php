@@ -32,10 +32,11 @@ final class EmailService
     'comprobante' => 'Comprobante de pago',
     'resumen' => 'Resumen semanal',
     'prueba' => 'Prueba',
+    'alerta' => 'Alerta del sistema',
   ];
 
   /** Tipos que no son avisos de marketing: se envían aunque el usuario se haya dado de baja. */
-  private const TRANSACCIONALES = ['comprobante', 'resumen', 'prueba'];
+  private const TRANSACCIONALES = ['comprobante', 'resumen', 'prueba', 'alerta'];
 
   public function __construct(
     private readonly EmailRepository $emails,

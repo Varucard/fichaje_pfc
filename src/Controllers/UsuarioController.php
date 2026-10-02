@@ -35,6 +35,7 @@ final class UsuarioController extends Controller
       'titulo' => 'Lista de Clientes',
       'usuarios' => $this->usuarios->listar(TipoUsuario::Alumno),
       'textoAgregar' => 'Agregar Cliente',
+      'exportar' => 'clientes',
     ]);
   }
 
@@ -44,6 +45,7 @@ final class UsuarioController extends Controller
       'titulo' => 'Lista de Profesores',
       'usuarios' => $this->usuarios->listar(TipoUsuario::Profesor),
       'textoAgregar' => 'Agregar Profesor',
+      'exportar' => 'profesores',
       'ocultarLlavero' => true,
     ]);
   }

@@ -6,12 +6,15 @@ namespace App\Controllers;
 
 use App\Core\Auth;
 use App\Core\Request;
+use App\Services\PromocionService;
 use App\Services\StockService;
 
 final class DashboardController extends Controller
 {
-  public function __construct(private readonly StockService $stock)
-  {
+  public function __construct(
+    private readonly StockService $stock,
+    private readonly PromocionService $promociones,
+  ) {
   }
 
   public function inicio(Request $request): void
@@ -25,6 +28,7 @@ final class DashboardController extends Controller
       'titulo' => 'Panel del Administrador',
       'administrador' => Auth::usuario(),
       'stockBajo' => $this->stock->cantidadBajoMinimo(),
+      'promociones' => $this->promociones->planesActivos(),
     ]);
   }
 }

@@ -34,5 +34,8 @@
 - [x] Agregar alumnos al momento de crear una clase.
 - [x] Liquidación de profesores por asistencia.
 
+## Resueltos en 3.4.0
+- [x] Backups automáticos, estado del lector con alertas, reporte de caja, exportación a Excel, gestión de administradores, protección del login y ventanas propias.
+
 ## Mejoras a futuro (consultar)
 - [ ] Factura electrónica de ARCA (ex AFIP): requiere CUIT, certificado digital y definir el tipo de factura.

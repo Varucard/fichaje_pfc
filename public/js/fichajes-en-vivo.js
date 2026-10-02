@@ -57,8 +57,7 @@
   }
 
   function actualizar() {
-    fetch(PFC.url('/api/fichajes/ultimos'), { headers: { Accept: 'application/json' } })
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+    PFC.json('/api/fichajes/ultimos')
       .then(dibujar)
       .catch((error) => console.error('No se pudieron cargar los fichajes:', error));
   }

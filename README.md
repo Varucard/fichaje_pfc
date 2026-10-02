@@ -11,6 +11,8 @@ Sistema de control de asistencia, pagos de cuotas y clases para el **Palillo Fig
 - Emails automáticos (vencimiento, deuda, cumpleaños, inactividad, bienvenida, resumen semanal) y comprobante de pago en PDF.
 - Aviso de cumpleaños, llaveros desconocidos y cuotas por vencer.
 - Auditoría de acciones y logs técnicos.
+- Backups automáticos diarios, control del lector con alertas, reporte de caja y exportación a Excel.
+- Gestión de administradores, bloqueo por intentos fallidos y cierre de sesión por inactividad.
 - Respaldo de la base de datos y reinicio remoto del lector.
 
 ---
@@ -39,7 +41,7 @@ fichaje_pfc/
 ├── config/              app.php (configuración) y routes.php (mapa de URLs)
 ├── database/            schema.sql, seed.sql (datos ficticios) y migrations/
 ├── storage/             logs/ y backups/ (generados, no se versionan)
-├── bin/                 Scripts de consola (migrar.php, crear-admin.php, procesar-emails.php)
+├── bin/                 Scripts de consola (tareas.php, migrar.php, crear-admin.php)
 ├── tests/               Tests de PHPUnit
 ├── firmware/            Código del Arduino, carcasa 3D e imágenes → ver firmware/README.md
 └── docker/  Dockerfile  docker-compose.yml
@@ -76,7 +78,7 @@ docker compose exec php php bin/crear-admin.php
 - phpMyAdmin: http://localhost:8081
 - Mailpit (buzón de prueba para ver los emails sin enviarlos): http://localhost:8025
 
-El servicio `tareas` corre `bin/procesar-emails.php` cada 15 minutos.
+El servicio `tareas` corre `bin/tareas.php` cada 15 minutos (emails, backup diario y control del lector).
 
 La primera vez se crea la base con `database/schema.sql` y los **datos ficticios** de `database/seed.sql`. Para empezar con la base vacía, hay que quitar la línea del seed en `docker-compose.yml` antes del primer `up`.
 
@@ -174,7 +176,7 @@ La clase aparece en *Últimos ingresos*, en las búsquedas y en la ficha del alu
 
 ## ✉️ Emails
 
-Los emails se **encolan** (tabla `emails_cola`) y se envían en segundo plano con `bin/procesar-emails.php`. Así una operación nunca espera ni falla por el correo, y si el envío falla se reintenta (hasta `MAIL_MAX_INTENTOS`, con espera creciente).
+Los emails se **encolan** (tabla `emails_cola`) y se envían en segundo plano con `bin/tareas.php`. Así una operación nunca espera ni falla por el correo, y si el envío falla se reintenta (hasta `MAIL_MAX_INTENTOS`, con espera creciente).
 
 | Email | Cuándo | Tipo |
 |---|---|---|
@@ -200,11 +202,43 @@ Los emails se **encolan** (tabla `emails_cola`) y se envían en segundo plano co
 3. Completar en el `.env`: `MAIL_USUARIO` y `MAIL_REMITENTE` con la cuenta, y `MAIL_PASSWORD` con la contraseña de aplicación (16 letras, sin espacios). Gmail admite unos 500 envíos por día.
 4. En el panel → Emails, cargar el email del administrador para el resumen y la dirección y el teléfono del gimnasio, y probar con *Enviar prueba*.
 
-### Programar el envío
+### Programar las tareas
 
 - **Docker:** ya lo hace el servicio `tareas`.
-- **Linux:** con cron, `0,15,30,45 * * * * php /ruta/al/proyecto/bin/procesar-emails.php`.
-- **Windows / XAMPP:** en el Programador de tareas, ejecutar `C:\xampp\php\php.exe C:\xampp\htdocs\fichaje_pfc\bin\procesar-emails.php` cada 15 minutos.
+- **Linux:** con cron, `0,15,30,45 * * * * php /ruta/al/proyecto/bin/tareas.php`.
+- **Windows / XAMPP:** en el Programador de tareas, ejecutar `C:\xampp\php\php.exe C:\xampp\htdocs\fichaje_pfc\bin\tareas.php` cada 15 minutos.
+
+---
+
+## 💾 Backups y tareas programadas
+
+`bin/tareas.php` (cada 15 minutos) hace todo lo programado:
+
+- **Emails:** genera los avisos del día y envía la cola.
+- **Backup diario:** a partir de `BACKUP_HORA` (por defecto, las 3), una vez por día. Borra los de más de `BACKUP_DIAS_RETENCION` días (por defecto 30), pero conserva siempre los 3 últimos. Si falla, avisa por email al administrador.
+- **Control del lector:** si el Arduino no responde, avisa por email (como máximo una vez cada 6 horas).
+
+Panel → *Backups*: lista de respaldos con descarga, último backup y botón *Respaldar ahora*. **Importante:** guardá periódicamente una copia fuera del equipo (pendrive o Drive), porque si se rompe el disco se pierden también los backups locales.
+
+Las alertas llegan al *Email del administrador* que se configura en Emails.
+
+## 📡 Estado del lector
+
+El dashboard muestra si el lector responde (🟢/🔴), la latencia y cuándo fue la última lectura de un llavero. Se actualiza cada minuto. Si deja de responder, `bin/tareas.php` avisa por email.
+
+## 📊 Reporte de caja y exportaciones
+
+- Panel → *Caja*: ingresos por mes del año (cuotas + ventas de productos) en un gráfico, con la variación respecto del año anterior y una vista en tabla. Al hacer clic en un mes se ve el detalle por clase y por producto. El criterio es de caja: cada cobro suma en el mes en que se cobró.
+- **Exportar a Excel (CSV):** deudores, clientes, profesores, pagos de un período, liquidaciones y la caja del año, desde el botón de cada pantalla. Los archivos usan `;` como separador y coma decimal, se abren directo con Excel en español y quedan auditados porque contienen datos personales.
+
+## 🔐 Acceso y administradores
+
+- Panel → *Administradores*: alta de administradores, cambio de contraseña y activar/desactivar. No se puede desactivar el propio usuario ni el último administrador activo.
+- Panel → *Mi cuenta*: cambiar la propia contraseña (pide la actual).
+- **Contraseñas:** mínimo 8 caracteres, distintas del DNI.
+- **Intentos fallidos:** después de `LOGIN_MAX_INTENTOS` (por defecto 5) con el mismo DNI en 15 minutos, el acceso se bloquea 15 minutos. Por IP, el límite es 20. Queda auditado.
+- **Inactividad:** la sesión se cierra después de `SESION_INACTIVIDAD_MINUTOS` (por defecto 120) sin uso. Las pantallas que se actualizan solas no cuentan como uso.
+- El primer administrador se crea con `php bin/crear-admin.php`.
 
 ---
 
@@ -231,6 +265,7 @@ Cada migración aplicada se registra en la tabla `migraciones`, así que es segu
 | 008 | Emails: `emails_cola`, `configuracion` y preferencia de avisos en `users` |
 | 009 | Horarios de clases (`clase_horarios`) y clase de cada fichada (`incomes.id_class`) |
 | 010 | Promociones, meses cubiertos por pago y liquidación por asistencia |
+| 011 | Control de intentos fallidos de inicio de sesión (`intentos_login`) |
 
 ---
 

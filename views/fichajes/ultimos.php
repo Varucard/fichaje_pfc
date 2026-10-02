@@ -38,3 +38,4 @@ $this->script('fichajes-en-vivo');
 
 <?= $this->renderParcial('partials/navegacion') ?>
 <?= $this->renderParcial('partials/modal_cumpleanos') ?>
+<?= $this->renderParcial('partials/dialogos') ?>

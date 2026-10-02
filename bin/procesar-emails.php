@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 /*
- * Genera los avisos del día (vencimiento, deuda, inactividad, cumpleaños, resumen) y
- * envía la cola de emails. Ejecutarlo periódicamente (cada 15 minutos está bien):
+ * Compatibilidad: ahora conviene programar bin/tareas.php, que además hace el backup
+ * diario y controla el lector. Este script solo genera los avisos y envía la cola. Ejecutarlo periódicamente (cada 15 minutos está bien):
  * nunca envía dos veces el mismo aviso.
  *
  *   Linux (cron):  0,15,30,45 * * * *  php /ruta/al/proyecto/bin/procesar-emails.php
