@@ -11,7 +11,7 @@
 <?= $this->renderParcial('partials/cabecera', ['titulo' => $titulo]) ?>
 
 <form method="get" class="filtros">
-  <label>Período <input type="month" name="periodo" value="<?= e($periodo) ?>" max="<?= date('Y-m') ?>"></label>
+  <label>Período <input type="month" name="periodo" value="<?= e($periodo) ?>" max="<?= date('Y-m') ?>" pattern="\d{4}-\d{2}" placeholder="AAAA-MM" title="Año y mes: AAAA-MM"></label>
   <button type="submit"><i class="fas fa-calendar-alt"></i> Ver</button>
   <a class="boton" href="<?= url('/exportar/liquidaciones.csv', ['periodo' => $periodo]) ?>"><i class="fas fa-file-excel"></i> Exportar registradas</a>
 </form>

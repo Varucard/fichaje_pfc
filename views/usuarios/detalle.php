@@ -54,29 +54,29 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
 
     <div class="form-group">
       <label for="rfid">N° de llavero:</label>
-      <input type="text" id="rfid" name="rfid" value="<?= e($usuario['rfid']) ?>">
+      <input type="text" id="rfid" name="rfid" value="<?= e(old('rfid', $usuario['rfid'])) ?>">
 
       <label for="dni">N° de DNI:</label>
       <input type="text" id="dni" name="dni" inputmode="numeric" pattern="\d{7,8}" value="<?= e($usuario['dni']) ?>" required>
 
       <label for="name">Nombre:</label>
-      <input type="text" id="name" name="name" value="<?= e($usuario['user_name']) ?>" required>
+      <input type="text" id="name" name="name" value="<?= e(old('name', $usuario['user_name'])) ?>" required>
     </div>
 
     <div class="form-group">
       <label for="surname">Apellido:</label>
-      <input type="text" id="surname" name="surname" value="<?= e($usuario['user_surname']) ?>">
+      <input type="text" id="surname" name="surname" value="<?= e(old('surname', $usuario['user_surname'])) ?>">
 
       <label for="birth_day">Fecha de Nacimiento:</label>
-      <input type="date" id="birth_day" name="birth_day" value="<?= e($usuario['birth_day']) ?>">
+      <input type="date" id="birth_day" name="birth_day" value="<?= e(old('birth_day', $usuario['birth_day'])) ?>">
     </div>
 
     <div class="form-group">
       <label for="email">Email:</label>
-      <input type="email" id="email" name="email" value="<?= e($usuario['email']) ?>">
+      <input type="email" id="email" name="email" value="<?= e(old('email', $usuario['email'])) ?>">
 
       <label for="phone">Teléfono:</label>
-      <input type="tel" id="phone" name="phone" value="<?= e($usuario['phone_number']) ?>">
+      <input type="tel" id="phone" name="phone" value="<?= e(old('phone', $usuario['phone_number'])) ?>">
     </div>
 
     <?php if ($activo): ?>
@@ -126,7 +126,7 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
 
         <form action="<?= url('/pagos/manual') ?>" method="post" class="form-en-linea" data-form-pago data-cuota="<?= e((string) $deuda['cuota']) ?>">
           <?= csrf_field() ?>
-          <input type="hidden" name="dni" value="<?= e($usuario['dni']) ?>">
+          <input type="hidden" name="dni" value="<?= e(old('dni', $usuario['dni'])) ?>">
           <input type="hidden" name="volver" value="<?= e($rutaUsuario) ?>">
           <label for="plan_pago">Plan:</label>
           <select id="plan_pago" name="plan">

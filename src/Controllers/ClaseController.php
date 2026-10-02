@@ -53,7 +53,12 @@ final class ClaseController extends Controller
     try {
       $resultado = $this->clases->crear($nombre, $precio, $request->inputArray('profesores'), $request->inputArray('alumnos'));
     } catch (ValidacionException $e) {
-      $this->error($e->getMessage(), '/clases/nueva', ['nombre_clase' => $nombre, 'precio' => $precio]);
+      $this->error($e->getMessage(), '/clases/nueva', [
+        'nombre_clase' => $nombre,
+        'precio' => $precio,
+        'profesores' => $request->inputArray('profesores'),
+        'alumnos' => $request->inputArray('alumnos'),
+      ]);
     }
 
     $mensaje = $resultado['omitidos']

@@ -49,6 +49,7 @@ $alto = fn (float $valor) => $maximo > 0 ? round($valor / $maximo * 100, 2) : 0;
     <div class="grafico-barras">
       <?php foreach ($meses as $m): ?>
         <a class="columna <?= $m['futuro'] ? 'futuro' : '' ?> <?= $m['mes'] === $mes_detalle ? 'elegida' : '' ?>"
+          <?= $m['futuro'] ? 'tabindex="-1" aria-hidden="true"' : '' ?>
           href="<?= url('/reportes/caja', ['anio' => $anio, 'mes' => $m['mes']]) ?>"
           data-tooltip="<?= e($m['nombre'] . ' ' . $anio . "\nCuotas: " . dinero($m['cuotas']) . "\nVentas: " . dinero($m['ventas']) . "\nTotal: " . dinero($m['total']) . ($m['variacion'] !== null ? "\nvs. año anterior: " . $variacion($m['variacion']) : '')) ?>"
           aria-label="<?= e($m['nombre'] . ': total ' . dinero($m['total'])) ?>">

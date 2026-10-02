@@ -100,7 +100,7 @@ final class UsuarioController extends Controller
     try {
       $usuario = $this->usuarios->actualizar((int) $id, $entrada, $request->tiene('cambiar_tipo'));
     } catch (ValidacionException $e) {
-      $this->error($e->getMessage(), '/usuarios/' . $request->input('dni_original', ''));
+      $this->error($e->getMessage(), '/usuarios/' . $request->input('dni_original', ''), $entrada);
     }
 
     $this->exito('Usuario actualizado exitosamente.', '/usuarios/' . $usuario['dni']);

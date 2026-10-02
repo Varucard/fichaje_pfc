@@ -31,20 +31,48 @@
       });
     },
 
-    /** Envía un POST como formulario normal (incluye el token CSRF). */
-    enviar(ruta, datos) {
-      const form = document.createElement('form');
-      form.method = 'post';
-      form.action = PFC.url(ruta);
-      Object.entries({ _token: meta('csrf-token'), ...datos }).forEach(([nombre, valor]) => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = nombre;
-        input.value = valor;
-        form.appendChild(input);
+    /**
+     * Ejecuta una consulta periódica (polling) que:
+     * - se pausa mientras la pestaña está oculta y se reanuda al volver,
+     * - no superpone pedidos (espera a que termine el anterior),
+     * - ante errores espera cada vez más (hasta 1 minuto) para no saturar.
+     * @param {() => Promise<any>} tarea
+     */
+    sondear(tarea, intervaloMs) {
+      let espera = intervaloMs;
+      let timer = null;
+      const ciclo = () => {
+        timer = null;
+        if (document.hidden) return;
+        tarea()
+          .then(() => (espera = intervaloMs))
+          .catch((error) => {
+            espera = Math.min(espera * 2, 60000);
+            console.warn('Consulta periódica fallida, reintento en', espera / 1000, 's:', error);
+          })
+          .finally(() => (timer = setTimeout(ciclo, espera)));
+      };
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && timer === null) ciclo();
       });
-      document.body.appendChild(form);
-      form.submit();
+      ciclo();
+    },
+
+    /** Copia texto al portapapeles; funciona también entrando por http://IP (sin HTTPS). */
+    copiar(texto) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(texto);
+      }
+      return new Promise((resolver, rechazar) => {
+        const campo = Object.assign(document.createElement('textarea'), { value: texto });
+        campo.setAttribute('readonly', '');
+        campo.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(campo);
+        campo.select();
+        const ok = document.execCommand('copy');
+        campo.remove();
+        ok ? resolver() : rechazar(new Error('No se pudo copiar'));
+      });
     },
 
     /** Muestra un aviso no bloqueante en la esquina de la pantalla. */
@@ -80,6 +108,8 @@
         if (!Contexto) return;
         PFC._audio ??= new Contexto();
         const ctx = PFC._audio;
+        // Si se creó antes de que el usuario tocara la página queda suspendido: reanudarlo.
+        if (ctx.state === 'suspended') ctx.resume();
         let inicio = ctx.currentTime;
         (TONOS[tipo] ?? TONOS.aviso).forEach(([frecuencia, duracion]) => {
           const oscilador = ctx.createOscillator();
@@ -98,17 +128,31 @@
     },
   });
 
+  // El audio se habilita con la primera interacción (política de los navegadores).
+  const habilitarAudio = () => {
+    const Contexto = window.AudioContext || window.webkitAudioContext;
+    if (Contexto) {
+      PFC._audio ??= new Contexto();
+      if (PFC._audio.state === 'suspended') PFC._audio.resume();
+    }
+  };
+  document.addEventListener('pointerdown', habilitarAudio, { once: true });
+  document.addEventListener('keydown', habilitarAudio, { once: true });
+
   // Buscadores
   const RUTAS_BUSQUEDA = { usuarios: '/usuarios/buscar', fichajes: '/fichajes/buscar', clases: '/clases/buscar' };
   const NOMBRE_O_DNI = /^(\d{7,8}|[\p{L}\s'.-]+)$/u;
+  // Los ingresos también se buscan por llavero (hex) o DNI parcial.
+  const BUSQUEDA_FICHAJES = /^(\d{3,8}|[0-9A-Fa-f]{4,20}|[\p{L}\s'.-]+)$/u;
 
   document.querySelectorAll('[data-buscar]').forEach((input) => {
     input.addEventListener('keydown', (evento) => {
       if (evento.key !== 'Enter') return;
       const tipo = input.dataset.buscar;
       const termino = input.value.trim();
-      if (tipo !== 'clases' && !NOMBRE_O_DNI.test(termino)) {
-        alert('Ingresá un nombre o un DNI de 7 u 8 dígitos.');
+      const valido = tipo === 'clases' || (tipo === 'fichajes' ? BUSQUEDA_FICHAJES : NOMBRE_O_DNI).test(termino);
+      if (!valido) {
+        alert(tipo === 'fichajes' ? 'Ingresá un nombre, un DNI o un número de llavero.' : 'Ingresá un nombre o un DNI de 7 u 8 dígitos.');
         return;
       }
       location.href = PFC.url(RUTAS_BUSQUEDA[tipo]) + '?q=' + encodeURIComponent(termino);
@@ -142,9 +186,15 @@
 
   document.querySelectorAll('dialog.dialogo').forEach((dialogo) => {
     dialogo.querySelectorAll('[data-cerrar-dialogo]').forEach((b) => b.addEventListener('click', () => dialogo.close()));
-    // Click en el fondo oscuro: cerrar
+    // Click en el fondo oscuro (fuera del recuadro): cerrar. Se miran las coordenadas
+    // para no cerrar al hacer clic en el borde interno ni al soltar una selección afuera.
+    dialogo.addEventListener('pointerdown', (evento) => {
+      const r = dialogo.getBoundingClientRect();
+      dialogo.dataset.clicAfuera = evento.target === dialogo
+        && (evento.clientX < r.left || evento.clientX > r.right || evento.clientY < r.top || evento.clientY > r.bottom) ? '1' : '';
+    });
     dialogo.addEventListener('click', (evento) => {
-      if (evento.target === dialogo) dialogo.close();
+      if (evento.target === dialogo && dialogo.dataset.clicAfuera === '1') dialogo.close();
     });
   });
 
@@ -188,6 +238,12 @@
       if (!dialogo) return;
       dialogo.querySelector('form')?.reset();
       dialogo.querySelectorAll('[data-volver-actual]').forEach((input) => (input.value = PFC.rutaActual()));
+      // Fecha de hoy al abrir (no la del momento en que se cargó la página).
+      const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      dialogo.querySelectorAll('input[type="date"][data-hoy]').forEach((input) => {
+        input.value = hoy;
+        input.max = hoy;
+      });
       dialogo.showModal();
     });
   });

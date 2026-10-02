@@ -53,10 +53,11 @@ final class StockController extends Controller
 
   public function actualizar(Request $request, string $id): void
   {
+    $entrada = $this->campos($request, self::CAMPOS_PRODUCTO);
     try {
-      $this->stock->actualizar((int) $id, $this->campos($request, self::CAMPOS_PRODUCTO));
+      $this->stock->actualizar((int) $id, $entrada);
     } catch (ValidacionException $e) {
-      $this->error($e->getMessage(), '/stock/' . $id);
+      $this->error($e->getMessage(), '/stock/' . $id, $entrada);
     }
 
     $this->exito('Producto actualizado.', '/stock/' . $id);
@@ -79,10 +80,11 @@ final class StockController extends Controller
   {
     $tipo = (string) $request->input('tipo', '');
 
+    $entrada = $this->campos($request, self::CAMPOS_MOVIMIENTO);
     try {
-      $resultado = $this->stock->registrarMovimiento((int) $id, $tipo, $this->campos($request, self::CAMPOS_MOVIMIENTO));
+      $resultado = $this->stock->registrarMovimiento((int) $id, $tipo, $entrada);
     } catch (ValidacionException $e) {
-      $this->error($e->getMessage(), '/stock/' . $id);
+      $this->error($e->getMessage(), '/stock/' . $id, ['tipo_movimiento' => $tipo] + $entrada);
     }
 
     $mensaje = match ($tipo) {

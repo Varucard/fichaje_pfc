@@ -17,7 +17,7 @@
 use App\Core\Config;
 
 $modo = Config::get('mail.modo');
-$etiquetasEstado = ['pendiente' => 'warning', 'enviado' => 'exito', 'error' => 'error', 'cancelado' => ''];
+$etiquetasEstado = ['pendiente' => 'warning', 'enviado' => 'exito', 'error' => 'error', 'cancelado' => 'neutra'];
 $campo = fn (string $clave) => str_replace('.', '_', $clave);
 ?>
 <?= $this->renderParcial('partials/cabecera', ['titulo' => $titulo]) ?>

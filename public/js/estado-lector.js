@@ -33,10 +33,5 @@
     indicador.replaceChildren(Object.assign(document.createElement('span'), { className: 'punto' }), ' ' + texto);
   }
 
-  function consultar() {
-    PFC.json('/api/lector/estado').then(mostrar).catch((error) => console.error('Estado del lector:', error));
-  }
-
-  consultar();
-  setInterval(consultar, 60000);
+  PFC.sondear(() => PFC.json('/api/lector/estado').then(mostrar), 60000);
 })();
