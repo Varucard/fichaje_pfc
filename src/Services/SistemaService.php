@@ -14,8 +14,10 @@ use PDO;
  */
 final class SistemaService
 {
-  public function __construct(private readonly PDO $pdo)
-  {
+  public function __construct(
+    private readonly PDO $pdo,
+    private readonly AuditoriaService $auditoria,
+  ) {
   }
 
   public function reiniciarArduino(): void
@@ -37,7 +39,8 @@ final class SistemaService
     curl_exec($ch);
     curl_close($ch);
 
-    Log::info("Reinicio del Arduino solicitado ({$ip})");
+    Log::info('Reinicio del Arduino solicitado', ['ip' => $ip]);
+    $this->auditoria->registrar('sistema.reinicio_arduino', "Reinicio del lector Arduino ({$ip})");
   }
 
   /**
@@ -57,7 +60,8 @@ final class SistemaService
       $this->backupConPhp($archivo);
     }
 
-    Log::info("Respaldo generado: {$archivo}");
+    Log::info('Respaldo generado', ['archivo' => $archivo]);
+    $this->auditoria->registrar('sistema.backup', 'Respaldo de la base de datos: ' . basename($archivo));
     return $archivo;
   }
 
@@ -93,7 +97,7 @@ final class SistemaService
     $codigo = proc_close($proceso);
 
     if ($codigo !== 0) {
-      Log::info('mysqldump no disponible o falló, se usa respaldo PHP: ' . trim((string) $errores));
+      Log::warning('mysqldump no disponible o falló, se usa respaldo PHP', ['error' => trim((string) $errores)]);
       @unlink($archivo);
       return false;
     }

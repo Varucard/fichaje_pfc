@@ -7,12 +7,15 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Core\Request;
 use App\Exceptions\ValidacionException;
+use App\Services\AuditoriaService;
 use App\Services\AuthService;
 
 final class AuthController extends Controller
 {
-  public function __construct(private readonly AuthService $auth)
-  {
+  public function __construct(
+    private readonly AuthService $auth,
+    private readonly AuditoriaService $auditoria,
+  ) {
   }
 
   public function mostrarLogin(Request $request): void
@@ -36,6 +39,7 @@ final class AuthController extends Controller
 
   public function logout(Request $request): void
   {
+    $this->auditoria->registrar('sesion.cierre', 'Cierre de sesión de ' . (Auth::usuario()['nombre'] ?? ''));
     Auth::cerrarSesion();
     redirigir('/login');
   }

@@ -32,7 +32,8 @@
     "test": "phpunit",
     "lint": "find src config public views bin tests -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null",
     "serve": "php -S localhost:8000 -t public public/index.php",
-    "crear-admin": "php bin/crear-admin.php"
+    "crear-admin": "php bin/crear-admin.php",
+    "migrar": "php bin/migrar.php"
   },
   "config": {
     "sort-packages": true,

@@ -27,7 +27,16 @@
     return td;
   }
 
+  let ultimoId = null;
+
   function dibujar(fichajes) {
+    // Suena cuando entra alguien nuevo (no en la primera carga)
+    const primero = fichajes[0]?.id_income ?? null;
+    if (ultimoId !== null && primero !== null && primero !== ultimoId) {
+      PFC.sonar(fichajes[0].pago_cerca ? 'aviso' : 'ingreso');
+    }
+    ultimoId = primero;
+
     const vacios = fichajes.length === 0;
     contenedor.classList.toggle('oculto', vacios);
     vacio.classList.toggle('oculto', !vacios);

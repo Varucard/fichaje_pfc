@@ -2,7 +2,10 @@
 /**
  * @var App\Core\View $this
  * @var string $titulo
+ * @var array $clases
  */
+$opcion = old('opcion_alta', '');
+$clasesElegidas = array_map('intval', (array) old('clases', []));
 ?>
 <?= $this->renderParcial('partials/cabecera', ['titulo' => $titulo]) ?>
 
@@ -37,10 +40,22 @@
   </div>
 
   <fieldset class="opciones-alta">
-    <label><input type="radio" name="opcion_alta" value="" checked> Cliente sin pago</label>
-    <label><input type="radio" name="opcion_alta" value="pago"> Cliente con pago</label>
-    <label><input type="radio" name="opcion_alta" value="profesor" <?= old('profesor') ? 'checked' : '' ?>> Profesor</label>
+    <label><input type="radio" name="opcion_alta" value="" <?= $opcion === '' ? 'checked' : '' ?>> Cliente sin pago</label>
+    <label><input type="radio" name="opcion_alta" value="pago" <?= $opcion === 'pago' ? 'checked' : '' ?>> Cliente con pago</label>
+    <label><input type="radio" name="opcion_alta" value="profesor" <?= $opcion === 'profesor' ? 'checked' : '' ?>> Profesor</label>
   </fieldset>
+
+  <?php if (!empty($clases)): ?>
+    <fieldset class="opciones-alta">
+      <legend>Clases (opcional; obligatorio para el alta con pago):</legend>
+      <?php foreach ($clases as $clase): ?>
+        <label>
+          <input type="checkbox" name="clases[]" value="<?= e($clase['id_class']) ?>" <?= in_array((int) $clase['id_class'], $clasesElegidas, true) ? 'checked' : '' ?>>
+          <?= e($clase['name_class']) ?> (<?= e(dinero($clase['price_class'])) ?>)
+        </label>
+      <?php endforeach; ?>
+    </fieldset>
+  <?php endif; ?>
 
   <div class="form-botones">
     <button type="submit"><i class="fas fa-user-plus"></i> Registrar Cliente/ Profesor</button>

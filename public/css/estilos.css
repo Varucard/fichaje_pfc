@@ -112,13 +112,15 @@ a.boton.button_small {
 }
 .tabla th, .detalle th { background-color: black; color: #fff; }
 tr.inactivo td { opacity: 0.6; }
-.celda-acciones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  justify-content: center;
+/* Acciones dentro de una celda: sin cambiar el display del <td> para no romper la tabla */
+.celda-acciones > form,
+.celda-acciones > a.boton,
+.celda-acciones > span {
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle;
 }
-.celda-acciones form, .celda-acciones a.boton, .celda-acciones button { margin: 0; }
+.celda-acciones button { margin: 0; }
 
 .tabla-container {
   display: flex;
@@ -320,3 +322,95 @@ tr.inactivo td { opacity: 0.6; }
 }
 .pie p { margin: 0; }
 .pie-autor { color: #66aaff; }
+
+/* Filtros y paginación */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 15px;
+}
+.filtros label { display: flex; flex-direction: column; font-size: 0.9em; gap: 4px; }
+.filtros input, .filtros select, .filtros button, .filtros a.boton { margin: 0; }
+.paginacion {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+}
+.texto-izquierda { text-align: left !important; }
+.tabla pre, .detalle pre { font-size: 0.8em; white-space: pre-wrap; text-align: left; }
+
+/* Etiquetas de nivel de log */
+.etiqueta {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 0.8em;
+  font-weight: 600;
+  background: var(--background);
+}
+.etiqueta-error { background: var(--pfc-peligro); color: #fff; }
+.etiqueta-warning { background: var(--pfc-aviso); color: #fff; }
+.etiqueta-info { background: #1c7ed6; color: #fff; }
+
+/* Tarjetas de resumen (deudores, liquidaciones, stock) */
+.resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+.resumen-dato {
+  flex: 1 1 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--background-alt);
+  border-left: 5px solid #1c7ed6;
+}
+.resumen-dato span { font-size: 0.85em; color: var(--text-muted); }
+.resumen-dato strong { font-size: 1.4em; }
+.resumen-dato.peligro { border-color: var(--pfc-peligro); }
+.resumen-dato.peligro strong { color: var(--pfc-peligro); }
+.resumen-dato.exito { border-color: var(--pfc-exito); }
+
+.input-monto { width: 130px; }
+.lista-fichajes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 6px;
+  padding: 0;
+  list-style: none;
+}
+.lista-fichajes li { font-size: 0.9em; }
+
+.etiqueta-exito { background: var(--pfc-exito); color: #fff; }
+tr.resaltada td { background-color: rgba(28, 126, 214, 0.25) !important; }
+tr.resaltada td:first-child { box-shadow: inset 4px 0 0 #1c7ed6; }
+.form-porcentaje { display: flex; gap: 4px; justify-content: center; margin: 0; }
+.form-porcentaje input { width: 70px; margin: 0; padding: 4px 6px; }
+.form-porcentaje button { margin: 0; }
+
+/* Stock: tarjetas de movimiento */
+.movimientos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+.tarjeta-movimiento {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--background-alt);
+}
+.tarjeta-movimiento h3 { margin: 0 0 4px; font-size: 1.05em; }
+.tarjeta-movimiento label { display: flex; flex-direction: column; font-size: 0.85em; gap: 2px; }
+.tarjeta-movimiento input { margin: 0; }
+.tarjeta-movimiento button { margin: 6px 0 0; }

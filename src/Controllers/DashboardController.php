@@ -6,9 +6,14 @@ namespace App\Controllers;
 
 use App\Core\Auth;
 use App\Core\Request;
+use App\Services\StockService;
 
 final class DashboardController extends Controller
 {
+  public function __construct(private readonly StockService $stock)
+  {
+  }
+
   public function inicio(Request $request): void
   {
     redirigir(Auth::check() ? '/dashboard' : '/login');
@@ -19,6 +24,7 @@ final class DashboardController extends Controller
     $this->render('dashboard/index', [
       'titulo' => 'Panel del Administrador',
       'administrador' => Auth::usuario(),
+      'stockBajo' => $this->stock->cantidadBajoMinimo(),
     ]);
   }
 }
