@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.1.0] - Sin publicar
+## [3.1.0] - 2026-10-02
 
 ### Logs y auditoría
 - Auditoría de acciones (quién hizo qué y cuándo, con los cambios realizados): pantalla *Auditoría* con filtros, e historial en la ficha de cada usuario.

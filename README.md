@@ -22,21 +22,21 @@ fichaje_pfc/
 │   ├── index.php        Front controller: todas las peticiones entran por acá
 │   ├── css/  js/  img/
 ├── src/                 Código PHP (namespace App\, autoload PSR-4)
-│   ├── Core/            Router, Request, View, Session, Csrf, Auth, Container, App
+│   ├── Core/            Router, Request, View, Session, Csrf, Auth, Container, Migrador, App
 │   ├── Controllers/     Reciben la petición, llaman a un servicio y responden
 │   │   └── Api/         Endpoints JSON (panel y lector Arduino)
-│   ├── Services/        Reglas de negocio (pagos, fichajes, usuarios, clases…)
+│   ├── Services/        Reglas de negocio (pagos, deuda, liquidaciones, stock, auditoría…)
 │   ├── Repositories/    Acceso a datos: todo el SQL vive acá
 │   ├── Domain/          Enums y valores del dominio (TipoUsuario, EstadoLectura, Llavero)
 │   ├── Exceptions/
 │   └── Support/         Helpers de vistas y log
 ├── views/               Plantillas: solo presentación
 │   ├── layouts/  partials/
-│   └── auth/  dashboard/  usuarios/  clases/  fichajes/  errors/
+│   └── auth/ dashboard/ usuarios/ clases/ fichajes/ deudas/ liquidaciones/ stock/ sistema/ errors/
 ├── config/              app.php (configuración) y routes.php (mapa de URLs)
 ├── database/            schema.sql, seed.sql (datos ficticios) y migrations/
 ├── storage/             logs/ y backups/ (generados, no se versionan)
-├── bin/                 Scripts de consola (crear-admin.php)
+├── bin/                 Scripts de consola (migrar.php, crear-admin.php)
 ├── tests/               Tests de PHPUnit
 ├── firmware/            Código del Arduino, carcasa 3D e imágenes → ver firmware/README.md
 └── docker/  Dockerfile  docker-compose.yml
