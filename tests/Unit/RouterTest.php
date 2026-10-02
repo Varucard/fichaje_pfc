@@ -56,6 +56,16 @@ final class RouterTest extends TestCase
     $this->despachar('GET', '/usuarios/abc');
   }
 
+  public function testParametroConCuantificadorEntreLlaves(): void
+  {
+    $this->router->get('/baja/{token:[0-9a-f]{4}}', [ControladorDePrueba::class, 'accion']);
+
+    self::assertSame([['ab12']], $this->despachar('GET', '/baja/ab12'));
+
+    $this->expectExceptionObject(new HttpException(404, 'Página no encontrada'));
+    $this->despachar('GET', '/baja/ab123');
+  }
+
   public function testMetodoNoPermitido(): void
   {
     try {

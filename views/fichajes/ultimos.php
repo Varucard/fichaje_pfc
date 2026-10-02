@@ -26,6 +26,7 @@ $this->script('fichajes-en-vivo');
         <th>N° de DNI</th>
         <th>Alumno</th>
         <th>Ingreso</th>
+        <th>Clase</th>
         <th>Vencimiento cuota</th>
       </tr>
     </thead>

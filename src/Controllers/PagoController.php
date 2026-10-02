@@ -6,13 +6,30 @@ namespace App\Controllers;
 
 use App\Core\Request;
 use App\Exceptions\ValidacionException;
+use App\Services\ComprobanteService;
 use App\Services\PagoService;
 use DateTimeImmutable;
 
 final class PagoController extends Controller
 {
-  public function __construct(private readonly PagoService $pagos)
+  public function __construct(
+    private readonly PagoService $pagos,
+    private readonly ComprobanteService $comprobantes,
+  ) {
+  }
+
+  /** Comprobante de pago en PDF (se abre en el navegador para imprimir o descargar). */
+  public function comprobante(Request $request, string $id): void
   {
+    try {
+      [$archivo, $pdf] = $this->comprobantes->pdf((int) $id);
+    } catch (ValidacionException $e) {
+      $this->error($e->getMessage(), '/dashboard');
+    }
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: inline; filename="' . $archivo . '"');
+    header('Content-Length: ' . strlen($pdf));
+    echo $pdf;
   }
 
   /** "Renovar pago": registra un pago con fecha de hoy. */

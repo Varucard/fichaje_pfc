@@ -79,7 +79,8 @@ final class Router
   private function aRegex(string $patron): string
   {
     $regex = preg_replace_callback(
-      '#\{(\w+)(?::([^}]+))?\}#',
+      // Admite cuantificadores con llaves dentro del regex del parámetro: {token:[0-9a-f]{32}}
+      '#\{(\w+)(?::((?:[^{}]|\{[^{}]*\})+))?\}#',
       fn (array $m) => '(?P<' . $m[1] . '>' . ($m[2] ?? '[^/]+') . ')',
       $patron
     );

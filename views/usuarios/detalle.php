@@ -11,6 +11,7 @@
  * @var array|null $deuda
  * @var array $fichajes
  * @var array $historial
+ * @var array $emails
  */
 use App\Domain\TipoUsuario;
 
@@ -162,7 +163,8 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
                   <?php endif; ?>
                 <?php endif; ?>
               </td>
-              <td>
+              <td class="celda-acciones">
+                <a class="boton button_small" href="<?= url('/pagos/' . $pago['id_payment'] . '/comprobante') ?>" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> Comprobante</a>
                 <form action="<?= url('/pagos/' . $pago['id_payment'] . '/eliminar') ?>" method="post"
                   data-confirmar="¿Eliminar el pago del <?= e(fecha($pago['discharge_date'])) ?>?">
                   <?= csrf_field() ?>
@@ -185,7 +187,10 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
     <?php else: ?>
       <ul class="lista-fichajes">
         <?php foreach ($fichajes as $ingreso): ?>
-          <li><i class="fas fa-clipboard-check"></i> <?= e(fecha_hora($ingreso)) ?></li>
+          <li>
+            <i class="fas fa-clipboard-check"></i> <?= e(fecha_hora($ingreso['addmission_date'])) ?>
+            <span class="<?= $ingreso['clase'] ? 'diminuto' : 'diminuto texto-aviso' ?>">· <?= e($ingreso['clase'] ?: 'Sin clase') ?></span>
+          </li>
         <?php endforeach; ?>
       </ul>
     <?php endif; ?>
@@ -254,6 +259,35 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
                   <button type="submit" class="button_small peligro"><i class="fas fa-trash"></i> Quitar de la clase</button>
                 </form>
               </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
+  <?php endif; ?>
+
+  <?php if ($tipo !== TipoUsuario::Administrador): ?>
+    <hr>
+    <h2>Emails</h2>
+    <?php if (empty($usuario['email'])): ?>
+      <p class="diminuto texto-peligro">Sin email cargado: no recibe avisos ni comprobantes. Cargalo en los datos de arriba.</p>
+    <?php else: ?>
+      <form action="<?= url($rutaUsuario . '/emails') ?>" method="post" class="form-en-linea">
+        <?= csrf_field() ?>
+        <input type="hidden" name="acepta" value="<?= $usuario['acepta_emails'] ? '0' : '1' ?>">
+        <span><?= $usuario['acepta_emails'] ? '✅ Recibe avisos por email' : '⛔ Se dio de baja de los avisos (los comprobantes se envían igual)' ?></span>
+        <button type="submit" class="button_small"><?= $usuario['acepta_emails'] ? 'Dar de baja de avisos' : 'Volver a enviar avisos' ?></button>
+      </form>
+    <?php endif; ?>
+    <?php if (!empty($emails)): ?>
+      <table>
+        <thead><tr><th>Fecha</th><th>Asunto</th><th>Estado</th></tr></thead>
+        <tbody>
+          <?php foreach ($emails as $email): ?>
+            <tr>
+              <td class="diminuto"><?= e(fecha_hora($email['enviado_en'] ?? $email['creado_en'])) ?></td>
+              <td class="texto-izquierda"><a href="<?= url('/emails/' . $email['id']) ?>" target="_blank" rel="noopener"><?= e($email['asunto']) ?></a></td>
+              <td class="diminuto"><?= e($email['estado']) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

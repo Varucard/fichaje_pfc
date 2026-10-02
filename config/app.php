@@ -18,7 +18,7 @@ $basePath = $urlApp !== ''
 return [
   'app' => [
     'nombre' => Env::get('SITENAME', 'Palillo Fight Club'),
-    'version' => Env::get('APPVERSION', '3.1.1'),
+    'version' => Env::get('APPVERSION', '3.2.0'),
     'url' => $urlApp,
     'base_path' => $basePath,
     'debug' => Env::bool('APP_DEBUG'),
@@ -43,6 +43,8 @@ return [
   'fichajes' => [
     // Si el mismo alumno pasa el llavero de nuevo dentro de estos minutos no se registra otra fichada.
     'minutos_entre_fichadas' => (int) Env::get('MINUTOS_ENTRE_FICHADAS', '5'),
+    // Para deducir la clase: se acepta la fichada desde estos minutos antes del inicio hasta el fin.
+    'minutos_antes_de_clase' => (int) Env::get('MINUTOS_ANTES_DE_CLASE', '30'),
   ],
 
   'liquidaciones' => [
@@ -53,6 +55,21 @@ return [
   'pagos' => [
     // Días antes/después del vencimiento en los que se marca la cuota en rojo.
     'dias_aviso_vencimiento' => (int) Env::get('DIAS_AVISO_VENCIMIENTO', '5'),
+  ],
+
+  'mail' => [
+    // smtp = envía de verdad | log = guarda los mails en storage/emails (desarrollo)
+    'modo' => Env::get('MAIL_MODO', Env::get('MAIL_HOST') ? 'smtp' : 'log'),
+    'host' => Env::get('MAIL_HOST', 'smtp.gmail.com'),
+    'puerto' => (int) Env::get('MAIL_PUERTO', '587'),
+    // tls (puerto 587), ssl (puerto 465) o ninguna (sin cifrado, ej: Mailpit en desarrollo)
+    'seguridad' => strtolower((string) Env::get('MAIL_SEGURIDAD', 'tls')) === 'ninguna' ? '' : Env::get('MAIL_SEGURIDAD', 'tls'),
+    'usuario' => Env::get('MAIL_USUARIO', ''),
+    'password' => Env::get('MAIL_PASSWORD', ''),
+    'remitente' => Env::get('MAIL_REMITENTE', Env::get('MAIL_USUARIO', '')),
+    'remitente_nombre' => Env::get('MAIL_REMITENTE_NOMBRE', Env::get('SITENAME', 'Palillo Fight Club')),
+    // Reintentos ante error de envío antes de marcar el mail como fallido
+    'max_intentos' => (int) Env::get('MAIL_MAX_INTENTOS', '3'),
   ],
 
   'log' => [

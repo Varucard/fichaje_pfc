@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.2.0] - 2026-10-02
+
+### Horarios y clase en la fichada
+- Horarios semanales por clase, con validación de superposiciones.
+- Cada fichada (lector o manual) se asigna a la clase en horario. Si no coincide ninguna, se registra igual como "Sin clase".
+- La clase se ve en los ingresos, las búsquedas y la ficha del alumno. El lector la muestra en el LCD.
+- Asistencias de los últimos 30 días en la ficha de cada clase.
+
+### Emails
+- Avisos automáticos: vencimiento próximo, cuota vencida/deuda, inasistencia ("te extrañamos"), cumpleaños y bienvenida.
+- Comprobante de pago en PDF (sin validez fiscal), adjunto por email y descargable desde la ficha.
+- Resumen semanal para el administrador.
+- Cola de envío con reintentos, panel con configuración, vista previa, reintento y email de prueba.
+- Baja de avisos por link (con `List-Unsubscribe`) o desde la ficha; todo queda auditado.
+- Envío por SMTP (Gmail). En desarrollo, Mailpit en Docker; además hay un modo archivo.
+
+### Correcciones
+- El router no aceptaba cuantificadores con llaves en los parámetros (ej: `{token:[0-9a-f]{32}}`).
+
 ## [3.1.1] - 2026-10-02
 
 ### Correcciones

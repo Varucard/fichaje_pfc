@@ -7,6 +7,8 @@ namespace App\Services;
 use App\Domain\TipoUsuario;
 use App\Exceptions\ValidacionException;
 use App\Repositories\ClaseRepository;
+use App\Repositories\FichajeRepository;
+use App\Repositories\HorarioRepository;
 use App\Repositories\MatriculaRepository;
 use App\Repositories\UsuarioRepository;
 
@@ -20,6 +22,8 @@ final class ClaseService
     private readonly MatriculaRepository $matriculas,
     private readonly UsuarioRepository $usuarios,
     private readonly AuditoriaService $auditoria,
+    private readonly HorarioRepository $horarios,
+    private readonly FichajeRepository $fichajes,
   ) {
   }
 
@@ -42,6 +46,8 @@ final class ClaseService
       'clase' => $clase,
       'profesores' => $this->matriculas->profesoresDeClase($id),
       'alumnos' => $this->matriculas->alumnosDeClase($id),
+      'horarios' => $this->horarios->deClase($id),
+      'asistencias' => $this->fichajes->asistenciasAClase($id),
     ];
   }
 
@@ -175,6 +181,55 @@ final class ClaseService
       $usuario['dni'],
       ['id_clase' => $idClase],
     );
+  }
+
+  public function agregarHorario(int $idClase, string $dia, string $inicio, string $fin): void
+  {
+    $clase = $this->clases->buscarPorId($idClase) ?? throw new ValidacionException('No se encontró la clase.');
+    $dia = (int) $dia;
+    if ($dia < 1 || $dia > 7) {
+      throw new ValidacionException('Elegí un día de la semana.');
+    }
+    $inicio = self::hora($inicio);
+    $fin = self::hora($fin);
+    if ($fin <= $inicio) {
+      throw new ValidacionException('La hora de fin debe ser posterior a la de inicio.');
+    }
+    if ($this->horarios->haySuperposicion($idClase, $dia, $inicio, $fin)) {
+      throw new ValidacionException('Ese horario se superpone con otro de la misma clase.');
+    }
+
+    $this->horarios->agregar($idClase, $dia, $inicio, $fin);
+    $this->auditoria->registrar(
+      'clase.horario_alta',
+      sprintf('Horario de %s: %s de %s a %s', $clase['name_class'], ConfiguracionService::DIAS_SEMANA[$dia], substr($inicio, 0, 5), substr($fin, 0, 5)),
+      'clase',
+      $idClase,
+    );
+  }
+
+  public function quitarHorario(int $idClase, int $idHorario): void
+  {
+    $horario = $this->horarios->buscarPorId($idHorario);
+    if (!$horario || (int) $horario['id_class'] !== $idClase) {
+      throw new ValidacionException('El horario no existe.');
+    }
+    $this->horarios->eliminar($idHorario);
+    $this->auditoria->registrar(
+      'clase.horario_baja',
+      sprintf('Se quitó el horario de %s: %s de %s a %s', $horario['name_class'], ConfiguracionService::DIAS_SEMANA[(int) $horario['dia_semana']], substr($horario['hora_inicio'], 0, 5), substr($horario['hora_fin'], 0, 5)),
+      'clase',
+      $idClase,
+    );
+  }
+
+  /** "9:5" o "09:05" => "09:05:00" */
+  private static function hora(string $valor): string
+  {
+    if (!preg_match('/^(\d{1,2}):(\d{2})$/', trim($valor), $m) || (int) $m[1] > 23 || (int) $m[2] > 59) {
+      throw new ValidacionException('Ingresá las horas con el formato HH:MM.');
+    }
+    return sprintf('%02d:%02d:00', $m[1], $m[2]);
   }
 
   /** @return array{0: string, 1: int} */

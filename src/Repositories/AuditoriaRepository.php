@@ -59,6 +59,14 @@ final class AuditoriaRepository extends Repository
     return ['filas' => $stmt->fetchAll(), 'total' => $total];
   }
 
+  public function contarAccion(string $accion, \DateTimeInterface $desde, \DateTimeInterface $hasta): int
+  {
+    return (int) $this->valor(
+      'SELECT COUNT(*) FROM auditoria WHERE accion = ? AND fecha BETWEEN ? AND ?',
+      [$accion, $desde->format('Y-m-d 00:00:00'), $hasta->format('Y-m-d 23:59:59')]
+    );
+  }
+
   /** Historial de una entidad puntual (ej: todas las acciones sobre un usuario). */
   public function deEntidad(string $entidad, string $id, int $limite = 20): array
   {

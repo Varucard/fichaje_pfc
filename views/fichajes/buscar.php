@@ -28,6 +28,7 @@
           <th>N° de DNI</th>
           <th>Alumno</th>
           <th>Ingreso</th>
+          <th>Clase</th>
           <th>Vencimiento cuota</th>
         </tr>
       </thead>
@@ -38,6 +39,7 @@
             <td><a href="<?= url('/usuarios/' . $fichaje['dni']) ?>"><?= e($fichaje['dni']) ?></a></td>
             <td class="diminuto"><?= e($fichaje['alumno']) ?></td>
             <td class="diminuto"><?= e(fecha_hora($fichaje['addmission_date'])) ?></td>
+            <td class="diminuto"><?= $fichaje['clase'] ? e($fichaje['clase']) : '<span class="texto-aviso">Sin clase</span>' ?></td>
             <td class="<?= $fichaje['pago_cerca'] ? 'cerca-de-vencer' : '' ?>"><?= e(fecha($fichaje['date_of_renovation'])) ?></td>
           </tr>
         <?php endforeach; ?>

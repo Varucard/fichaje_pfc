@@ -96,6 +96,11 @@ final class StockRepository extends Repository
     return ['cantidad' => (int) $fila['cantidad'], 'total' => (float) $fila['total']];
   }
 
+  public function bajoMinimo(): array
+  {
+    return $this->todos('SELECT * FROM productos WHERE activo = 1 AND stock <= stock_minimo ORDER BY nombre');
+  }
+
   public function cantidadBajoMinimo(): int
   {
     return (int) $this->valor('SELECT COUNT(*) FROM productos WHERE activo = 1 AND stock <= stock_minimo');

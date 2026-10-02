@@ -30,6 +30,8 @@ final class UsuarioService
     private readonly DeudaService $deudas,
     private readonly FichajeRepository $fichajes,
     private readonly LiquidacionRepository $liquidaciones,
+    private readonly AvisosService $avisos,
+    private readonly EmailService $emails,
   ) {
   }
 
@@ -94,6 +96,7 @@ final class UsuarioService
       'deuda' => $tipo === TipoUsuario::Alumno ? $this->deudas->deudaDe($idUsuario) : null,
       'fichajes' => $tipo === TipoUsuario::Alumno ? $this->fichajes->deUsuario($idUsuario) : [],
       'liquidaciones' => $tipo === TipoUsuario::Profesor ? $this->liquidaciones->deProfesor($idUsuario) : [],
+      'emails' => $this->emails->deUsuario($idUsuario),
       'historial' => $this->auditoria->historialDe('usuario', $usuario['dni']),
     ];
   }
@@ -133,10 +136,12 @@ final class UsuarioService
           : $this->matriculas->inscribirAlumno($id, $idClase);
         $this->auditoria->registrar('matricula.alta', "{$datos['nombre']} {$datos['apellido']} agregado/a a {$clase['name_class']} en el alta", 'usuario', $datos['dni'], ['id_clase' => $idClase]);
       }
+      $usuario = $this->usuarios->buscarPorId($id);
+      $this->avisos->bienvenida($usuario);
       if ($conPago && !$esProfesor) {
         $this->pagoService->registrar($id);
       }
-      return $this->usuarios->buscarPorId($id);
+      return $usuario;
     });
   }
 

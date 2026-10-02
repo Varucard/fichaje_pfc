@@ -22,6 +22,17 @@ function url(string $ruta = '/', array $query = []): string
   return $query ? $url . '?' . http_build_query($query) : $url;
 }
 
+/**
+ * URL absoluta (con dominio) para usar fuera del navegador, por ejemplo en los emails.
+ * Requiere APP_URL en el .env.
+ */
+function url_absoluta(string $ruta = '/', array $query = []): string
+{
+  $base = rtrim((string) Config::get('app.url', ''), '/');
+  $url = $base . '/' . ltrim($ruta, '/');
+  return $query ? $url . '?' . http_build_query($query) : $url;
+}
+
 /** URL de un archivo estático de public/ con versión para invalidar caché. */
 function asset(string $ruta): string
 {

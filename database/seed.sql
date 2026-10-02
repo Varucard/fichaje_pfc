@@ -13,7 +13,7 @@ INSERT INTO `users` (`id_user`, `rfid`, `dni`, `user_name`, `user_surname`, `pas
 (1, 'SIN LLAVERO', 30111222, 'Ana', 'Profesora', NULL, '1990-05-10', 'ana.profe@example.com', '1100000001', 1, 1),
 (2, 'SIN LLAVERO', 30222333, 'Bruno', 'Instructor', NULL, '1988-11-02', NULL, NULL, 1, 1),
 (3, 'A1B2C3D4', 40111222, 'Carla', 'Alumna', NULL, CURDATE() - INTERVAL 25 YEAR, 'carla@example.com', '1100000002', 1, 2),
-(4, 'B2C3D4E5', 40222333, 'Diego', 'Moroso', NULL, '2001-03-15', NULL, NULL, 1, 2),
+(4, 'B2C3D4E5', 40222333, 'Diego', 'Moroso', NULL, '2001-03-15', 'diego@example.com', NULL, 1, 2),
 (5, 'C3D4E5F6', 40333444, 'Elena', 'Sinclase', NULL, '1999-07-21', NULL, NULL, 1, 2),
 (6, 'D4E5F6A7', 40444555, 'Fede', 'Inactivo', NULL, '1995-01-30', NULL, NULL, 0, 2);
 
