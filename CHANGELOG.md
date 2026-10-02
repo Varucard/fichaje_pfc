@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.2.0] - Sin publicar
+
+### Emails
+- Avisos automáticos: vencimiento próximo, cuota vencida/deuda, inasistencia ("te extrañamos"), cumpleaños y bienvenida.
+- Comprobante de pago en PDF (sin validez fiscal), adjunto por email y descargable desde la ficha.
+- Resumen semanal para el administrador.
+- Cola de envío con reintentos, panel con configuración, vista previa, reintento y email de prueba.
+- Baja de avisos por link (con `List-Unsubscribe`) o desde la ficha; todo queda auditado.
+- Envío por SMTP (Gmail). En desarrollo, Mailpit en Docker; además hay un modo archivo.
+
+### Correcciones
+- El router no aceptaba cuantificadores con llaves en los parámetros (ej: `{token:[0-9a-f]{32}}`).
+
 ## [3.1.1] - 2026-10-02
 
 ### Correcciones
