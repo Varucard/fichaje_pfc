@@ -1,63 +1,54 @@
+// Prueba de conexión con el servidor de fichajes.
+// Envía un UID de prueba al endpoint del lector y muestra la respuesta por el monitor serie.
+// Ajustar IPs y token antes de subirlo (deben coincidir con el .env del servidor).
+//
+// Si no conecta: verificar que el firewall de la PC servidor permita conexiones
+// entrantes al puerto 8080 desde la IP del Arduino (mejor una regla puntual que desactivarlo).
 #include <SPI.h>
 #include <Ethernet.h>
 
-// Configuración de red
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 0, 36);          // IP fija del Arduino
-IPAddress server(192, 168, 0, 245);      // IP del servidor PHP
-
-EthernetClient client;
+IPAddress ip(192, 168, 0, 36);      // IP fija del Arduino
+IPAddress server(192, 168, 0, 245); // IP del servidor PHP
+const int PUERTO = 8080;
+const char *TOKEN = "cambiar-este-token";
 
 void setup() {
   Serial.begin(9600);
   Ethernet.begin(mac, ip);
   delay(1000);
-  Serial.println("Iniciando conexión...");
-
-  String uid = "1234567890";
-  consultarServidor(uid);
+  Serial.println("Iniciando conexion...");
+  consultarServidor("A1B2C3D4");
 }
 
 void loop() {
-  // Nada en loop para esta demo
 }
 
-// Es posible que al conectarse y tirar error sea necesario o desactivar el Firewall (No aconsejado)
-// O crear una regla de entrada que solo permita el acceso de la IP del Arduino
-void consultarServidor(String uid) {
-  Serial.println("Conectando al servidor...");
+void consultarServidor(const char *uid) {
+  EthernetClient client;
+  client.setConnectionTimeout(2000);
 
-  if (client.connect(server, 8080)) {
-    Serial.println("Conexión exitosa");
-
-    String url = "/config/get_uid.php?uid=" + uid;
-
-    client.println("GET " + url + " HTTP/1.1");
-    client.println("Host: 192.168.0.245:8080");
-    client.println("Connection: close");
-    client.println();
-
-    String response = "";
-    bool headersEnded = false;
-
-    while (client.connected()) {
-      while (client.available()) {
-        String line = client.readStringUntil('\n');
-        if (!headersEnded) {
-          if (line == "\r") {
-            headersEnded = true; // fin de los headers HTTP
-          }
-        } else {
-          response += line;
-        }
-      }
-    }
-    client.stop();
-
-    Serial.println("Respuesta recibida:");
-    Serial.println(response);
-    // Aquí podrías parsear el JSON si querés
-  } else {
+  if (!client.connect(server, PUERTO)) {
     Serial.println("No se pudo conectar al servidor");
+    return;
   }
+
+  Serial.println("Conexion exitosa");
+  client.print("GET /api/arduino/lectura?uid=");
+  client.print(uid);
+  client.print("&auth=");
+  client.print(TOKEN);
+  client.println(" HTTP/1.0");
+  client.println("Connection: close");
+  client.println();
+
+  unsigned long inicio = millis();
+  while ((client.connected() || client.available()) && millis() - inicio < 5000) {
+    if (client.available()) {
+      Serial.write(client.read()); // Muestra encabezados y cuerpo tal cual
+    }
+  }
+  client.stop();
+  Serial.println();
+  Serial.println("Fin de la respuesta");
 }

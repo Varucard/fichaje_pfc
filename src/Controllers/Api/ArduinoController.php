@@ -36,6 +36,24 @@ final class ArduinoController extends Controller
       throw new HttpException(400, 'UID no proporcionado o inválido');
     }
 
-    $this->json($this->fichajes->procesarLectura($uid));
+    $respuesta = $this->fichajes->procesarLectura($uid);
+    $respuesta['nombre'] = self::textoLcd($respuesta['nombre']);
+    $respuesta['apellido'] = self::textoLcd($respuesta['apellido']);
+
+    $this->json($respuesta);
+  }
+
+  /**
+   * El LCD 20x4 no tiene tildes ni ñ y cada línea admite 20 caracteres:
+   * "José Muñoz" => "Jose Munoz".
+   */
+  public static function textoLcd(string $texto): string
+  {
+    $texto = strtr($texto, [
+      'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n',
+      'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U', 'Ü' => 'U', 'Ñ' => 'N',
+    ]);
+    $texto = preg_replace('/[^\x20-\x7E]/', '', $texto) ?? '';
+    return substr(trim($texto), 0, 20);
   }
 }

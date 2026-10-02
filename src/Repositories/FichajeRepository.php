@@ -44,6 +44,15 @@ final class FichajeRepository extends Repository
     return $stmt->fetchAll();
   }
 
+  /** ¿El usuario fichó después de la fecha indicada? */
+  public function fichoDesde(int $idUsuario, DateTimeInterface $desde): bool
+  {
+    return (bool) $this->valor(
+      'SELECT EXISTS(SELECT 1 FROM incomes WHERE id_user = ? AND addmission_date >= ?)',
+      [$idUsuario, $desde->format('Y-m-d H:i:s')]
+    );
+  }
+
   public function registrar(int $idUsuario, DateTimeInterface $fecha): void
   {
     $this->ejecutar(

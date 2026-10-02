@@ -31,7 +31,8 @@ final class SistemaService
     $ch = curl_init(sprintf('http://%s:%d/reiniciar', $ip, (int) Config::get('arduino.puerto')));
     curl_setopt_array($ch, [
       CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_TIMEOUT => 1, // El Arduino se reinicia sin responder: no esperamos.
+      CURLOPT_TIMEOUT => 1, // El Arduino se reinicia enseguida: no esperamos la respuesta.
+      CURLOPT_HTTPHEADER => ['X-PFC-Token: ' . Config::get('arduino.token')],
     ]);
     curl_exec($ch);
     curl_close($ch);

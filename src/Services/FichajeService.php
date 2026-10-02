@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\Config;
 use App\Domain\EstadoLectura;
 use App\Domain\Llavero;
 use App\Domain\TipoUsuario;
@@ -99,7 +100,7 @@ final class FichajeService
       $ahora
     );
 
-    if ($estado === EstadoLectura::Activo) {
+    if ($estado === EstadoLectura::Activo && !$this->fichoRecientemente($idUsuario, $ahora)) {
       $this->fichajes->registrar($idUsuario, $ahora);
     }
 
@@ -124,6 +125,13 @@ final class FichajeService
       return EstadoLectura::SinClase;
     }
     return PagoService::estaAlDia($renovacion, $ahora) ? EstadoLectura::Activo : EstadoLectura::Moroso;
+  }
+
+  /** Evita fichadas duplicadas si el alumno pasa el llavero varias veces seguidas. */
+  private function fichoRecientemente(int $idUsuario, DateTimeImmutable $ahora): bool
+  {
+    $minutos = (int) Config::get('fichajes.minutos_entre_fichadas', 5);
+    return $minutos > 0 && $this->fichajes->fichoDesde($idUsuario, $ahora->modify("-{$minutos} minutes"));
   }
 
   private function respuesta(EstadoLectura $estado, ?array $usuario = null): array

@@ -40,6 +40,11 @@ return [
     'token' => Env::get('ARDUINO_TOKEN', ''),
   ],
 
+  'fichajes' => [
+    // Si el mismo alumno pasa el llavero de nuevo dentro de estos minutos no se registra otra fichada.
+    'minutos_entre_fichadas' => (int) Env::get('MINUTOS_ENTRE_FICHADAS', '5'),
+  ],
+
   'pagos' => [
     // Días antes/después del vencimiento en los que se marca la cuota en rojo.
     'dias_aviso_vencimiento' => (int) Env::get('DIAS_AVISO_VENCIMIENTO', '5'),
