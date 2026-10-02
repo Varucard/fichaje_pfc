@@ -9,6 +9,7 @@ use App\Domain\TipoUsuario;
 use App\Exceptions\ValidacionException;
 use App\Repositories\ClaseRepository;
 use App\Repositories\FichajeRepository;
+use App\Repositories\LiquidacionRepository;
 use App\Repositories\MatriculaRepository;
 use App\Repositories\PagoRepository;
 use App\Repositories\UsuarioRepository;
@@ -28,6 +29,7 @@ final class UsuarioService
     private readonly AuditoriaService $auditoria,
     private readonly DeudaService $deudas,
     private readonly FichajeRepository $fichajes,
+    private readonly LiquidacionRepository $liquidaciones,
   ) {
   }
 
@@ -91,6 +93,7 @@ final class UsuarioService
       'pagos' => $tipo === TipoUsuario::Alumno ? $this->pagos->ultimosDeUsuario($idUsuario) : [],
       'deuda' => $tipo === TipoUsuario::Alumno ? $this->deudas->deudaDe($idUsuario) : null,
       'fichajes' => $tipo === TipoUsuario::Alumno ? $this->fichajes->deUsuario($idUsuario) : [],
+      'liquidaciones' => $tipo === TipoUsuario::Profesor ? $this->liquidaciones->deProfesor($idUsuario) : [],
       'historial' => $this->auditoria->historialDe('usuario', $usuario['dni']),
     ];
   }

@@ -10,6 +10,7 @@ use App\Controllers\ClaseController;
 use App\Controllers\DashboardController;
 use App\Controllers\DeudaController;
 use App\Controllers\FichajeController;
+use App\Controllers\LiquidacionController;
 use App\Controllers\PagoController;
 use App\Controllers\SistemaController;
 use App\Controllers\UsuarioController;
@@ -55,6 +56,13 @@ return function (Router $r): void {
 
     // Deudas
     $r->get('/deudores', [DeudaController::class, 'index']);
+
+    // Liquidación de profesores
+    $r->get('/liquidaciones', [LiquidacionController::class, 'index']);
+    $r->post('/liquidaciones', [LiquidacionController::class, 'registrar']);
+    $r->post('/liquidaciones/{id:\d+}/pagar', [LiquidacionController::class, 'pagar']);
+    $r->post('/liquidaciones/{id:\d+}/anular', [LiquidacionController::class, 'anular']);
+    $r->post('/liquidaciones/profesores/{id:\d+}/porcentaje', [LiquidacionController::class, 'porcentaje']);
 
     // Clases
     $r->get('/clases', [ClaseController::class, 'index']);

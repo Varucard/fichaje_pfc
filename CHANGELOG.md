@@ -16,7 +16,12 @@
 - Cálculo de deuda, listado de deudores y bloqueo de la desactivación de alumnos con deuda.
 - Alta de clientes con matriculación en sus clases.
 
+### Liquidación de profesores
+- Cálculo mensual: porcentaje (por profesor o por defecto) de lo cobrado en sus clases.
+- Registro, pago y anulación de liquidaciones, con historial en la ficha del profesor.
+
 ### Mejoras
+- Corregida la grilla de las tablas con botones de acción.
 - Últimos ingresos en la ficha del alumno.
 - Sonido en los avisos de llavero desconocido y en los ingresos nuevos.
 

@@ -45,6 +45,11 @@ return [
     'minutos_entre_fichadas' => (int) Env::get('MINUTOS_ENTRE_FICHADAS', '5'),
   ],
 
+  'liquidaciones' => [
+    // % de lo cobrado en sus clases que se liquida a un profesor sin porcentaje propio.
+    'porcentaje_defecto' => (float) Env::get('LIQUIDACION_PORCENTAJE', '50'),
+  ],
+
   'pagos' => [
     // Días antes/después del vencimiento en los que se marca la cuota en rojo.
     'dias_aviso_vencimiento' => (int) Env::get('DIAS_AVISO_VENCIMIENTO', '5'),

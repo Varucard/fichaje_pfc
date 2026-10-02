@@ -6,7 +6,9 @@ Sistema de control de asistencia, pagos de cuotas y clases para el **Palillo Fig
 - Clases con profesores y alumnos matriculados.
 - Pagos de cuotas con monto, cálculo automático de vencimiento y control de deuda.
 - Fichadas automáticas con llavero RFID o manuales desde el panel.
+- Control de deuda y liquidación mensual de profesores.
 - Aviso de cumpleaños, llaveros desconocidos y cuotas por vencer.
+- Auditoría de acciones y logs técnicos.
 - Respaldo de la base de datos y reinicio remoto del lector.
 
 ---
@@ -116,6 +118,17 @@ Resumen: el lector consulta `GET /api/arduino/lectura?uid=…&auth=<ARDUINO_TOKE
 
 ---
 
+## 👨‍🏫 Liquidación de profesores
+
+Panel → *Liquidaciones* (o el botón *Liquidar* en la ficha del profesor).
+
+- **Base** = lo cobrado en el mes (según la fecha de pago) en las clases que dicta el profesor, tomando el reparto por clase de cada pago. Si una clase tiene varios profesores, lo cobrado se divide en partes iguales.
+- **Monto** = base × porcentaje del profesor. Cada profesor puede tener su propio porcentaje (se edita en la misma pantalla); si no tiene uno, se usa `LIQUIDACION_PORCENTAJE` (por defecto 50 %).
+- Flujo: el cálculo se ve en vivo → **Registrar** (guarda el monto y el detalle; no cambia aunque después entren más pagos) → **Pagar**. Una liquidación registrada y no pagada se puede **Anular** para recalcularla.
+- Se usan los profesores asignados actualmente a cada clase. Los pagos anteriores a la v3.1 no tienen reparto por clase y no cuentan.
+
+---
+
 ## 🗃️ Migraciones
 
 Los cambios de estructura de la base viven en `database/migrations/NNN_descripcion.sql` y se aplican con:
@@ -134,6 +147,7 @@ Cada migración aplicada se registra en la tabla `migraciones`, así que es segu
 | 003 | Claves foráneas entre usuarios, clases, pagos y fichadas |
 | 004 | Tabla `auditoria` |
 | 005 | Monto y cuota en `payments`; reparto por clase en `payment_classes` |
+| 006 | Porcentaje de liquidación en `users` y tabla `liquidaciones` |
 
 ---
 
@@ -190,6 +204,7 @@ Convenciones:
 | `user_class` / `teacher_class` | Matriculaciones de alumnos / profesores |
 | `payments` | Pagos: fecha, vencimiento (`date_of_renovation`), monto cobrado y cuota |
 | `payment_classes` | Parte de cada pago asignada a cada clase |
+| `liquidaciones` | Liquidaciones mensuales de profesores (una por profesor y período) |
 | `incomes` | Fichadas (ingresos) |
 | `uid_incomes` | Llaveros desconocidos pendientes de mostrar en el panel |
 | `types_users` | Catálogo de tipos de usuario |

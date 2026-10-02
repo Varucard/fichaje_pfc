@@ -19,11 +19,11 @@
 - [x] Mostrar los últimos fichajes en la ficha del usuario.
 - [x] Poder matricular al alumno en sus clases desde el alta.
 - [x] Sistema de logs y auditoría.
+- [x] Liquidación de profesores.
 
 ## Pendientes / errores conocidos
 
 ## Módulos a crear
-- [ ] Liquidación de profesores (el botón "Liquidar" ya está en la ficha, deshabilitado).
 - [ ] Stock.
 
 ## Mejoras a futuro (consultar)

@@ -85,9 +85,9 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
         <?php endif; ?>
         <button type="submit"><i class="fas fa-sync-alt"></i> Actualizar <?= e($etiqueta) ?></button>
         <?php if ($tipo === TipoUsuario::Profesor): ?>
-          <button type="button" disabled title="Módulo de liquidación de profesores pendiente">
-            <i class="fas fa-chalkboard-teacher"></i> Liquidar
-          </button>
+          <a class="boton" href="<?= url('/liquidaciones', ['profesor' => $usuario['dni']]) ?>">
+            <i class="fas fa-money-check-alt"></i> Liquidar
+          </a>
         <?php endif; ?>
       </div>
     <?php endif; ?>
@@ -189,6 +189,27 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
         <?php endforeach; ?>
       </ul>
     <?php endif; ?>
+  <?php endif; ?>
+
+  <?php if (!empty($liquidaciones)): ?>
+    <hr>
+    <h2>Liquidaciones</h2>
+    <table>
+      <thead>
+        <tr><th>Período</th><th>Base</th><th>%</th><th>Monto</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        <?php foreach ($liquidaciones as $liquidacion): ?>
+          <tr>
+            <td><a href="<?= url('/liquidaciones', ['periodo' => $liquidacion['periodo']]) ?>"><?= e($liquidacion['periodo']) ?></a></td>
+            <td><?= e(dinero($liquidacion['monto_base'])) ?></td>
+            <td><?= e($liquidacion['porcentaje'] + 0) ?>%</td>
+            <td><?= e(dinero($liquidacion['monto'])) ?></td>
+            <td><?= $liquidacion['pagada'] ? 'Pagada ' . e(fecha($liquidacion['fecha_pago'])) : 'Pendiente de pago' ?></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
   <?php endif; ?>
 
   <?php if ($tipo !== TipoUsuario::Administrador): ?>

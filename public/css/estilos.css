@@ -112,13 +112,15 @@ a.boton.button_small {
 }
 .tabla th, .detalle th { background-color: black; color: #fff; }
 tr.inactivo td { opacity: 0.6; }
-.celda-acciones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  justify-content: center;
+/* Acciones dentro de una celda: sin cambiar el display del <td> para no romper la tabla */
+.celda-acciones > form,
+.celda-acciones > a.boton,
+.celda-acciones > span {
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle;
 }
-.celda-acciones form, .celda-acciones a.boton, .celda-acciones button { margin: 0; }
+.celda-acciones button { margin: 0; }
 
 .tabla-container {
   display: flex;
@@ -386,3 +388,10 @@ tr.inactivo td { opacity: 0.6; }
   list-style: none;
 }
 .lista-fichajes li { font-size: 0.9em; }
+
+.etiqueta-exito { background: var(--pfc-exito); color: #fff; }
+tr.resaltada td { background-color: rgba(28, 126, 214, 0.25) !important; }
+tr.resaltada td:first-child { box-shadow: inset 4px 0 0 #1c7ed6; }
+.form-porcentaje { display: flex; gap: 4px; justify-content: center; margin: 0; }
+.form-porcentaje input { width: 70px; margin: 0; padding: 4px 6px; }
+.form-porcentaje button { margin: 0; }
