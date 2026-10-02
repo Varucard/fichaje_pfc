@@ -39,6 +39,12 @@ final class App
     Session::iniciar();
 
     $request = Request::desdeGlobales((string) Config::get('app.base_path'));
+    Log::contexto([
+      'ip' => $_SERVER['REMOTE_ADDR'] ?? 'cli',
+      'peticion' => $request->metodo() . ' ' . $request->ruta(),
+      'usuario' => Auth::usuario()['id'] ?? null,
+    ]);
+
     $router = new Router(self::container());
     (require base_path('config/routes.php'))($router);
 
@@ -55,10 +61,14 @@ final class App
     $mensaje = $e instanceof HttpException ? $e->getMessage() : 'Ocurrió un error inesperado.';
 
     if ($status === 500) {
-      Log::error("{$request->metodo()} {$request->ruta()}", $e);
+      Log::error('Error no controlado', $e);
       if (Config::get('app.debug')) {
         $mensaje = $e::class . ': ' . $e->getMessage() . ' (' . $e->getFile() . ':' . $e->getLine() . ')';
       }
+    } elseif (in_array($status, [401, 403], true)) {
+      Log::warning("Acceso rechazado ({$status}): {$mensaje}");
+    } else {
+      Log::info("Respuesta {$status}: {$mensaje}");
     }
 
     if (headers_sent() === false) {

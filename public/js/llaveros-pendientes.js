@@ -25,6 +25,7 @@
     contenido.append(copiar);
 
     PFC.avisar(contenido);
+    PFC.sonar('alerta');
   }
 
   function consultar() {

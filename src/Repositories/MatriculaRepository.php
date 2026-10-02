@@ -45,6 +45,39 @@ final class MatriculaRepository extends Repository
     );
   }
 
+  /**
+   * Cuota mensual (suma de precios de sus clases) de cada alumno.
+   *
+   * @return array<int, float> id_user => cuota
+   */
+  public function cuotasPorAlumno(): array
+  {
+    $filas = $this->todos(
+      'SELECT uc.id_user, SUM(c.price_class) AS cuota FROM user_class uc
+        JOIN classes c ON c.id_class = uc.id_class GROUP BY uc.id_user'
+    );
+    $cuotas = [];
+    foreach ($filas as $fila) {
+      $cuotas[(int) $fila['id_user']] = (float) $fila['cuota'];
+    }
+    return $cuotas;
+  }
+
+  /**
+   * Clases que dicta cada profesor, con la cantidad de profesores que comparten cada clase.
+   *
+   * @return array<int, array> filas: id_user, id_class, name_class, profesores_en_clase
+   */
+  public function clasesDeProfesores(): array
+  {
+    return $this->todos(
+      'SELECT tc.id_user, c.id_class, c.name_class,
+          (SELECT COUNT(*) FROM teacher_class t2 WHERE t2.id_class = c.id_class) AS profesores_en_clase
+        FROM teacher_class tc JOIN classes c ON c.id_class = tc.id_class
+        ORDER BY c.name_class'
+    );
+  }
+
   public function alumnoTieneClases(int $idUsuario): bool
   {
     return (bool) $this->valor('SELECT EXISTS(SELECT 1 FROM user_class WHERE id_user = ?)', [$idUsuario]);

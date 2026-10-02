@@ -8,6 +8,9 @@
  * @var array $clases
  * @var array $clasesDisponibles
  * @var array $pagos
+ * @var array|null $deuda
+ * @var array $fichajes
+ * @var array $historial
  */
 use App\Domain\TipoUsuario;
 
@@ -82,9 +85,9 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
         <?php endif; ?>
         <button type="submit"><i class="fas fa-sync-alt"></i> Actualizar <?= e($etiqueta) ?></button>
         <?php if ($tipo === TipoUsuario::Profesor): ?>
-          <button type="button" disabled title="Módulo de liquidación de profesores pendiente">
-            <i class="fas fa-chalkboard-teacher"></i> Liquidar
-          </button>
+          <a class="boton" href="<?= url('/liquidaciones', ['profesor' => $usuario['dni']]) ?>">
+            <i class="fas fa-money-check-alt"></i> Liquidar
+          </a>
         <?php endif; ?>
       </div>
     <?php endif; ?>
@@ -93,24 +96,44 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
   <?php if ($esAlumno): ?>
     <hr>
     <h2>Pagos</h2>
+
+    <div class="resumen">
+      <div class="resumen-dato"><span>Cuota mensual</span><strong><?= e(dinero($deuda['cuota'])) ?></strong></div>
+      <div class="resumen-dato"><span>Vence</span><strong><?= e($deuda['renovacion'] ? fecha($deuda['renovacion']) : 'Sin pagos') ?></strong></div>
+      <div class="resumen-dato <?= $deuda['total'] > 0 ? 'peligro' : 'exito' ?>">
+        <span><?php
+          $partes = [];
+          if ($deuda['meses'] > 0) $partes[] = (int) $deuda['meses'] . ' cuota(s) vencida(s)';
+          if ($deuda['saldo_pagos'] > 0) $partes[] = 'saldo de pagos parciales ' . e(dinero($deuda['saldo_pagos']));
+          echo 'Deuda' . ($partes ? ': ' . implode(' + ', $partes) : '');
+        ?></span>
+        <strong><?= $deuda['total'] > 0 ? e(dinero($deuda['total'])) : 'Al día' ?></strong>
+      </div>
+    </div>
+
     <?php if ($activo): ?>
       <div class="acciones-pago">
         <form action="<?= url($rutaUsuario . '/pagos') ?>" method="post"
-          data-confirmar="¿Registrar un pago con fecha de hoy?">
+          data-confirmar="¿Registrar un pago de <?= e(dinero($deuda['cuota'])) ?> con fecha de hoy?">
           <?= csrf_field() ?>
           <input type="hidden" name="volver" value="<?= e($rutaUsuario) ?>">
-          <button type="submit"><i class="fas fa-wallet"></i> Renovar pago (hoy)</button>
+          <button type="submit"><i class="fas fa-wallet"></i> Renovar pago hoy (<?= e(dinero($deuda['cuota'])) ?>)</button>
         </form>
 
         <form action="<?= url('/pagos/manual') ?>" method="post" class="form-en-linea">
           <?= csrf_field() ?>
           <input type="hidden" name="dni" value="<?= e($usuario['dni']) ?>">
           <input type="hidden" name="volver" value="<?= e($rutaUsuario) ?>">
-          <label for="fecha_pago">Pago con fecha:</label>
+          <label for="fecha_pago">Fecha:</label>
           <input type="date" id="fecha_pago" name="fecha" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" required>
+          <label for="monto_pago">Monto $:</label>
+          <input type="number" id="monto_pago" name="monto" min="0" step="0.01" value="<?= e((string) $deuda['cuota']) ?>" class="input-monto" required>
           <button type="submit"><i class="fas fa-hand-paper"></i> Pago manual</button>
         </form>
       </div>
+      <?php if ($deuda['cuota'] <= 0): ?>
+        <p class="diminuto texto-peligro">El alumno no está en ninguna clase: su cuota es $0.</p>
+      <?php endif; ?>
     <?php endif; ?>
 
     <?php if (!empty($pagos)): ?>
@@ -119,7 +142,8 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
         <thead>
           <tr>
             <th>Fecha de Pago</th>
-            <th>Fecha de Renovación</th>
+            <th>Vencimiento</th>
+            <th>Monto</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -128,6 +152,16 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
             <tr>
               <td><?= e(fecha($pago['discharge_date'])) ?></td>
               <td><?= e(fecha($pago['date_of_renovation'])) ?></td>
+              <td>
+                <?php if ($pago['monto'] === null): ?>
+                  <span class="diminuto">Sin dato</span>
+                <?php else: ?>
+                  <?= e(dinero($pago['monto'])) ?>
+                  <?php if ($pago['monto_cuota'] !== null && (float) $pago['monto'] < (float) $pago['monto_cuota']): ?>
+                    <br><span class="diminuto texto-peligro">Parcial (cuota <?= e(dinero($pago['monto_cuota'])) ?>)</span>
+                  <?php endif; ?>
+                <?php endif; ?>
+              </td>
               <td>
                 <form action="<?= url('/pagos/' . $pago['id_payment'] . '/eliminar') ?>" method="post"
                   data-confirmar="¿Eliminar el pago del <?= e(fecha($pago['discharge_date'])) ?>?">
@@ -143,6 +177,39 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
     <?php else: ?>
       <p>No tiene pagos registrados.</p>
     <?php endif; ?>
+
+    <hr>
+    <h2>Últimos ingresos</h2>
+    <?php if (empty($fichajes)): ?>
+      <p>Todavía no registró ingresos.</p>
+    <?php else: ?>
+      <ul class="lista-fichajes">
+        <?php foreach ($fichajes as $ingreso): ?>
+          <li><i class="fas fa-clipboard-check"></i> <?= e(fecha_hora($ingreso)) ?></li>
+        <?php endforeach; ?>
+      </ul>
+    <?php endif; ?>
+  <?php endif; ?>
+
+  <?php if (!empty($liquidaciones)): ?>
+    <hr>
+    <h2>Liquidaciones</h2>
+    <table>
+      <thead>
+        <tr><th>Período</th><th>Base</th><th>%</th><th>Monto</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        <?php foreach ($liquidaciones as $liquidacion): ?>
+          <tr>
+            <td><a href="<?= url('/liquidaciones', ['periodo' => $liquidacion['periodo']]) ?>"><?= e($liquidacion['periodo']) ?></a></td>
+            <td><?= e(dinero($liquidacion['monto_base'])) ?></td>
+            <td><?= e($liquidacion['porcentaje'] + 0) ?>%</td>
+            <td><?= e(dinero($liquidacion['monto'])) ?></td>
+            <td><?= $liquidacion['pagada'] ? 'Pagada ' . e(fecha($liquidacion['fecha_pago'])) : 'Pendiente de pago' ?></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
   <?php endif; ?>
 
   <?php if ($tipo !== TipoUsuario::Administrador): ?>
@@ -192,6 +259,28 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
         </tbody>
       </table>
     <?php endif; ?>
+  <?php endif; ?>
+
+  <?php if (!empty($historial)): ?>
+    <hr>
+    <details>
+      <summary><strong>Historial de cambios</strong> (<?= count($historial) ?>)</summary>
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Quién</th><th>Detalle</th></tr>
+        </thead>
+        <tbody>
+          <?php foreach ($historial as $registro): ?>
+            <tr>
+              <td class="diminuto"><?= e(fecha_hora($registro['fecha'])) ?></td>
+              <td class="diminuto"><?= e($registro['usuario']) ?></td>
+              <td class="texto-izquierda"><?= e($registro['descripcion']) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+      <a href="<?= url('/auditoria', ['texto' => $usuario['dni']]) ?>">Ver todo en Auditoría</a>
+    </details>
   <?php endif; ?>
 </section>
 

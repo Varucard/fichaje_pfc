@@ -8,6 +8,8 @@ use App\Domain\Llavero;
 use App\Domain\TipoUsuario;
 use App\Exceptions\ValidacionException;
 use App\Repositories\ClaseRepository;
+use App\Repositories\FichajeRepository;
+use App\Repositories\LiquidacionRepository;
 use App\Repositories\MatriculaRepository;
 use App\Repositories\PagoRepository;
 use App\Repositories\UsuarioRepository;
@@ -24,6 +26,10 @@ final class UsuarioService
     private readonly PagoRepository $pagos,
     private readonly ClaseRepository $clases,
     private readonly PagoService $pagoService,
+    private readonly AuditoriaService $auditoria,
+    private readonly DeudaService $deudas,
+    private readonly FichajeRepository $fichajes,
+    private readonly LiquidacionRepository $liquidaciones,
   ) {
   }
 
@@ -44,6 +50,11 @@ final class UsuarioService
   public function listar(TipoUsuario $tipo): array
   {
     return $this->usuarios->listarPorTipo($tipo);
+  }
+
+  public function clases(): array
+  {
+    return $this->clases->listar();
   }
 
   public function profesoresActivos(): array
@@ -80,14 +91,22 @@ final class UsuarioService
       'clases' => $clases,
       'clasesDisponibles' => $clasesDisponibles,
       'pagos' => $tipo === TipoUsuario::Alumno ? $this->pagos->ultimosDeUsuario($idUsuario) : [],
+      'deuda' => $tipo === TipoUsuario::Alumno ? $this->deudas->deudaDe($idUsuario) : null,
+      'fichajes' => $tipo === TipoUsuario::Alumno ? $this->fichajes->deUsuario($idUsuario) : [],
+      'liquidaciones' => $tipo === TipoUsuario::Profesor ? $this->liquidaciones->deProfesor($idUsuario) : [],
+      'historial' => $this->auditoria->historialDe('usuario', $usuario['dni']),
     ];
   }
 
   /**
    * Da de alta un cliente o profesor. Opcionalmente registra el primer pago.
    */
-  public function crear(array $entrada, bool $esProfesor, bool $conPago): array
+  public function crear(array $entrada, bool $esProfesor, bool $conPago, array $idsClases = []): array
   {
+    $idsClases = array_values(array_unique(array_filter(array_map('intval', $idsClases))));
+    if ($conPago && !$esProfesor && !$idsClases) {
+      throw new ValidacionException('Para registrar el pago elegí al menos una clase: la cuota es la suma de sus clases.');
+    }
     $datos = $this->normalizar($entrada, $esProfesor ? TipoUsuario::Profesor : TipoUsuario::Alumno);
 
     $existente = $this->usuarios->buscarPorDni($datos['dni']);
@@ -98,8 +117,22 @@ final class UsuarioService
     }
     $this->validarLlaveroLibre($datos['rfid']);
 
-    return $this->usuarios->transaccion(function () use ($datos, $esProfesor, $conPago): array {
+    return $this->usuarios->transaccion(function () use ($datos, $esProfesor, $conPago, $idsClases): array {
       $id = $this->usuarios->crear($datos);
+      $this->auditoria->registrar(
+        'usuario.alta',
+        sprintf('Alta de %s %s %s (DNI %s)', mb_strtolower($datos['tipo']->etiqueta()), $datos['nombre'], $datos['apellido'], $datos['dni']),
+        'usuario',
+        $datos['dni'],
+      );
+      foreach ($idsClases as $idClase) {
+        $clase = $this->clases->buscarPorId($idClase)
+          ?? throw new ValidacionException('Una de las clases elegidas no existe.');
+        $esProfesor
+          ? $this->matriculas->asignarProfesor($id, $idClase)
+          : $this->matriculas->inscribirAlumno($id, $idClase);
+        $this->auditoria->registrar('matricula.alta', "{$datos['nombre']} {$datos['apellido']} agregado/a a {$clase['name_class']} en el alta", 'usuario', $datos['dni'], ['id_clase' => $idClase]);
+      }
       if ($conPago && !$esProfesor) {
         $this->pagoService->registrar($id);
       }
@@ -136,7 +169,21 @@ final class UsuarioService
     $this->validarLlaveroLibre($datos['rfid'], $id);
 
     $this->usuarios->actualizar($id, $datos);
-    return $this->usuarios->buscarPorId($id);
+    $actualizado = $this->usuarios->buscarPorId($id);
+
+    $cambios = AuditoriaService::cambios($usuario, $actualizado, [
+      'rfid', 'dni', 'user_name', 'user_surname', 'birth_day', 'email', 'phone_number', 'type_user',
+    ]);
+    if ($cambios) {
+      $this->auditoria->registrar(
+        'usuario.actualizacion',
+        sprintf('Actualización de %s %s (DNI %s): %s', $actualizado['user_name'], $actualizado['user_surname'], $actualizado['dni'], implode(', ', array_keys($cambios))),
+        'usuario',
+        $actualizado['dni'],
+        $cambios,
+      );
+    }
+    return $actualizado;
   }
 
   public function desactivar(string $dni): array
@@ -144,11 +191,18 @@ final class UsuarioService
     $usuario = $this->usuarios->buscarPorDni($dni)
       ?? throw new ValidacionException('El usuario no existe.');
 
+    if (TipoUsuario::deUsuario($usuario) === TipoUsuario::Alumno) {
+      $deuda = $this->deudas->deudaDe((int) $usuario['id_user']);
+      if ($deuda['total'] > 0) {
+        throw new ValidacionException('El alumno tiene una deuda de ' . dinero($deuda['total']) . '. Debe saldarla antes de desactivarlo.');
+      }
+    }
     if ($this->matriculas->tieneMatriculaciones((int) $usuario['id_user'])) {
       throw new ValidacionException('El usuario tiene matriculaciones activas. Quitelo de sus clases antes de desactivarlo.');
     }
 
     $this->usuarios->cambiarEstado((int) $usuario['id_user'], false);
+    $this->auditoria->registrar('usuario.desactivacion', "Desactivación de {$usuario['user_name']} {$usuario['user_surname']} (DNI {$dni})", 'usuario', $dni);
     return $usuario;
   }
 
@@ -173,6 +227,12 @@ final class UsuarioService
     }
 
     $this->usuarios->cambiarEstado($id, true);
+    $this->auditoria->registrar(
+      'usuario.reactivacion',
+      "Reactivación de {$usuario['user_name']} {$usuario['user_surname']} (DNI {$dni})" . ($llaveroQuitado ? ' — se le quitó el llavero por estar asignado a otra persona' : ''),
+      'usuario',
+      $dni,
+    );
     return ['usuario' => $usuario, 'llavero_quitado' => $llaveroQuitado];
   }
 

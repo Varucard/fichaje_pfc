@@ -2,6 +2,7 @@
 /**
  * @var App\Core\View $this
  * @var array $administrador
+ * @var int $stockBajo Productos con stock en o debajo del mínimo
  */
 $this->script('llaveros-pendientes');
 ?>
@@ -35,9 +36,14 @@ $this->script('llaveros-pendientes');
   <a class="boton" href="<?= url('/clientes') ?>"><i class="fas fa-users"></i> Clientes</a>
   <a class="boton" href="<?= url('/profesores') ?>"><i class="fas fa-user-graduate"></i> Profesores</a>
   <a class="boton" href="<?= url('/fichajes') ?>"><i class="fas fa-clipboard-check"></i> Últimos Ingresos</a>
+  <a class="boton" href="<?= url('/deudores') ?>"><i class="fas fa-file-invoice-dollar"></i> Deudores</a>
+  <a class="boton" href="<?= url('/liquidaciones') ?>"><i class="fas fa-money-check-alt"></i> Liquidaciones</a>
+  <a class="boton" href="<?= url('/stock') ?>"><i class="fas fa-boxes"></i> Stock<?php if ($stockBajo): ?> <span class="etiqueta etiqueta-error"><?= (int) $stockBajo ?></span><?php endif; ?></a>
 </section>
 
 <section class="acciones acciones-sistema">
+  <a class="boton" href="<?= url('/auditoria') ?>"><i class="fas fa-history"></i> Auditoría</a>
+  <a class="boton" href="<?= url('/sistema/logs') ?>"><i class="fas fa-file-alt"></i> Logs</a>
   <form action="<?= url('/sistema/reiniciar-arduino') ?>" method="post" data-confirmar="¿Reiniciar el lector Arduino?">
     <?= csrf_field() ?>
     <button type="submit" class="peligro"><i class="fas fa-sync-alt"></i> Reiniciar Arduino</button>

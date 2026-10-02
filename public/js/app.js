@@ -51,6 +51,38 @@
       if (duracion) setTimeout(() => aviso.remove(), duracion);
     },
 
+    /**
+     * Sonido de aviso generado con Web Audio (sin archivos).
+     * Los navegadores solo permiten sonar después de que el usuario interactuó con la página.
+     */
+    sonar(tipo = 'aviso') {
+      const TONOS = {
+        aviso: [[880, 0.15], [1320, 0.2]],
+        alerta: [[660, 0.2], [440, 0.2], [660, 0.3]],
+        ingreso: [[1046, 0.12]],
+      };
+      try {
+        const Contexto = window.AudioContext || window.webkitAudioContext;
+        if (!Contexto) return;
+        PFC._audio ??= new Contexto();
+        const ctx = PFC._audio;
+        let inicio = ctx.currentTime;
+        (TONOS[tipo] ?? TONOS.aviso).forEach(([frecuencia, duracion]) => {
+          const oscilador = ctx.createOscillator();
+          const volumen = ctx.createGain();
+          oscilador.frequency.value = frecuencia;
+          volumen.gain.setValueAtTime(0.2, inicio);
+          volumen.gain.exponentialRampToValueAtTime(0.001, inicio + duracion);
+          oscilador.connect(volumen).connect(ctx.destination);
+          oscilador.start(inicio);
+          oscilador.stop(inicio + duracion);
+          inicio += duracion + 0.05;
+        });
+      } catch (error) {
+        console.warn('No se pudo reproducir el sonido:', error);
+      }
+    },
+
     pedirDni(mensaje) {
       const dni = prompt(mensaje);
       if (dni === null) return null;

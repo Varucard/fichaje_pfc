@@ -18,7 +18,7 @@ $basePath = $urlApp !== ''
 return [
   'app' => [
     'nombre' => Env::get('SITENAME', 'Palillo Fight Club'),
-    'version' => Env::get('APPVERSION', '3.0.0'),
+    'version' => Env::get('APPVERSION', '3.1.0'),
     'url' => $urlApp,
     'base_path' => $basePath,
     'debug' => Env::bool('APP_DEBUG'),
@@ -45,9 +45,21 @@ return [
     'minutos_entre_fichadas' => (int) Env::get('MINUTOS_ENTRE_FICHADAS', '5'),
   ],
 
+  'liquidaciones' => [
+    // % de lo cobrado en sus clases que se liquida a un profesor sin porcentaje propio.
+    'porcentaje_defecto' => (float) Env::get('LIQUIDACION_PORCENTAJE', '50'),
+  ],
+
   'pagos' => [
     // Días antes/después del vencimiento en los que se marca la cuota en rojo.
     'dias_aviso_vencimiento' => (int) Env::get('DIAS_AVISO_VENCIMIENTO', '5'),
+  ],
+
+  'log' => [
+    // Nivel mínimo a registrar: debug | info | warning | error
+    'nivel' => Env::get('LOG_NIVEL', 'info'),
+    // Los archivos de log más viejos que esta cantidad de días se borran (0 = nunca)
+    'dias_retencion' => (int) Env::get('LOG_DIAS_RETENCION', '90'),
   ],
 
   'backup_dir' => Env::get('BACKUP_DIR', base_path('storage/backups')),

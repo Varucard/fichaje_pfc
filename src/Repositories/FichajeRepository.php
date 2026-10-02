@@ -44,6 +44,16 @@ final class FichajeRepository extends Repository
     return $stmt->fetchAll();
   }
 
+  /** Últimos ingresos de un usuario. */
+  public function deUsuario(int $idUsuario, int $limite = 10): array
+  {
+    $stmt = $this->pdo->prepare('SELECT addmission_date FROM incomes WHERE id_user = :id ORDER BY addmission_date DESC LIMIT :limite');
+    $stmt->bindValue('id', $idUsuario, PDO::PARAM_INT);
+    $stmt->bindValue('limite', $limite, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_COLUMN);
+  }
+
   /** ¿El usuario fichó después de la fecha indicada? */
   public function fichoDesde(int $idUsuario, DateTimeInterface $desde): bool
   {
