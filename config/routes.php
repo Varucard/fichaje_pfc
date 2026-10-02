@@ -13,6 +13,7 @@ use App\Controllers\FichajeController;
 use App\Controllers\LiquidacionController;
 use App\Controllers\PagoController;
 use App\Controllers\SistemaController;
+use App\Controllers\StockController;
 use App\Controllers\UsuarioController;
 use App\Core\Router;
 
@@ -63,6 +64,15 @@ return function (Router $r): void {
     $r->post('/liquidaciones/{id:\d+}/pagar', [LiquidacionController::class, 'pagar']);
     $r->post('/liquidaciones/{id:\d+}/anular', [LiquidacionController::class, 'anular']);
     $r->post('/liquidaciones/profesores/{id:\d+}/porcentaje', [LiquidacionController::class, 'porcentaje']);
+
+    // Stock
+    $r->get('/stock', [StockController::class, 'index']);
+    $r->get('/stock/nuevo', [StockController::class, 'crear']);
+    $r->post('/stock', [StockController::class, 'guardar']);
+    $r->get('/stock/{id:\d+}', [StockController::class, 'mostrar']);
+    $r->post('/stock/{id:\d+}/actualizar', [StockController::class, 'actualizar']);
+    $r->post('/stock/{id:\d+}/activo', [StockController::class, 'cambiarActivo']);
+    $r->post('/stock/{id:\d+}/movimientos', [StockController::class, 'movimiento']);
 
     // Clases
     $r->get('/clases', [ClaseController::class, 'index']);

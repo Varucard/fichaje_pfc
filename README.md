@@ -7,6 +7,7 @@ Sistema de control de asistencia, pagos de cuotas y clases para el **Palillo Fig
 - Pagos de cuotas con monto, cálculo automático de vencimiento y control de deuda.
 - Fichadas automáticas con llavero RFID o manuales desde el panel.
 - Control de deuda y liquidación mensual de profesores.
+- Stock de productos con ventas, entradas y ajustes de inventario.
 - Aviso de cumpleaños, llaveros desconocidos y cuotas por vencer.
 - Auditoría de acciones y logs técnicos.
 - Respaldo de la base de datos y reinicio remoto del lector.
@@ -129,6 +130,20 @@ Panel → *Liquidaciones* (o el botón *Liquidar* en la ficha del profesor).
 
 ---
 
+## 📦 Stock
+
+Panel → *Stock*. El botón muestra un contador rojo cuando hay productos en su stock mínimo o debajo.
+
+- **Productos**: nombre, descripción, precio de venta, stock y stock mínimo. Se pueden desactivar (no se borran, para conservar el historial).
+- **Movimientos** (desde la pantalla de cada producto):
+  - *Venta*: cantidad y precio (por defecto el del producto). Se puede asociar al DNI de un cliente.
+  - *Entrada*: compra o reposición, con costo unitario opcional.
+  - *Ajuste de inventario*: se carga el stock real contado y un motivo obligatorio.
+- El stock nunca queda negativo. Cada movimiento bloquea el producto en la base, así dos ventas simultáneas no pueden pasar el límite.
+- El listado muestra las ventas del mes, y cada movimiento queda en el historial del producto y en la auditoría.
+
+---
+
 ## 🗃️ Migraciones
 
 Los cambios de estructura de la base viven en `database/migrations/NNN_descripcion.sql` y se aplican con:
@@ -148,6 +163,7 @@ Cada migración aplicada se registra en la tabla `migraciones`, así que es segu
 | 004 | Tabla `auditoria` |
 | 005 | Monto y cuota en `payments`; reparto por clase en `payment_classes` |
 | 006 | Porcentaje de liquidación en `users` y tabla `liquidaciones` |
+| 007 | Tablas `productos` y `movimientos_stock` |
 
 ---
 
@@ -205,6 +221,7 @@ Convenciones:
 | `payments` | Pagos: fecha, vencimiento (`date_of_renovation`), monto cobrado y cuota |
 | `payment_classes` | Parte de cada pago asignada a cada clase |
 | `liquidaciones` | Liquidaciones mensuales de profesores (una por profesor y período) |
+| `productos` / `movimientos_stock` | Productos y su historial de entradas, ventas y ajustes |
 | `incomes` | Fichadas (ingresos) |
 | `uid_incomes` | Llaveros desconocidos pendientes de mostrar en el panel |
 | `types_users` | Catálogo de tipos de usuario |

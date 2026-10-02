@@ -2,6 +2,7 @@
 /**
  * @var App\Core\View $this
  * @var array $administrador
+ * @var int $stockBajo Productos con stock en o debajo del mínimo
  */
 $this->script('llaveros-pendientes');
 ?>
@@ -37,6 +38,7 @@ $this->script('llaveros-pendientes');
   <a class="boton" href="<?= url('/fichajes') ?>"><i class="fas fa-clipboard-check"></i> Últimos Ingresos</a>
   <a class="boton" href="<?= url('/deudores') ?>"><i class="fas fa-file-invoice-dollar"></i> Deudores</a>
   <a class="boton" href="<?= url('/liquidaciones') ?>"><i class="fas fa-money-check-alt"></i> Liquidaciones</a>
+  <a class="boton" href="<?= url('/stock') ?>"><i class="fas fa-boxes"></i> Stock<?php if ($stockBajo): ?> <span class="etiqueta etiqueta-error"><?= (int) $stockBajo ?></span><?php endif; ?></a>
 </section>
 
 <section class="acciones acciones-sistema">

@@ -20,11 +20,9 @@
 - [x] Poder matricular al alumno en sus clases desde el alta.
 - [x] Sistema de logs y auditoría.
 - [x] Liquidación de profesores.
+- [x] Stock.
 
 ## Pendientes / errores conocidos
-
-## Módulos a crear
-- [ ] Stock.
 
 ## Mejoras a futuro (consultar)
 - [ ] Enviar información de las clases por email a los alumnos.

@@ -20,6 +20,10 @@
 - Cálculo mensual: porcentaje (por profesor o por defecto) de lo cobrado en sus clases.
 - Registro, pago y anulación de liquidaciones, con historial en la ficha del profesor.
 
+### Stock
+- Productos con precio, stock y stock mínimo, y aviso en el panel cuando hay que reponer.
+- Ventas (opcionalmente a un cliente), entradas y ajustes de inventario, con historial por producto y ventas del mes.
+
 ### Mejoras
 - Corregida la grilla de las tablas con botones de acción.
 - Últimos ingresos en la ficha del alumno.
