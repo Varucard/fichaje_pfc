@@ -84,7 +84,8 @@ final class LiquidacionService
     foreach ($clases as $clase) {
       $asistencias = (int) ($asistenciasPorClase[(int) $clase['id_class']] ?? 0);
       $profesores = max(1, (int) $clase['profesores_en_clase']);
-      $parte = round($asistencias / $profesores, 2);
+      // Sin redondear: con 3 profesores, 1 asistencia vale 1/3 para cada uno.
+      $parte = $asistencias / $profesores;
       $base += $parte;
       $detalle[] = [
         'id_class' => (int) $clase['id_class'],
@@ -97,7 +98,7 @@ final class LiquidacionService
 
     return [
       'detalle' => $detalle,
-      'base' => round($base, 2),
+      'base' => round($base, 4),
       'monto_por_asistencia' => $montoPorAsistencia,
       'monto' => round($base * $montoPorAsistencia, 2),
     ];
@@ -205,8 +206,8 @@ final class LiquidacionService
     $periodo = self::validarPeriodo($periodo);
     $profesor = $this->profesor($idProfesor);
 
-    if ($periodo > (new DateTimeImmutable())->format('Y-m')) {
-      throw new ValidacionException('No se puede liquidar un período futuro.');
+    if ($periodo >= (new DateTimeImmutable())->format('Y-m')) {
+      throw new ValidacionException('Solo se pueden registrar liquidaciones de meses cerrados: el cálculo del mes en curso todavía puede cambiar.');
     }
     if ($this->liquidaciones->existe($idProfesor, $periodo)) {
       throw new ValidacionException("La liquidación de {$profesor['user_name']} para {$periodo} ya está registrada.");

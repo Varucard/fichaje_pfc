@@ -29,7 +29,7 @@ $alto = fn (float $valor) => $maximo > 0 ? round($valor / $maximo * 100, 2) : 0;
 <div class="resumen">
   <div class="resumen-dato"><span>Cuotas <?= (int) $anio ?> (<?= (int) $totales['pagos'] ?> pagos)</span><strong><?= e(dinero($totales['cuotas'])) ?></strong></div>
   <div class="resumen-dato"><span>Ventas de productos</span><strong><?= e(dinero($totales['ventas'])) ?></strong></div>
-  <div class="resumen-dato exito"><span>Total · vs. <?= (int) $anio - 1 ?>: <?= e($variacion($totales['variacion'])) ?></span><strong><?= e(dinero($totales['total'])) ?></strong></div>
+  <div class="resumen-dato exito"><span>Total · meses cerrados vs. <?= (int) $anio - 1 ?>: <?= e($variacion($totales['variacion'])) ?></span><strong><?= e(dinero($totales['total'])) ?></strong></div>
 </div>
 
 <figure class="grafico-caja" aria-labelledby="titulo-grafico">
@@ -76,7 +76,7 @@ $alto = fn (float $valor) => $maximo > 0 ? round($valor / $maximo * 100, 2) : 0;
           <td><?= e(dinero($m['cuotas'])) ?></td>
           <td><?= e(dinero($m['ventas'])) ?></td>
           <td><strong><?= e(dinero($m['total'])) ?></strong></td>
-          <td class="diminuto"><?= e($variacion($m['variacion'])) ?></td>
+          <td class="diminuto"><?= $m['en_curso'] ? 'en curso' : e($variacion($m['variacion'])) ?></td>
         </tr>
       <?php endforeach; ?>
     </tbody>

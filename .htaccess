@@ -4,6 +4,8 @@
 Options -Indexes
 RewriteEngine On
 
+# El firmware anterior del lector consulta /config/get_uid.php: va al front controller.
+RewriteRule ^config/get_uid\.php$ public/index.php [L]
 RewriteRule ^(\.env|\.git|composer\.(json|lock)|vendor|src|config|views|storage|database|bin|tests|firmware|docker)(/|$) - [F,L]
 RewriteRule ^$ public/ [L]
 RewriteCond %{REQUEST_URI} !/public/

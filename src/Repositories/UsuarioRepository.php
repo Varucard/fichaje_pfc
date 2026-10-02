@@ -53,8 +53,8 @@ final class UsuarioRepository extends Repository
   {
     return $this->todos(
       "SELECT id_user, user_name, user_surname FROM users
-        WHERE asset = 1 AND DATE_FORMAT(birth_day, '%m-%d') = ?",
-      [$fecha->format('m-d')]
+        WHERE asset = 1 AND (DATE_FORMAT(birth_day, '%m-%d') = ? OR (? AND DATE_FORMAT(birth_day, '%m-%d') = '02-29'))",
+      [$fecha->format('m-d'), $fecha->format('m-d') === '02-28' && !$fecha->format('L') ? 1 : 0]
     );
   }
 

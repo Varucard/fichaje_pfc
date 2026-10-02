@@ -35,7 +35,7 @@ final class ReporteService
     $ventasAnterior = $this->reportes->ventasPorMes($anio - 1);
 
     $meses = [];
-    $totales = ['cuotas' => 0.0, 'ventas' => 0.0, 'total' => 0.0, 'pagos' => 0, 'anterior' => 0.0];
+    $totales = ['cuotas' => 0.0, 'ventas' => 0.0, 'total' => 0.0, 'pagos' => 0, 'anterior' => 0.0, 'cerrados' => 0.0];
     $ultimoMes = $anio < (int) $hoy->format('Y') ? 12 : ($anio > (int) $hoy->format('Y') ? 0 : (int) $hoy->format('n'));
     for ($mes = 1; $mes <= 12; $mes++) {
       $fila = [
@@ -48,18 +48,22 @@ final class ReporteService
       ];
       $fila['total'] = $fila['cuotas'] + $fila['ventas'];
       $anterior = ($cuotasAnterior[$mes]['total'] ?? 0.0) + ($ventasAnterior[$mes]['total'] ?? 0.0);
-      $fila['variacion'] = $fila['futuro'] ? null : self::variacion($fila['total'], $anterior);
+      $fila['en_curso'] = $anio === (int) $hoy->format('Y') && $mes === (int) $hoy->format('n');
+      // El mes en curso está incompleto: compararlo con un mes entero sería engañoso.
+      $fila['variacion'] = $fila['futuro'] || $fila['en_curso'] ? null : self::variacion($fila['total'], $anterior);
       $meses[] = $fila;
 
       $totales['cuotas'] += $fila['cuotas'];
       $totales['ventas'] += $fila['ventas'];
       $totales['total'] += $fila['total'];
       $totales['pagos'] += $fila['pagos'];
-      if (!$fila['futuro']) {
+      if (!$fila['futuro'] && !$fila['en_curso']) {
         $totales['anterior'] += $anterior;
+        $totales['cerrados'] += $fila['total'];
       }
     }
-    $totales['variacion'] = self::variacion($totales['total'], $totales['anterior']);
+    // Variación anual sobre los meses cerrados (sin el mes en curso).
+    $totales['variacion'] = self::variacion($totales['cerrados'], $totales['anterior']);
 
     $mesDetalle ??= $ultimoMes ?: 12;
     $desde = new DateTimeImmutable(sprintf('%04d-%02d-01', $anio, $mesDetalle));

@@ -92,5 +92,9 @@ final class PlanesYAdelantosTest extends TestCase
 
     self::assertSame(55.0, $calculo['base'], '40 + 30/2');
     self::assertSame(27500.0, $calculo['monto']);
+
+    // Una asistencia compartida por 3 profesores: $300 a cada uno, sin perder centavos.
+    $compartida = LiquidacionService::calcularAsistencia([['id_class' => 1, 'name_class' => 'X', 'profesores_en_clase' => 3]], [1 => 1], 900);
+    self::assertSame(300.0, $compartida['monto']);
   }
 }

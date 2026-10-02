@@ -81,7 +81,7 @@ final class TareasService
     if ($estado['configurado'] === false) {
       return 'sin configurar';
     }
-    if ($estado['en_linea']) {
+    if ($estado['en_linea'] ?? false) {
       return 'en línea';
     }
 

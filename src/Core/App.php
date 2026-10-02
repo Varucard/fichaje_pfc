@@ -75,6 +75,10 @@ final class App
 
   private static function manejarError(Throwable $e, Request $request): void
   {
+    // Clave duplicada (ej. doble clic al matricular o registrar): no es un error del sistema.
+    if ($e instanceof \PDOException && $e->getCode() === '23000' && str_contains($e->getMessage(), 'Duplicate')) {
+      $e = new HttpException(409, 'Ese registro ya existe (¿se envió el formulario dos veces?). Volvé atrás y revisá.');
+    }
     $status = $e instanceof HttpException ? $e->status : 500;
     $mensaje = $e instanceof HttpException ? $e->getMessage() : 'Ocurrió un error inesperado.';
 

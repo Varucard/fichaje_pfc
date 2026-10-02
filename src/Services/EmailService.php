@@ -262,7 +262,8 @@ final class EmailService
     }
     // Permite que Gmail muestre el botón "Anular suscripción" (RFC 2369 / 8058).
     return [
-      'List-Unsubscribe' => '<' . url_absoluta('/emails/baja/' . $usuario['token_baja']) . '>',
+      'List-Unsubscribe' => '<' . url_absoluta('/emails/baja/' . $usuario['token_baja'] . '/un-clic') . '>',
+      'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
     ];
   }
 }

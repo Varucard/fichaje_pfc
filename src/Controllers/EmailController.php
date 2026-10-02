@@ -118,6 +118,15 @@ final class EmailController extends Controller
     $this->render('publico/baja', ['titulo' => 'Avisos por email', 'usuario' => $usuario, 'token' => $token], 'layouts/simple');
   }
 
+  /** Baja en un clic desde el botón "Anular suscripción" de Gmail (RFC 8058). */
+  public function bajaUnClic(Request $request, string $token): void
+  {
+    $usuario = $this->usuarios->buscarPorTokenBaja($token) ?? throw new HttpException(404, 'El link no es válido.');
+    $this->usuarios->cambiarAceptaEmails((int) $usuario['id_user'], false);
+    $this->auditoria->registrar('usuario.emails', "Baja de avisos por email en un clic desde el cliente de correo ({$usuario['user_name']})", 'usuario', $usuario['dni'], actor: $usuario['user_name']);
+    $this->json(['status' => 'ok']);
+  }
+
   public function confirmarBaja(Request $request, string $token): void
   {
     $usuario = $this->usuarios->buscarPorTokenBaja($token) ?? throw new HttpException(404, 'El link no es válido.');

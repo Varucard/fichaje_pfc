@@ -230,6 +230,10 @@ final class UsuarioService
     $usuario = $this->usuarios->buscarPorDni($dni)
       ?? throw new ValidacionException('El usuario no existe.');
 
+    if (TipoUsuario::deUsuario($usuario) === TipoUsuario::Administrador) {
+      throw new ValidacionException('Los administradores se gestionan desde Sistema → Administradores.');
+    }
+
     $id = (int) $usuario['id_user'];
     $llaveroQuitado = false;
 

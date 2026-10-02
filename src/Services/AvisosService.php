@@ -130,7 +130,7 @@ final class AvisosService
         }
       }
 
-      if (!empty($alumno['birth_day']) && substr($alumno['birth_day'], 5, 5) === $hoy->format('m-d')
+      if (!empty($alumno['birth_day']) && self::cumpleHoy($alumno['birth_day'], $hoy)
         && $this->config->activo('aviso.cumpleanos.activo')
         && $this->emails->encolarParaUsuario(
           'cumpleanos',
@@ -148,6 +148,16 @@ final class AvisosService
     }
 
     return $encolados;
+  }
+
+  /** ¿Cumple años hoy? Quien nació un 29/02 se saluda el 28/02 en los años no bisiestos. */
+  public static function cumpleHoy(string $nacimiento, DateTimeImmutable $hoy): bool
+  {
+    $diaMes = substr($nacimiento, 5, 5);
+    if ($diaMes === '02-29' && !$hoy->format('L')) {
+      $diaMes = '02-28';
+    }
+    return $diaMes === $hoy->format('m-d');
   }
 
   /** Bienvenida al dar de alta un cliente. */

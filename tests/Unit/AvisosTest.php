@@ -61,4 +61,20 @@ final class AvisosTest extends TestCase
   {
     self::assertSame('00000123', ComprobanteService::numero(123));
   }
+
+  public function testCumpleaniosDel29DeFebrero(): void
+  {
+    self::assertTrue(AvisosService::cumpleHoy('2000-02-29', new DateTimeImmutable('2025-02-28')), 'Año no bisiesto: se saluda el 28/02');
+    self::assertFalse(AvisosService::cumpleHoy('2000-02-29', new DateTimeImmutable('2024-02-28')), 'Año bisiesto: se espera al 29');
+    self::assertTrue(AvisosService::cumpleHoy('2000-02-29', new DateTimeImmutable('2024-02-29')));
+    self::assertTrue(AvisosService::cumpleHoy('1990-05-10', new DateTimeImmutable('2025-05-10')));
+  }
+
+  public function testMontosConCentavosSoloCuandoLosHay(): void
+  {
+    self::assertSame('$12.500', dinero(12500));
+    self::assertSame('$0,40', dinero(0.4), 'Un saldo de 40 centavos no se muestra como $0');
+    self::assertSame('$3.333,33', dinero(3333.333));
+    self::assertSame('-$150', dinero(-150));
+  }
 }

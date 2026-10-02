@@ -41,13 +41,19 @@ final class SistemaService
       return ['configurado' => false, 'ip' => '', 'en_linea' => false, 'latencia_ms' => null, 'ultima_lectura' => $ultima];
     }
 
+    // La consulta puede tardar hasta ~2,5 s: se libera la sesión para no frenar otros pedidos.
+    if (session_status() === PHP_SESSION_ACTIVE) {
+      session_write_close();
+    }
+
     $inicio = microtime(true);
     $conexion = @fsockopen($ip, (int) Config::get('arduino.puerto'), $codigo, $error, 1.5);
-    $enLinea = is_resource($conexion);
-    if ($enLinea) {
+    $enLinea = false;
+    if (is_resource($conexion)) {
       stream_set_timeout($conexion, 1);
       fwrite($conexion, "GET /estado HTTP/1.0\r\nConnection: close\r\n\r\n");
-      fgets($conexion);
+      // El W5100 acepta conexiones por hardware: solo cuenta como en línea si el firmware contesta.
+      $enLinea = str_starts_with((string) fgets($conexion), 'HTTP/');
       fclose($conexion);
     }
 
@@ -57,14 +63,24 @@ final class SistemaService
       'en_linea' => $enLinea,
       'latencia_ms' => $enLinea ? (int) round((microtime(true) - $inicio) * 1000) : null,
       'ultima_lectura' => $ultima,
+      // Segundos desde la última lectura, calculados en el servidor (evita diferencias de zona horaria).
+      'segundos_desde_lectura' => $ultima ? max(0, time() - strtotime($ultima)) : null,
     ];
   }
 
-  public function reiniciarArduino(): void
+  /**
+   * Pide el reinicio del lector y devuelve un mensaje con el resultado real:
+   * el firmware responde 200 antes de reiniciarse, o 403 si el token no coincide.
+   */
+  public function reiniciarArduino(): string
   {
     $ip = (string) Config::get('arduino.ip');
+    $token = (string) Config::get('arduino.token');
     if ($ip === '') {
       throw new ValidacionException('No está configurada la IP del Arduino (IP_ARDUINO en .env).');
+    }
+    if ($token === '') {
+      throw new ValidacionException('No está configurado ARDUINO_TOKEN en el .env: el lector rechazaría el pedido.');
     }
     if (!function_exists('curl_init')) {
       throw new ValidacionException('La extensión cURL de PHP no está habilitada.');
@@ -73,14 +89,29 @@ final class SistemaService
     $ch = curl_init(sprintf('http://%s:%d/reiniciar', $ip, (int) Config::get('arduino.puerto')));
     curl_setopt_array($ch, [
       CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_TIMEOUT => 1, // El Arduino se reinicia enseguida: no esperamos la respuesta.
-      CURLOPT_HTTPHEADER => ['X-PFC-Token: ' . Config::get('arduino.token')],
+      CURLOPT_CONNECTTIMEOUT => 2,
+      CURLOPT_TIMEOUT => 3,
+      CURLOPT_HTTPHEADER => ['X-PFC-Token: ' . $token],
     ]);
     curl_exec($ch);
+    $codigo = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_errno($ch);
+    // ¿Se llegó a abrir la conexión? (si no, el lector no recibió el pedido)
+    $conecto = (float) curl_getinfo($ch, CURLINFO_CONNECT_TIME) > 0;
     curl_close($ch);
 
-    Log::info('Reinicio del Arduino solicitado', ['ip' => $ip]);
+    Log::info('Reinicio del Arduino solicitado', ['ip' => $ip, 'http' => $codigo, 'curl_error' => $error]);
+    if ($codigo === 403) {
+      throw new ValidacionException('El lector rechazó el pedido: el token no coincide (ARDUINO_TOKEN del .env vs PFC_API_TOKEN del firmware).');
+    }
+    if ($codigo === 0 && !$conecto) {
+      throw new ValidacionException("No se pudo conectar con el lector ({$ip}). ¿Está encendido y conectado a la red?");
+    }
+
     $this->auditoria->registrar('sistema.reinicio_arduino', "Reinicio del lector Arduino ({$ip})");
+    return $codigo === 200
+      ? 'El lector confirmó el reinicio. Vuelve a estar disponible en unos segundos.'
+      : 'Pedido de reinicio enviado, pero el lector no confirmó (puede tener un firmware anterior). Verificá el estado en unos segundos.';
   }
 
   /**

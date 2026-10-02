@@ -21,6 +21,29 @@ final class AuthService
   ) {
   }
 
+  /**
+   * ¿La sesión sigue siendo válida según la base? Se cierra si el usuario fue
+   * desactivado, dejó de ser administrador o se le cambió la contraseña.
+   */
+  public function sesionVigente(?array $sesion): bool
+  {
+    if ($sesion === null) {
+      return false;
+    }
+    $usuario = $this->usuarios->buscarPorId((int) $sesion['id']);
+    $vigente = $usuario !== null
+      && (int) $usuario['asset'] === 1
+      && !empty($usuario['password'])
+      && hash_equals((string) ($sesion['huella'] ?? ''), \App\Core\Auth::huella($usuario));
+
+    if (!$vigente) {
+      \App\Core\Auth::cerrarSesion();
+      \App\Core\Session::iniciar();
+      \App\Core\Session::flash('aviso', 'Tu sesión se cerró porque cambiaron tus credenciales o tu usuario fue desactivado.');
+    }
+    return $vigente;
+  }
+
   /** "30111222" o "30.111.222" => "30111222"; cualquier otro formato => null. */
   public static function normalizarDni(string $dni): ?string
   {

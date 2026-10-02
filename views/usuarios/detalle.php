@@ -27,7 +27,9 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
   <h1><?= e($titulo) ?></h1>
   <div class="cabecera-acciones">
     <a class="boton" href="<?= url($rutaLista) ?>"><i class="fas fa-undo-alt"></i> Volver</a>
-    <?php if ($activo): ?>
+    <?php if ($tipo === TipoUsuario::Administrador): ?>
+      <a class="boton" href="<?= url('/administradores') ?>"><i class="fas fa-user-shield"></i> Gestionar en Administradores</a>
+    <?php elseif ($activo): ?>
       <form action="<?= url($rutaUsuario . '/desactivar') ?>" method="post" data-confirmar="¿Inhabilitar a <?= e($usuario['user_name']) ?>?">
         <?= csrf_field() ?>
         <button type="submit" class="peligro"><i class="fas fa-trash"></i> Inhabilitar <?= e($etiqueta) ?></button>

@@ -21,12 +21,12 @@ final class SistemaController extends Controller
   public function reiniciarArduino(Request $request): void
   {
     try {
-      $this->sistema->reiniciarArduino();
+      $mensaje = $this->sistema->reiniciarArduino();
     } catch (ValidacionException $e) {
       $this->error($e->getMessage(), '/dashboard');
     }
 
-    $this->exito('Reiniciando Arduino. Por favor aguarde...', '/dashboard');
+    $this->exito($mensaje, '/dashboard');
   }
 
   public function backup(Request $request): void

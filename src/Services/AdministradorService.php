@@ -96,6 +96,7 @@ final class AdministradorService
     }
     $this->exigirPassword($password, $confirmacion, (string) $admin['dni']);
     $this->usuarios->actualizarPassword($id, password_hash($password, PASSWORD_DEFAULT));
+    Auth::iniciarSesion($this->usuarios->buscarPorId($id));
     $this->auditoria->registrar('usuario.admin_password', "{$admin['user_name']} cambió su contraseña", 'usuario', $admin['dni']);
   }
 

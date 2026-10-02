@@ -122,7 +122,9 @@ function fecha_hora(?string $valor): string
   return fecha($valor, 'd-m-Y H:i:s');
 }
 
+/** $12.500 o $12.500,50 (muestra centavos solo si los hay). */
 function dinero(int|float|string|null $monto): string
 {
-  return '$' . number_format((float) $monto, 0, ',', '.');
+  $monto = round((float) $monto, 2);
+  return ($monto < 0 ? '-$' : '$') . number_format(abs($monto), fmod($monto, 1.0) != 0.0 ? 2 : 0, ',', '.');
 }

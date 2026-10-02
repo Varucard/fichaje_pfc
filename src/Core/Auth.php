@@ -6,6 +6,12 @@ namespace App\Core;
 
 final class Auth
 {
+  /** Huella de las credenciales: si cambia la contraseña, las sesiones abiertas dejan de valer. */
+  public static function huella(array $usuario): string
+  {
+    return substr(hash('sha256', (string) ($usuario['password'] ?? '')), 0, 16);
+  }
+
   public static function iniciarSesion(array $usuario): void
   {
     Session::regenerar();
@@ -13,6 +19,7 @@ final class Auth
       'id' => (int) $usuario['id_user'],
       'nombre' => $usuario['user_name'],
       'dni' => (string) $usuario['dni'],
+      'huella' => self::huella($usuario),
     ]);
     Session::set('ultima_actividad', time());
   }
