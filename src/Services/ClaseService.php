@@ -19,6 +19,7 @@ final class ClaseService
     private readonly ClaseRepository $clases,
     private readonly MatriculaRepository $matriculas,
     private readonly UsuarioRepository $usuarios,
+    private readonly AuditoriaService $auditoria,
   ) {
   }
 
@@ -61,6 +62,7 @@ final class ClaseService
     return $this->clases->transaccion(function () use ($nombre, $precio, $idsProfesores): array {
       $id = $this->clases->crear($nombre, $precio);
       $omitidos = [];
+      $asignados = [];
 
       foreach (array_unique(array_map('intval', $idsProfesores)) as $idProfesor) {
         $profesor = $this->usuarios->buscarPorId($idProfesor);
@@ -69,15 +71,19 @@ final class ClaseService
           continue;
         }
         $this->matriculas->asignarProfesor($idProfesor, $id);
+        $asignados[] = trim($profesor['user_name'] . ' ' . $profesor['user_surname']);
       }
 
+      $this->auditoria->registrar('clase.alta', "Alta de la clase {$nombre} (" . dinero($precio) . ')', 'clase', $id, [
+        'profesores' => $asignados,
+      ]);
       return ['id' => $id, 'omitidos' => $omitidos];
     });
   }
 
   public function actualizar(int $id, string $nombre, string $precio): void
   {
-    $this->clases->buscarPorId($id) ?? throw new ValidacionException('No se encontró la clase.');
+    $anterior = $this->clases->buscarPorId($id) ?? throw new ValidacionException('No se encontró la clase.');
     [$nombre, $precio] = $this->validar($nombre, $precio);
 
     $otra = $this->clases->buscarPorNombreExacto($nombre);
@@ -86,6 +92,11 @@ final class ClaseService
     }
 
     $this->clases->actualizar($id, $nombre, $precio);
+
+    $cambios = AuditoriaService::cambios($anterior, ['name_class' => $nombre, 'price_class' => $precio], ['name_class', 'price_class']);
+    if ($cambios) {
+      $this->auditoria->registrar('clase.actualizacion', "Actualización de la clase {$nombre}", 'clase', $id, $cambios);
+    }
   }
 
   /**
@@ -94,15 +105,22 @@ final class ClaseService
    */
   public function eliminar(int $id, bool $incluirMatriculaciones): void
   {
-    $this->clases->buscarPorId($id) ?? throw new ValidacionException('No se encontró la clase.');
+    $clase = $this->clases->buscarPorId($id) ?? throw new ValidacionException('No se encontró la clase.');
 
     if (!$incluirMatriculaciones && $this->matriculas->claseTieneMatriculaciones($id)) {
       throw new ValidacionException('La clase tiene alumnos o profesores. Confirmá la eliminación de sus matriculaciones.');
     }
 
-    $this->clases->transaccion(function () use ($id): void {
+    $this->clases->transaccion(function () use ($id, $clase): void {
+      $miembros = count($this->matriculas->alumnosDeClase($id)) + count($this->matriculas->profesoresDeClase($id));
       $this->matriculas->eliminarDeClase($id);
       $this->clases->eliminar($id);
+      $this->auditoria->registrar(
+        'clase.eliminacion',
+        "Eliminación de la clase {$clase['name_class']}" . ($miembros ? " junto con {$miembros} matriculación(es)" : ''),
+        'clase',
+        $id,
+      );
     });
   }
 
@@ -128,6 +146,14 @@ final class ClaseService
       TipoUsuario::Administrador => throw new ValidacionException('Los administradores no se pueden matricular en clases.'),
     };
 
+    $clase = $this->clases->buscarPorId($idClase);
+    $this->auditoria->registrar(
+      'matricula.alta',
+      "{$usuario['user_name']} {$usuario['user_surname']} agregado/a a {$clase['name_class']} como " . mb_strtolower(TipoUsuario::deUsuario($usuario)->etiqueta()),
+      'usuario',
+      $usuario['dni'],
+      ['id_clase' => $idClase],
+    );
     return $usuario;
   }
 
@@ -139,6 +165,16 @@ final class ClaseService
     if ($quitados === 0) {
       throw new ValidacionException('El usuario no pertenecía a la clase.');
     }
+
+    $usuario = $this->usuarios->buscarPorId($idUsuario);
+    $clase = $this->clases->buscarPorId($idClase);
+    $this->auditoria->registrar(
+      'matricula.baja',
+      "{$usuario['user_name']} {$usuario['user_surname']} quitado/a de {$clase['name_class']}",
+      'usuario',
+      $usuario['dni'],
+      ['id_clase' => $idClase],
+    );
   }
 
   /** @return array{0: string, 1: int} */

@@ -193,6 +193,28 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
       </table>
     <?php endif; ?>
   <?php endif; ?>
+
+  <?php if (!empty($historial)): ?>
+    <hr>
+    <details>
+      <summary><strong>Historial de cambios</strong> (<?= count($historial) ?>)</summary>
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Quién</th><th>Detalle</th></tr>
+        </thead>
+        <tbody>
+          <?php foreach ($historial as $registro): ?>
+            <tr>
+              <td class="diminuto"><?= e(fecha_hora($registro['fecha'])) ?></td>
+              <td class="diminuto"><?= e($registro['usuario']) ?></td>
+              <td class="texto-izquierda"><?= e($registro['descripcion']) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+      <a href="<?= url('/auditoria', ['texto' => $usuario['dni']]) ?>">Ver todo en Auditoría</a>
+    </details>
+  <?php endif; ?>
 </section>
 
 <?= $this->renderParcial('partials/navegacion', ['volver' => $rutaLista]) ?>

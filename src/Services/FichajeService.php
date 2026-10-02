@@ -28,6 +28,7 @@ final class FichajeService
     private readonly MatriculaRepository $matriculas,
     private readonly LlaveroPendienteRepository $pendientes,
     private readonly PagoService $pagoService,
+    private readonly AuditoriaService $auditoria,
   ) {
   }
 
@@ -69,6 +70,7 @@ final class FichajeService
     }
 
     $this->fichajes->registrar($idUsuario, $ahora);
+    $this->auditoria->registrar('fichaje.manual', "Fichada manual de {$usuario['user_name']} {$usuario['user_surname']}", 'usuario', $usuario['dni']);
     return $usuario;
   }
 
@@ -86,6 +88,7 @@ final class FichajeService
       // Si el llavero nunca fue asignado lo dejamos pendiente para que el panel lo muestre.
       if ($this->usuarios->buscarUltimoPorRfid($uid) === null) {
         $this->pendientes->registrar($uid);
+        $this->auditoria->registrar('lector.llavero_desconocido', "Se leyó el llavero desconocido {$uid}", 'llavero', $uid, actor: 'Lector RFID');
         return $this->respuesta(EstadoLectura::Desconocido);
       }
       return $this->respuesta(EstadoLectura::Inactivo);

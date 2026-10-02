@@ -24,6 +24,7 @@ final class UsuarioService
     private readonly PagoRepository $pagos,
     private readonly ClaseRepository $clases,
     private readonly PagoService $pagoService,
+    private readonly AuditoriaService $auditoria,
   ) {
   }
 
@@ -80,6 +81,7 @@ final class UsuarioService
       'clases' => $clases,
       'clasesDisponibles' => $clasesDisponibles,
       'pagos' => $tipo === TipoUsuario::Alumno ? $this->pagos->ultimosDeUsuario($idUsuario) : [],
+      'historial' => $this->auditoria->historialDe('usuario', $usuario['dni']),
     ];
   }
 
@@ -100,6 +102,12 @@ final class UsuarioService
 
     return $this->usuarios->transaccion(function () use ($datos, $esProfesor, $conPago): array {
       $id = $this->usuarios->crear($datos);
+      $this->auditoria->registrar(
+        'usuario.alta',
+        sprintf('Alta de %s %s %s (DNI %s)', mb_strtolower($datos['tipo']->etiqueta()), $datos['nombre'], $datos['apellido'], $datos['dni']),
+        'usuario',
+        $datos['dni'],
+      );
       if ($conPago && !$esProfesor) {
         $this->pagoService->registrar($id);
       }
@@ -136,7 +144,21 @@ final class UsuarioService
     $this->validarLlaveroLibre($datos['rfid'], $id);
 
     $this->usuarios->actualizar($id, $datos);
-    return $this->usuarios->buscarPorId($id);
+    $actualizado = $this->usuarios->buscarPorId($id);
+
+    $cambios = AuditoriaService::cambios($usuario, $actualizado, [
+      'rfid', 'dni', 'user_name', 'user_surname', 'birth_day', 'email', 'phone_number', 'type_user',
+    ]);
+    if ($cambios) {
+      $this->auditoria->registrar(
+        'usuario.actualizacion',
+        sprintf('Actualización de %s %s (DNI %s): %s', $actualizado['user_name'], $actualizado['user_surname'], $actualizado['dni'], implode(', ', array_keys($cambios))),
+        'usuario',
+        $actualizado['dni'],
+        $cambios,
+      );
+    }
+    return $actualizado;
   }
 
   public function desactivar(string $dni): array
@@ -149,6 +171,7 @@ final class UsuarioService
     }
 
     $this->usuarios->cambiarEstado((int) $usuario['id_user'], false);
+    $this->auditoria->registrar('usuario.desactivacion', "Desactivación de {$usuario['user_name']} {$usuario['user_surname']} (DNI {$dni})", 'usuario', $dni);
     return $usuario;
   }
 
@@ -173,6 +196,12 @@ final class UsuarioService
     }
 
     $this->usuarios->cambiarEstado($id, true);
+    $this->auditoria->registrar(
+      'usuario.reactivacion',
+      "Reactivación de {$usuario['user_name']} {$usuario['user_surname']} (DNI {$dni})" . ($llaveroQuitado ? ' — se le quitó el llavero por estar asignado a otra persona' : ''),
+      'usuario',
+      $dni,
+    );
     return ['usuario' => $usuario, 'llavero_quitado' => $llaveroQuitado];
   }
 

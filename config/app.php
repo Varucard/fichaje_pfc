@@ -50,5 +50,12 @@ return [
     'dias_aviso_vencimiento' => (int) Env::get('DIAS_AVISO_VENCIMIENTO', '5'),
   ],
 
+  'log' => [
+    // Nivel mínimo a registrar: debug | info | warning | error
+    'nivel' => Env::get('LOG_NIVEL', 'info'),
+    // Los archivos de log más viejos que esta cantidad de días se borran (0 = nunca)
+    'dias_retencion' => (int) Env::get('LOG_DIAS_RETENCION', '90'),
+  ],
+
   'backup_dir' => Env::get('BACKUP_DIR', base_path('storage/backups')),
 ];

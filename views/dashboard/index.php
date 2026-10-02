@@ -38,6 +38,8 @@ $this->script('llaveros-pendientes');
 </section>
 
 <section class="acciones acciones-sistema">
+  <a class="boton" href="<?= url('/auditoria') ?>"><i class="fas fa-history"></i> Auditoría</a>
+  <a class="boton" href="<?= url('/sistema/logs') ?>"><i class="fas fa-file-alt"></i> Logs</a>
   <form action="<?= url('/sistema/reiniciar-arduino') ?>" method="post" data-confirmar="¿Reiniciar el lector Arduino?">
     <?= csrf_field() ?>
     <button type="submit" class="peligro"><i class="fas fa-sync-alt"></i> Reiniciar Arduino</button>

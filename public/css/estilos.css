@@ -320,3 +320,36 @@ tr.inactivo td { opacity: 0.6; }
 }
 .pie p { margin: 0; }
 .pie-autor { color: #66aaff; }
+
+/* Filtros y paginación */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 15px;
+}
+.filtros label { display: flex; flex-direction: column; font-size: 0.9em; gap: 4px; }
+.filtros input, .filtros select, .filtros button, .filtros a.boton { margin: 0; }
+.paginacion {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+}
+.texto-izquierda { text-align: left !important; }
+.tabla pre, .detalle pre { font-size: 0.8em; white-space: pre-wrap; text-align: left; }
+
+/* Etiquetas de nivel de log */
+.etiqueta {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 0.8em;
+  font-weight: 600;
+  background: var(--background);
+}
+.etiqueta-error { background: var(--pfc-peligro); color: #fff; }
+.etiqueta-warning { background: var(--pfc-aviso); color: #fff; }
+.etiqueta-info { background: #1c7ed6; color: #fff; }

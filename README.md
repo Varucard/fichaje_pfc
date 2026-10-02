@@ -62,6 +62,7 @@ git clone https://github.com/varucard/fichaje_pfc.git
 cd fichaje_pfc
 cp .env.example .env          # completar claves y ARDUINO_TOKEN
 docker compose up -d --build
+docker compose exec php php bin/migrar.php
 docker compose exec php php bin/crear-admin.php
 ```
 
@@ -80,7 +81,7 @@ Requisitos: XAMPP 8.2 o superior (PHP ≥ 8.1, MariaDB ≥ 10.4 / MySQL ≥ 8) y
 
 1. Clonar el repositorio dentro de `htdocs` (por ejemplo, `C:\xampp\htdocs\fichaje_pfc`).
 2. Instalar dependencias: `composer install --no-dev`.
-3. Crear la base de datos y un usuario en phpMyAdmin, e importar `database/schema.sql` (y opcionalmente `database/seed.sql`).
+3. Crear la base de datos y un usuario en phpMyAdmin, e importar `database/schema.sql` (y opcionalmente `database/seed.sql`). Después aplicar las migraciones con `php bin/migrar.php`.
 4. Copiar `.env.example` como `.env` y completar los datos. `APP_URL` debe ser `http://localhost/fichaje_pfc` y `MYSQL_DB_HOST`, `127.0.0.1`.
 5. Crear el administrador: `php bin/crear-admin.php`.
 6. Entrar a http://localhost/fichaje_pfc.
@@ -101,6 +102,50 @@ Resumen: el lector consulta `GET /api/arduino/lectura?uid=…&auth=<ARDUINO_TOKE
 
 ---
 
+## 🗃️ Migraciones
+
+Los cambios de estructura de la base viven en `database/migrations/NNN_descripcion.sql` y se aplican con:
+
+```bash
+php bin/migrar.php            # aplica las pendientes
+php bin/migrar.php --estado   # lista las pendientes sin aplicar nada
+```
+
+Cada migración aplicada se registra en la tabla `migraciones`, así que es seguro ejecutarlo varias veces. **Después de cada actualización del sistema hay que correr `bin/migrar.php`.** Antes de migrar producción, conviene hacer un respaldo desde el panel.
+
+| Migración | Qué hace |
+|---|---|
+| 001 | Teléfono como texto (antes INT) |
+| 002 | Limpia matriculaciones huérfanas o repetidas y hace único el DNI |
+| 003 | Claves foráneas entre usuarios, clases, pagos y fichadas |
+| 004 | Tabla `auditoria` |
+
+---
+
+## 📜 Logs y auditoría
+
+**Auditoría** (panel → *Auditoría*): historial de quién hizo qué y cuándo. Se guarda en la tabla `auditoria` e incluye inicios de sesión (también los fallidos), altas, cambios (con el valor anterior y el nuevo), bajas, pagos, fichadas manuales, matriculaciones, clases, liquidaciones, stock, respaldos y reinicios del lector. Se puede filtrar por fecha, tipo y texto o DNI, y la ficha de cada usuario muestra su propio historial.
+
+Para auditar una acción nueva, desde un servicio:
+
+```php
+$this->auditoria->registrar('entidad.accion', 'Descripción legible', 'entidad', $id, ['datos' => 'extra']);
+```
+
+**Logs técnicos** (panel → *Logs*, o los archivos `storage/logs/app-AAAA-MM-DD.log`): una entrada JSON por línea, con fecha, nivel, mensaje, IP, petición y usuario. Registran errores con su traza, accesos rechazados, inicios de sesión fallidos, 404 y eventos del sistema.
+
+```php
+use App\Support\Log;
+Log::info('Mensaje', ['dato' => 1]);   // también debug(), warning() y error($mensaje, $excepcion)
+```
+
+| Variable `.env` | Valor por defecto | Uso |
+|---|---|---|
+| `LOG_NIVEL` | `info` | Nivel mínimo: `debug`, `info`, `warning`, `error` |
+| `LOG_DIAS_RETENCION` | `90` | Los archivos más viejos se borran solos (0 = nunca) |
+
+---
+
 ## 🧪 Desarrollo
 
 ```bash
@@ -115,7 +160,8 @@ Convenciones:
 - PHP 8.1+, `declare(strict_types=1)`, PSR-4 y PSR-12 con indentación de 2 espacios (ver `.editorconfig`).
 - Los formularios POST llevan `<?= csrf_field() ?>`. El router rechaza los POST sin token.
 - Toda salida en vistas pasa por `e()`.
-- Los cambios de estructura de la base van como un archivo nuevo en `database/migrations/` y además se reflejan en `schema.sql`.
+- Los cambios de estructura de la base van como un archivo nuevo en `database/migrations/` (no se edita `schema.sql`).
+- Toda acción que modifique datos se audita desde su servicio con `AuditoriaService`.
 - Ramas: `main` (estable) ← `dev` (integración) ← ramas de funcionalidad (`feat/…`, `fix/…`).
 
 ---
@@ -132,7 +178,10 @@ Convenciones:
 | `uid_incomes` | Llaveros desconocidos pendientes de mostrar en el panel |
 | `types_users` | Catálogo de tipos de usuario |
 
-Migraciones pendientes para bases creadas con el dump anterior: `database/migrations/001_telefono_varchar.sql`.
+| `auditoria` | Historial de acciones de los administradores |
+| `migraciones` | Control de migraciones aplicadas |
+
+La estructura base está en `database/schema.sql`; los cambios posteriores, en `database/migrations/` (ver *Migraciones*).
 
 ---
 

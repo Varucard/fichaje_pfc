@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\Api\ArduinoController;
 use App\Controllers\Api\PanelApiController;
+use App\Controllers\AuditoriaController;
 use App\Controllers\AuthController;
 use App\Controllers\ClaseController;
 use App\Controllers\DashboardController;
@@ -66,6 +67,10 @@ return function (Router $r): void {
     $r->get('/fichajes', [FichajeController::class, 'index']);
     $r->get('/fichajes/buscar', [FichajeController::class, 'buscar']);
     $r->post('/fichajes/manual', [FichajeController::class, 'manual']);
+
+    // Auditoría y logs
+    $r->get('/auditoria', [AuditoriaController::class, 'index']);
+    $r->get('/sistema/logs', [AuditoriaController::class, 'logs']);
 
     // Mantenimiento
     $r->post('/sistema/reiniciar-arduino', [SistemaController::class, 'reiniciarArduino']);
