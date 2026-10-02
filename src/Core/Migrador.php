@@ -13,6 +13,10 @@ use RuntimeException;
  *
  * Cada migración debe poder correr tanto en una base nueva (schema.sql + seed) como en
  * una base existente de producción.
+ *
+ * MySQL no puede revertir cambios de estructura (ALTER/CREATE), así que si una migración
+ * falla a mitad de camino se guarda cuántas sentencias se aplicaron (tabla
+ * migraciones_progreso) y la próxima ejecución retoma desde la que falló.
  */
 final class Migrador
 {
@@ -43,15 +47,33 @@ final class Migrador
   {
     $aplicadas = 0;
     foreach ($this->pendientes() as $nombre) {
-      foreach (self::sentencias((string) file_get_contents($this->directorio . '/' . $nombre)) as $sql) {
+      $sentencias = self::sentencias((string) file_get_contents($this->directorio . '/' . $nombre));
+      $hechas = $this->progreso($nombre);
+
+      foreach (array_slice($sentencias, $hechas, null, true) as $indice => $sql) {
         try {
           $this->pdo->exec($sql);
         } catch (\PDOException $e) {
-          throw new RuntimeException("Falló la migración {$nombre}: {$e->getMessage()}\nSentencia: {$sql}", 0, $e);
+          throw new RuntimeException(
+            sprintf(
+              "Falló la migración %s en la sentencia %d de %d: %s\nSentencia: %s\n"
+              . 'Corregí el problema y volvé a ejecutar: se retoma desde esta sentencia.',
+              $nombre,
+              $indice + 1,
+              count($sentencias),
+              $e->getMessage(),
+              $sql
+            ),
+            0,
+            $e
+          );
         }
+        $this->guardarProgreso($nombre, $indice + 1);
       }
+
       $stmt = $this->pdo->prepare('INSERT INTO migraciones (nombre, aplicada_en) VALUES (?, NOW())');
       $stmt->execute([$nombre]);
+      $this->pdo->prepare('DELETE FROM migraciones_progreso WHERE nombre = ?')->execute([$nombre]);
       $avisar($nombre);
       $aplicadas++;
     }
@@ -77,8 +99,27 @@ final class Migrador
     ));
   }
 
+  private function progreso(string $nombre): int
+  {
+    $stmt = $this->pdo->prepare('SELECT sentencias_ok FROM migraciones_progreso WHERE nombre = ?');
+    $stmt->execute([$nombre]);
+    return (int) $stmt->fetchColumn();
+  }
+
+  private function guardarProgreso(string $nombre, int $sentencias): void
+  {
+    $this->pdo->prepare('REPLACE INTO migraciones_progreso (nombre, sentencias_ok) VALUES (?, ?)')
+      ->execute([$nombre, $sentencias]);
+  }
+
   private function crearTablaDeControl(): void
   {
+    $this->pdo->exec(
+      'CREATE TABLE IF NOT EXISTS migraciones_progreso (
+        nombre VARCHAR(190) NOT NULL PRIMARY KEY,
+        sentencias_ok INT NOT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci'
+    );
     $this->pdo->exec(
       'CREATE TABLE IF NOT EXISTS migraciones (
         nombre VARCHAR(190) NOT NULL PRIMARY KEY,

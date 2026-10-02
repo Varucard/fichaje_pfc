@@ -195,13 +195,13 @@ php bin/migrar.php            # aplica las pendientes
 php bin/migrar.php --estado   # lista las pendientes sin aplicar nada
 ```
 
-Cada migración aplicada se registra en la tabla `migraciones`, así que es seguro ejecutarlo varias veces. **Después de cada actualización del sistema hay que correr `bin/migrar.php`.** Antes de migrar producción, conviene hacer un respaldo desde el panel.
+Cada migración aplicada se registra en la tabla `migraciones`, así que es seguro ejecutarlo varias veces. Si una migración falla a mitad de camino (por ejemplo, por un DNI duplicado), el mensaje indica la sentencia y el motivo: se corrige el dato y se vuelve a ejecutar, y retoma desde esa sentencia (tabla `migraciones_progreso`). **Después de cada actualización del sistema hay que correr `bin/migrar.php`.** Antes de migrar producción, conviene hacer un respaldo desde el panel.
 
 | Migración | Qué hace |
 |---|---|
 | 001 | Teléfono como texto (antes INT) |
 | 002 | Limpia matriculaciones huérfanas o repetidas y hace único el DNI |
-| 003 | Claves foráneas entre usuarios, clases, pagos y fichadas |
+| 003 | Claves foráneas entre usuarios, clases, pagos y fichadas. Los pagos y fichadas de usuarios que ya no existen se mueven a `huerfanos_payments` / `huerfanos_incomes` para revisarlos |
 | 004 | Tabla `auditoria` |
 | 005 | Monto y cuota en `payments`; reparto por clase en `payment_classes` |
 | 006 | Porcentaje de liquidación en `users` y tabla `liquidaciones` |

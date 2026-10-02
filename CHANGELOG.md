@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.1.1] - 2026-10-02
+
+### Correcciones
+- La migración 003 fallaba en bases con pagos o fichadas de usuarios borrados a mano. Ahora esos registros se mueven a tablas de respaldo antes de crear las claves foráneas.
+- El migrador retoma una migración que falló a mitad de camino, en lugar de quedar bloqueado por los cambios que ya se habían aplicado.
+
 ## [3.1.0] - 2026-10-02
 
 ### Logs y auditoría
