@@ -1,5 +1,48 @@
 # Changelog
 
+## [3.4.1] - 2026-10-02
+
+Correcciones de la revisión exhaustiva del código (seguridad, lógica, interfaz y firmware).
+
+### Seguridad
+- **XSS almacenado sin autenticación** en la Auditoría (DNI de un login fallido). El DNI se valida antes de guardarse y el link se escapa.
+- El bloqueo de login se evadía con variantes del mismo DNI. El contador de intentos es atómico y el intento se reserva antes de comparar la contraseña.
+- Redirección abierta con `/\`. Content-Security-Policy y otros encabezados de seguridad.
+- La sesión se revalida contra la base: se cierra si el admin fue desactivado o cambió su contraseña.
+
+### Pagos y deuda (reglas definidas)
+- La cuota vale hasta el día del vencimiento inclusive.
+- Un pago tardío cubre la cuota más vieja adeudada. Al reactivar, se cobra desde la reactivación.
+- Saldo de pagos parciales neteado (un pago de más lo cancela).
+- Día ancla: el fin de mes no arrastra días perdidos.
+- Pagos duplicados rechazados. Solo se elimina el último pago.
+- Fechas imposibles rechazadas y montos con separador de miles.
+
+### Liquidación
+- Solo meses cerrados.
+- Una asistencia por alumno, clase y día.
+- Prorrateo de pagos de varios meses desde el mes que cubren.
+
+### Integración
+- La ruta del firmware anterior funciona en XAMPP.
+- El reinicio del Arduino informa el resultado real y el estado del lector exige una respuesta HTTP.
+- Zona horaria de MySQL igual a la de PHP.
+- Centavos visibles.
+- Clave duplicada → mensaje claro.
+
+### Interfaz
+- Sonido y copiar más robustos.
+- Polling que se pausa con la pestaña oculta.
+- Ventanas que no se cierran por error.
+- Formularios que conservan lo escrito.
+- Accesibilidad y tablas sin desborde.
+
+### Firmware
+- Lecturas con plazo absoluto (el watchdog ya no se dispara con clientes lentos).
+- "Servidor lento" distinto de "sin conexión".
+- LCD sin parpadeo y LED verde solo para acceso permitido.
+- `Host` con puerto y puerto de reinicio configurable.
+
 ## [3.4.0] - 2026-10-02
 
 ### Operación

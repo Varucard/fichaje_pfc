@@ -37,11 +37,13 @@ fichaje_pfc/
 │   ├── layouts/  partials/
 │   ├── emails/          Plantillas de los emails (layout + una por tipo) y panel
 │   ├── comprobantes/    PDF del comprobante de pago
-│   └── auth/ dashboard/ usuarios/ clases/ fichajes/ deudas/ liquidaciones/ stock/ sistema/ publico/ errors/
+│   └── auth/ dashboard/ usuarios/ clases/ fichajes/ deudas/ liquidaciones/ promociones/
+│       stock/ reportes/ administradores/ sistema/ publico/ errors/
 ├── config/              app.php (configuración) y routes.php (mapa de URLs)
 ├── database/            schema.sql, seed.sql (datos ficticios) y migrations/
-├── storage/             logs/ y backups/ (generados, no se versionan)
-├── bin/                 Scripts de consola (tareas.php, migrar.php, crear-admin.php)
+├── storage/             logs/, backups/ y emails/ (generados, no se versionan)
+├── bin/                 Scripts de consola (tareas.php, migrar.php, crear-admin.php;
+│                        procesar-emails.php queda por compatibilidad)
 ├── tests/               Tests de PHPUnit
 ├── firmware/            Código del Arduino, carcasa 3D e imágenes → ver firmware/README.md
 └── docker/  Dockerfile  docker-compose.yml
@@ -93,7 +95,7 @@ Requisitos: XAMPP 8.2 o superior (PHP ≥ 8.1, MariaDB ≥ 10.4 / MySQL ≥ 8) y
 1. Clonar el repositorio dentro de `htdocs` (por ejemplo, `C:\xampp\htdocs\fichaje_pfc`).
 2. Instalar dependencias: `composer install --no-dev`.
 3. Crear la base de datos y un usuario en phpMyAdmin, e importar `database/schema.sql` (y opcionalmente `database/seed.sql`). Después aplicar las migraciones con `php bin/migrar.php`.
-4. Copiar `.env.example` como `.env` y completar los datos. `APP_URL` debe ser `http://localhost/fichaje_pfc` y `MYSQL_DB_HOST`, `127.0.0.1`.
+4. Copiar `.env.example` como `.env` y completar los datos. `MYSQL_DB_HOST` debe ser `127.0.0.1` y `APP_URL`, la dirección con la que se entra al panel **desde otros equipos** (por ejemplo, `http://192.168.0.245/fichaje_pfc`). Se usa en los links de los emails, así que si queda `localhost` los links no van a funcionar para los clientes.
 5. Crear el administrador: `php bin/crear-admin.php`.
 6. Entrar a http://localhost/fichaje_pfc.
 
@@ -121,9 +123,12 @@ Resumen: el lector consulta `GET /api/arduino/lectura?uid=…&auth=<ARDUINO_TOKE
   - la **cuota** que correspondía en ese momento,
   - el **reparto por clase**, proporcional al precio (tabla `payment_classes`), que es la base de la liquidación de profesores.
 - **Plan del pago**: 1, 2, 3, 6 o 12 meses (cuota × meses) o una **promoción** activa. El monto se completa solo según el plan y se puede modificar (pago parcial).
-- **Adelanto**: si el alumno paga **antes** de que venza, los meses se suman desde su vencimiento actual (no pierde días). Si ya venció, se cuentan desde la fecha de pago.
+- **La cuota vale hasta el día del vencimiento inclusive** (es lo que dice el comprobante).
+- **Cobertura de cada pago:** si el alumno ya tenía un vencimiento, el pago se suma desde ahí. Un **adelanto** no pierde días, y un **pago tardío cubre la cuota más vieja adeudada**, así que si debía 3 meses y paga 1, sigue debiendo 2. Si nunca pagó, cubre desde la fecha de pago. Al **reactivar** un alumno se le cobra desde la reactivación, no el tiempo que estuvo inactivo.
+- El vencimiento conserva siempre el **día ancla**: un alumno que paga el 31 vence el 28/02 y vuelve a vencer el 31/03.
+- Solo se puede eliminar el **último pago** de un alumno, porque los vencimientos se encadenan. Un segundo pago del mismo alumno dentro de los 20 segundos se rechaza (doble clic).
 - **Promociones** (panel → *Promociones*): "N meses pagos + M bonificados", con descuento opcional. Ejemplos: "3 + 1 gratis" (3 pagos, 1 bonificado) o "Semestral 10 % off" (6 pagos, 10 %). No se borran: se desactivan, para conservar el historial de los pagos que las usaron.
-- **Deuda** = cuotas vencidas × cuota actual + saldos de pagos parciales (cuota − monto cobrado). Un alumno con clases que nunca pagó adeuda una cuota. Los pagos anteriores a la v3.1 (sin monto) se consideran completos.
+- **Deuda** = cuotas vencidas × cuota actual + saldo de pagos parciales, neteado: lo que se debió cobrar menos lo cobrado, así que un pago de más cancela un saldo anterior. Un alumno con clases que nunca pagó adeuda una cuota. Los pagos anteriores a la v3.1 (sin monto) se consideran completos.
 - **Deudores** (panel → *Deudores*): alumnos activos con deuda, de mayor a menor, con la deuda total.
 - No se puede desactivar a un alumno con deuda.
 - En el alta, el cliente se puede matricular directamente en sus clases, y al crear una clase se pueden elegir sus profesores y alumnos. Para el alta *con pago*, elegir al menos una.
@@ -142,7 +147,8 @@ Cada profesor se liquida en uno de dos modos, que se elige en la misma pantalla:
 | **$ por asistencia** | Ingresos de alumnos a sus clases en el mes, según la clase de cada fichada (ver *Horarios*) | Base × monto por asistencia |
 
 Si una clase tiene varios profesores, la base de esa clase se divide en partes iguales.
-- Flujo: el cálculo se ve en vivo → **Registrar** (guarda el monto y el detalle; no cambia aunque después entren más pagos) → **Pagar**. Una liquidación registrada y no pagada se puede **Anular** para recalcularla.
+- Flujo: el cálculo se ve en vivo → **Registrar** (solo para **meses cerrados**; guarda el monto y el detalle) → **Pagar**. Una liquidación registrada y no pagada se puede **Anular** para recalcularla.
+- En el modo por asistencia se cuenta una asistencia por alumno, clase y día, aunque haya fichado con el llavero y además a mano.
 - Se usan los profesores asignados actualmente a cada clase. Los pagos anteriores a la v3.1 no tienen reparto por clase y no cuentan.
 
 ---
@@ -327,12 +333,14 @@ Convenciones:
 | `productos` / `movimientos_stock` | Productos y su historial de entradas, ventas y ajustes |
 | `emails_cola` | Emails encolados, enviados o con error |
 | `configuracion` | Opciones editables desde el panel (avisos y datos del gimnasio) |
-| `incomes` | Fichadas (ingresos) |
+| `incomes` | Fichadas (ingresos), con la clase deducida por horario |
+| `clase_horarios` | Horarios semanales de cada clase |
 | `uid_incomes` | Llaveros desconocidos pendientes de mostrar en el panel |
 | `types_users` | Catálogo de tipos de usuario |
-
 | `auditoria` | Historial de acciones de los administradores |
-| `migraciones` | Control de migraciones aplicadas |
+| `intentos_login` | Intentos fallidos de inicio de sesión (bloqueo temporal) |
+| `migraciones` / `migraciones_progreso` | Control de migraciones aplicadas y de una migración a medias |
+| `huerfanos_payments` / `huerfanos_incomes` | Respaldo de pagos y fichadas de usuarios que ya no existían (migración 003) |
 
 La estructura base está en `database/schema.sql`; los cambios posteriores, en `database/migrations/` (ver *Migraciones*).
 

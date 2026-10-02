@@ -54,10 +54,14 @@ IPAddress gateway(PFC_GATEWAY);
 IPAddress subnet(PFC_SUBNET);
 IPAddress servidor(PFC_SERVER_IP);
 
-EthernetServer servidorHttp(8080);
+#ifndef PFC_HTTP_PORT
+#define PFC_HTTP_PORT 8080 // Puerto del lector para el reinicio remoto (ARDUINO_PORT en el servidor)
+#endif
+EthernetServer servidorHttp(PFC_HTTP_PORT);
 
 // ---------------------------------------------------------------- Estado
 unsigned long ultimoMensaje = 0;
+bool mostrandoBienvenida = false; // Evita redibujar (y parpadear) la pantalla en reposo
 char ultimoUid[21] = "";
 unsigned long momentoUltimoUid = 0;
 
@@ -91,6 +95,7 @@ void linea(uint8_t fila, const char *texto) {
 }
 
 void pantalla(const char *l0, const char *l1 = "", const char *l2 = "", const char *l3 = "") {
+  mostrandoBienvenida = false;
   linea(0, l0);
   linea(1, l1);
   linea(2, l2);
@@ -98,13 +103,18 @@ void pantalla(const char *l0, const char *l1 = "", const char *l2 = "", const ch
 }
 
 void mostrarBienvenida() {
-  leds(true, false, true);
+  ultimoMensaje = millis();
+  if (mostrandoBienvenida) {
+    return; // Ya está en pantalla: no la redibuja (evita el parpadeo cada 10 s)
+  }
+  // Reposo: solo el azul ("listo para leer"); el verde queda para "acceso permitido".
+  leds(false, false, true);
   lcd.clear();
   lcd.setCursor(0, 0);  lcd.print("Palillo");
   lcd.setCursor(8, 1);  lcd.print("Fight");
   lcd.setCursor(14, 2); lcd.print("Club!");
   lcd.setCursor(0, 3);  lcd.print("Bienvenidos!");
-  ultimoMensaje = millis();
+  mostrandoBienvenida = true;
 }
 
 void mostrarError(const char *titulo, const char *detalle) {
@@ -122,6 +132,32 @@ void reiniciarArduino() {
 
 // ================================================================ Red
 
+/*
+ * Lee una línea (hasta '\n', sin '\r') con un plazo ABSOLUTO: a diferencia de
+ * readBytesUntil, cuyo timeout es por carácter, un cliente que manda datos de a poco no
+ * puede trabar la lectura (ni disparar el watchdog). Devuelve -1 si venció el plazo.
+ */
+int leerLinea(EthernetClient &cliente, char *destino, size_t tamanio, unsigned long hasta) {
+  size_t largo = 0;
+  while ((long) (hasta - millis()) > 0) {
+    wdt_reset();
+    if (!cliente.available()) {
+      if (!cliente.connected()) break;
+      continue;
+    }
+    char c = cliente.read();
+    if (c == '\n') {
+      destino[largo] = '\0';
+      return (int) largo;
+    }
+    if (c != '\r' && largo < tamanio - 1) {
+      destino[largo++] = c;
+    }
+  }
+  destino[largo] = '\0';
+  return largo > 0 ? (int) largo : -1;
+}
+
 void iniciarRed() {
   pantalla("Conectando Red...", "Aguarde por favor...");
   Ethernet.begin(mac, ip, gateway, gateway, subnet); // DNS = gateway
@@ -132,6 +168,7 @@ void iniciarRed() {
     while (true) { beep(1000); } // Sin red el lector no puede funcionar
   }
 
+  // Solo los chips W5200/W5500 informan el estado del cable; el W5100 devuelve "Unknown".
   if (Ethernet.linkStatus() == LinkOFF) {
     pantalla("ATENCION:", "Cable de red", "desconectado");
     beep(300); beep(300);
@@ -150,13 +187,12 @@ void iniciarRed() {
 
 /*
  * Consulta al servidor por un llavero.
- * Devuelve el código HTTP (0 si no se pudo conectar) y deja el cuerpo en `cuerpo`.
- * Cada etapa tiene timeout, así el lector nunca queda colgado esperando al servidor.
+ * Devuelve el código HTTP, 0 si no se pudo conectar o -1 si conectó pero no respondió a
+ * tiempo, y deja el cuerpo en `cuerpo`. Toda la consulta tiene un plazo absoluto.
  */
 int consultarServidor(const char *uid, char *cuerpo, size_t tamanio) {
   EthernetClient cliente;
   cliente.setConnectionTimeout(TIMEOUT_CONEXION_MS);
-  cliente.setTimeout(TIMEOUT_RESPUESTA_MS);
   cuerpo[0] = '\0';
 
   wdt_reset();
@@ -167,28 +203,34 @@ int consultarServidor(const char *uid, char *cuerpo, size_t tamanio) {
   // HTTP/1.0: el servidor responde sin "chunked encoding" y cierra la conexión al terminar.
   cliente.print(F("GET " PFC_API_PATH "?uid="));
   cliente.print(uid);
-  cliente.print(F("&auth=" PFC_API_TOKEN " HTTP/1.0\r\n"
-                  "Host: " PFC_SERVER_HOST "\r\n"
-                  "Connection: close\r\n\r\n"));
+  cliente.print(F("&auth=" PFC_API_TOKEN " HTTP/1.0\r\nHost: " PFC_SERVER_HOST ":"));
+  cliente.print(PFC_SERVER_PORT);
+  cliente.print(F("\r\nConnection: close\r\n\r\n"));
+
+  const unsigned long hasta = millis() + TIMEOUT_RESPUESTA_MS;
 
   // Línea de estado: "HTTP/1.1 200 OK"
-  wdt_reset();
-  char estado[32];
-  size_t n = cliente.readBytesUntil('\n', estado, sizeof(estado) - 1);
-  estado[n] = '\0';
+  char renglon[64];
+  if (leerLinea(cliente, renglon, sizeof(renglon), hasta) < 0) {
+    cliente.stop();
+    return -1;
+  }
   int codigo = 0;
-  const char *espacio = strchr(estado, ' ');
-  if (espacio) {
+  const char *espacio = strchr(renglon, ' ');
+  if (strncmp(renglon, "HTTP/", 5) == 0 && espacio) {
     codigo = atoi(espacio + 1);
   }
 
-  // Saltear encabezados y leer el cuerpo con límite de tamaño y de tiempo.
-  wdt_reset();
-  if (codigo > 0 && cliente.find((char *)"\r\n\r\n")) {
-    wdt_reset();
+  // Encabezados: hasta la línea vacía.
+  int n;
+  while ((n = leerLinea(cliente, renglon, sizeof(renglon), hasta)) > 0) {
+  }
+
+  // Cuerpo, acotado en tamaño y dentro del mismo plazo.
+  if (codigo > 0 && n == 0) {
     size_t largo = 0;
-    unsigned long inicio = millis();
-    while ((cliente.connected() || cliente.available()) && millis() - inicio < TIMEOUT_RESPUESTA_MS) {
+    while ((cliente.connected() || cliente.available()) && (long) (hasta - millis()) > 0) {
+      wdt_reset();
       if (cliente.available()) {
         char c = cliente.read();
         if (largo < tamanio - 1) {
@@ -200,8 +242,7 @@ int consultarServidor(const char *uid, char *cuerpo, size_t tamanio) {
   }
 
   cliente.stop();
-  wdt_reset();
-  return codigo;
+  return codigo > 0 ? codigo : -1;
 }
 
 /*
@@ -217,15 +258,12 @@ void atenderPedidosHttp() {
   bool pideReinicio = false;
   bool tokenValido = false;
   char renglon[96];
-  unsigned long inicio = millis();
-  cliente.setTimeout(TIMEOUT_PEDIDO_HTTP_MS);
+  const unsigned long hasta = millis() + TIMEOUT_PEDIDO_HTTP_MS;
 
-  // Lee la línea del pedido y los encabezados hasta la línea vacía.
-  for (uint8_t i = 0; i < 20 && millis() - inicio < TIMEOUT_PEDIDO_HTTP_MS; i++) {
-    size_t n = cliente.readBytesUntil('\n', renglon, sizeof(renglon) - 1);
-    if (n > 0 && renglon[n - 1] == '\r') n--;
-    renglon[n] = '\0';
-    if (n == 0) break;
+  // Lee la línea del pedido y los encabezados hasta la línea vacía (plazo total de 1 s).
+  for (uint8_t i = 0; i < 20; i++) {
+    int n = leerLinea(cliente, renglon, sizeof(renglon), hasta);
+    if (n <= 0) break;
 
     if (i == 0) {
       pideReinicio = strncmp(renglon, "GET /reiniciar", 14) == 0;
@@ -336,6 +374,9 @@ void procesarLlavero() {
 
   if (codigo == 0) {
     mostrarError("Error servidor", "Sin conexion");
+  } else if (codigo == -1) {
+    // Conectó pero no respondió a tiempo: la fichada pudo haberse registrado igual.
+    mostrarError("Servidor lento", "Sin respuesta");
   } else if (codigo == 403) {
     mostrarError("Error servidor", "Token invalido");
   } else if (codigo != 200) {
