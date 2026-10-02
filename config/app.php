@@ -18,7 +18,7 @@ $basePath = $urlApp !== ''
 return [
   'app' => [
     'nombre' => Env::get('SITENAME', 'Palillo Fight Club'),
-    'version' => Env::get('APPVERSION', '3.4.0'),
+    'version' => Env::get('APPVERSION', '3.4.1'),
     'url' => $urlApp,
     'base_path' => $basePath,
     'debug' => Env::bool('APP_DEBUG'),

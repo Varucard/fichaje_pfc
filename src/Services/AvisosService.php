@@ -80,7 +80,14 @@ final class AvisosService
       $id = (int) $alumno['id_user'];
       $cuota = $cuotas[$id] ?? 0.0;
       $renovacion = $resumenPagos[$id]['renovacion'] ?? null;
-      $deuda = DeudaService::calcular($cuota, $renovacion, $resumenPagos[$id]['saldo'] ?? 0.0, $hoy->setTime(12, 0));
+      $deuda = DeudaService::calcular(
+        $cuota,
+        $renovacion,
+        $resumenPagos[$id]['saldo'] ?? 0.0,
+        $hoy,
+        $resumenPagos[$id]['dia_ancla'] ?? null,
+        $alumno['cuota_desde'] ?? null,
+      );
 
       if ($cuota > 0 && $this->config->activo('aviso.vencimiento.activo')) {
         $dias = self::correspondeVencimiento($renovacion, $hoy, $this->config->entero('aviso.vencimiento.dias'));
@@ -123,7 +130,7 @@ final class AvisosService
         }
       }
 
-      if (!empty($alumno['birth_day']) && substr($alumno['birth_day'], 5, 5) === $hoy->format('m-d')
+      if (!empty($alumno['birth_day']) && self::cumpleHoy($alumno['birth_day'], $hoy)
         && $this->config->activo('aviso.cumpleanos.activo')
         && $this->emails->encolarParaUsuario(
           'cumpleanos',
@@ -141,6 +148,16 @@ final class AvisosService
     }
 
     return $encolados;
+  }
+
+  /** ¿Cumple años hoy? Quien nació un 29/02 se saluda el 28/02 en los años no bisiestos. */
+  public static function cumpleHoy(string $nacimiento, DateTimeImmutable $hoy): bool
+  {
+    $diaMes = substr($nacimiento, 5, 5);
+    if ($diaMes === '02-29' && !$hoy->format('L')) {
+      $diaMes = '02-28';
+    }
+    return $diaMes === $hoy->format('m-d');
   }
 
   /** Bienvenida al dar de alta un cliente. */

@@ -30,6 +30,7 @@ final class PagoService
     private readonly MatriculaRepository $matriculas,
     private readonly AuditoriaService $auditoria,
     private readonly AvisosService $avisos,
+    private readonly EmailService $emails,
   ) {
   }
 
@@ -43,37 +44,48 @@ final class PagoService
   }
 
   /**
-   * Suma N meses conservando el día; si ese día no existe en el mes destino,
-   * usa el último día del mes (31/01 + 1 = 28/02; 31/01 + 3 = 30/04).
+   * Suma N meses usando un día ancla (por defecto, el día de la fecha); si ese día no
+   * existe en el mes destino, usa el último día del mes. Con ancla 31:
+   * 31/01 + 1 = 28/02, y 28/02 + 1 = 31/03 (no arrastra el 28).
    */
-  public static function sumarMeses(DateTimeImmutable $fecha, int $meses): DateTimeImmutable
+  public static function sumarMeses(DateTimeImmutable $fecha, int $meses, ?int $diaAncla = null): DateTimeImmutable
   {
     $destino = $fecha->modify('first day of this month')->modify("+{$meses} month");
-    $dia = min((int) $fecha->format('d'), (int) $destino->format('t'));
+    $dia = min($diaAncla ?? (int) $fecha->format('d'), (int) $destino->format('t'));
     return $destino->setDate((int) $destino->format('Y'), (int) $destino->format('m'), $dia);
   }
 
   /**
-   * Nuevo vencimiento de un pago que cubre N meses.
-   * Si el alumno paga antes de que venza (adelanto), los meses se suman desde su
-   * vencimiento actual para que no pierda días; si ya venció, desde la fecha de pago.
+   * Desde cuándo cubre un pago nuevo (regla del gimnasio):
+   * - Si ya tenía un vencimiento (al día o vencido), el pago continúa desde ahí: un
+   *   adelanto no pierde días y un pago tardío cubre el mes más viejo adeudado.
+   * - Si se lo reactivó después de ese vencimiento, desde la reactivación (no se cobra
+   *   el tiempo inactivo).
+   * - Si nunca pagó, desde la fecha de pago.
    */
-  public static function calcularVencimiento(DateTimeImmutable $fechaPago, ?string $vencimientoActual, int $meses): DateTimeImmutable
+  public static function inicioCobertura(DateTimeImmutable $fechaPago, ?string $vencimientoActual, ?string $cuotaDesde = null): DateTimeImmutable
   {
-    $base = $fechaPago;
-    if ($vencimientoActual !== null) {
-      $actual = new DateTimeImmutable($vencimientoActual);
-      if ($fechaPago <= $actual) {
-        $base = $actual;
-      }
+    if ($cuotaDesde !== null && ($vencimientoActual === null || $cuotaDesde > $vencimientoActual)) {
+      return new DateTimeImmutable($cuotaDesde);
     }
-    return self::sumarMeses($base, $meses);
+    return $vencimientoActual !== null ? new DateTimeImmutable($vencimientoActual) : $fechaPago;
   }
 
-  /** La cuota está al día si la fecha actual no superó el vencimiento. */
+  /** Nuevo vencimiento de un pago que cubre N meses (ver inicioCobertura). */
+  public static function calcularVencimiento(
+    DateTimeImmutable $fechaPago,
+    ?string $vencimientoActual,
+    int $meses,
+    ?string $cuotaDesde = null,
+    ?int $diaAncla = null,
+  ): DateTimeImmutable {
+    return self::sumarMeses(self::inicioCobertura($fechaPago, $vencimientoActual, $cuotaDesde), $meses, $diaAncla);
+  }
+
+  /** La cuota está al día hasta el día del vencimiento inclusive (es lo que dice el comprobante). */
   public static function estaAlDia(?string $renovacion, DateTimeImmutable $ahora): bool
   {
-    return $renovacion !== null && $ahora <= new DateTimeImmutable($renovacion);
+    return $renovacion !== null && $ahora->format('Y-m-d') <= substr($renovacion, 0, 10);
   }
 
   /** True si faltan (o pasaron) pocos días del vencimiento, para resaltarlo en rojo. */
@@ -104,14 +116,23 @@ final class PagoService
       return [];
     }
 
+    // El ajuste de redondeo va a la clase más cara: así ninguna parte queda negativa.
+    $clases = array_values($clases);
+    $mayor = 0;
+    foreach ($clases as $i => $clase) {
+      if ((float) $clase['price_class'] > (float) $clases[$mayor]['price_class']) {
+        $mayor = $i;
+      }
+    }
+    $montos = [];
+    foreach ($clases as $i => $clase) {
+      $montos[$i] = $i === $mayor ? 0.0 : round($monto * (float) $clase['price_class'] / $cuota, 2);
+    }
+    $montos[$mayor] = round($monto - array_sum($montos), 2);
+
     $partes = [];
-    $asignado = 0.0;
-    $ultima = count($clases) - 1;
-    foreach (array_values($clases) as $i => $clase) {
-      $parte = $i === $ultima
-        ? round($monto - $asignado, 2)
-        : round($monto * (float) $clase['price_class'] / $cuota, 2);
-      $asignado += $parte;
+    foreach ($clases as $i => $clase) {
+      $parte = $montos[$i];
       $partes[] = [
         'id_class' => (int) $clase['id_class'],
         'nombre_clase' => (string) $clase['name_class'],
@@ -157,17 +178,33 @@ final class PagoService
     if ($fechaPago > new DateTimeImmutable('today')) {
       throw new ValidacionException('La fecha de pago no puede ser futura.');
     }
-    $vencimientoActual = $this->pagos->ultimaRenovacion($idUsuario);
-    $renovacion = self::calcularVencimiento($fechaPago, $vencimientoActual, $plan->mesesCubiertos());
 
-    $this->pagos->transaccion(function () use ($idUsuario, $usuario, $fechaPago, $renovacion, $monto, $precio, $clases, $plan, $vencimientoActual): void {
-      $idPago = $this->pagos->crear($idUsuario, $fechaPago, $renovacion, $monto, $precio, $plan->mesesCubiertos(), $plan->idPromocion);
+    $this->pagos->transaccion(function () use ($idUsuario, $usuario, $fechaPago, $monto, $precio, $clases, $plan): void {
+      // Bloquea al alumno hasta el fin de la transacción: dos pagos simultáneos no pueden
+      // leer el mismo vencimiento, y un doble envío del formulario se rechaza.
+      $this->usuarios->bloquearParaActualizar($idUsuario);
+      if ($this->pagos->hayPagoReciente($idUsuario, 20)) {
+        throw new ValidacionException('Ya se registró un pago para este alumno hace instantes (¿doble clic?). Revisá el historial antes de cargar otro.');
+      }
+
+      $ultimo = $this->pagos->ultimoPago($idUsuario);
+      $vencimientoActual = $ultimo['renovacion'] ?? null;
+      $inicio = self::inicioCobertura($fechaPago, $vencimientoActual, $usuario['cuota_desde'] ?? null);
+      // Continúa la cadena de vencimientos: conserva el día ancla del último pago.
+      $ancla = $vencimientoActual !== null && $inicio->format('Y-m-d') === $vencimientoActual
+        ? (int) ($ultimo['dia_ancla'] ?? $inicio->format('d'))
+        : (int) $inicio->format('d');
+      $renovacion = self::sumarMeses($inicio, $plan->mesesCubiertos(), $ancla);
+
+      $idPago = $this->pagos->crear($idUsuario, $fechaPago, $renovacion, $monto, $precio, $plan->mesesCubiertos(), $plan->idPromocion, $inicio, $ancla);
       foreach (self::prorratear($monto, $clases) as $parte) {
         $this->pagos->agregarDetalle($idPago, $parte);
       }
 
       $saldo = $precio - $monto;
-      $adelanto = $vencimientoActual !== null && $fechaPago <= new DateTimeImmutable($vencimientoActual);
+      $cobertura = ', cubre desde el ' . $inicio->format('d-m-Y')
+        . ($vencimientoActual !== null && $fechaPago->format('Y-m-d') <= $vencimientoActual ? ' (adelanto)' : '')
+        . ($vencimientoActual !== null && $fechaPago->format('Y-m-d') > $vencimientoActual && $inicio->format('Y-m-d') === $vencimientoActual ? ' (cuota adeudada)' : '');
       $this->auditoria->registrar(
         'pago.alta',
         sprintf(
@@ -178,7 +215,7 @@ final class PagoService
           $fechaPago->format('d-m-Y'),
           $plan->descripcion(),
           $renovacion->format('d-m-Y'),
-          $adelanto ? ', adelantado desde el vencimiento ' . fecha($vencimientoActual) : '',
+          $cobertura,
           $saldo > 0 ? ' — queda un saldo de ' . dinero($saldo) : ''
         ),
         'usuario',
@@ -200,13 +237,25 @@ final class PagoService
   }
 
   /** Elimina un pago y devuelve el usuario al que pertenecía. */
+  /**
+   * Elimina un pago. Solo se puede eliminar el último pago del alumno: los vencimientos
+   * se encadenan, así que borrar uno intermedio dejaría vencimientos posteriores que
+   * ya no corresponden.
+   */
   public function eliminar(int $idPago): array
   {
     $pago = $this->pagos->buscarPorId($idPago)
       ?? throw new ValidacionException('El pago no existe.');
 
     $usuario = $this->usuarios->buscarPorId((int) $pago['id_user']) ?? [];
-    $this->pagos->eliminar($idPago);
+    $this->pagos->transaccion(function () use ($pago, $idPago): void {
+      $this->usuarios->bloquearParaActualizar((int) $pago['id_user']);
+      if ($this->pagos->idUltimoPago((int) $pago['id_user']) !== $idPago) {
+        throw new ValidacionException('Solo se puede eliminar el último pago del alumno (los vencimientos se encadenan). Eliminá primero los pagos posteriores.');
+      }
+      $this->pagos->eliminar($idPago);
+      $this->emails->cancelarPorClave('comprobante:' . $idPago);
+    });
 
     $this->auditoria->registrar(
       'pago.eliminacion',

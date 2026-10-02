@@ -37,7 +37,7 @@
       <?php endforeach; ?>
     </select>
     <label for="fecha-pago-rapido">Fecha de pago</label>
-    <input type="date" id="fecha-pago-rapido" name="fecha" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" required>
+    <input type="date" id="fecha-pago-rapido" name="fecha" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" data-hoy required>
     <label for="monto-pago-rapido">Monto $ <span class="diminuto">(vacío = precio del plan según sus clases)</span></label>
     <input type="number" id="monto-pago-rapido" name="monto" min="0" step="0.01" placeholder="Precio del plan">
     <div class="dialogo-botones">

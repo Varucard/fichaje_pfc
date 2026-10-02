@@ -12,10 +12,11 @@
     tooltip.textContent = columna.dataset.tooltip;
     tooltip.hidden = false;
     const caja = figura.getBoundingClientRect();
-    const col = columna.getBoundingClientRect();
+    // Se ubica sobre la barra (no sobre toda la columna, que ocupa todo el alto).
+    const col = (columna.querySelector('.segmento') ?? columna).getBoundingClientRect();
     const izquierda = Math.min(Math.max(col.left - caja.left + col.width / 2 - tooltip.offsetWidth / 2, 0), caja.width - tooltip.offsetWidth);
     tooltip.style.left = `${izquierda}px`;
-    tooltip.style.top = `${Math.max(col.top - caja.top - tooltip.offsetHeight + 40, 0)}px`;
+    tooltip.style.top = `${Math.max(col.top - caja.top - tooltip.offsetHeight - 8, 0)}px`;
   }
 
   figura.querySelectorAll('.columna').forEach((columna) => {

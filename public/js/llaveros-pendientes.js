@@ -20,7 +20,9 @@
     copiar.className = 'button_small';
     copiar.textContent = 'Copiar';
     copiar.addEventListener('click', () => {
-      navigator.clipboard?.writeText(uid).then(() => (copiar.textContent = '¡Copiado!'));
+      PFC.copiar(uid)
+        .then(() => (copiar.textContent = '¡Copiado!'))
+        .catch(() => (copiar.textContent = 'Copiá a mano: ' + uid));
     });
     contenido.append(copiar);
 
@@ -28,12 +30,5 @@
     PFC.sonar('alerta');
   }
 
-  function consultar() {
-    PFC.json('/api/llaveros/pendientes')
-      .then((datos) => (datos.llaveros ?? []).forEach(avisar))
-      .catch((error) => console.error('No se pudieron consultar los llaveros:', error));
-  }
-
-  consultar();
-  setInterval(consultar, INTERVALO_MS);
+  PFC.sondear(() => PFC.json('/api/llaveros/pendientes').then((datos) => (datos.llaveros ?? []).forEach(avisar)), INTERVALO_MS);
 })();

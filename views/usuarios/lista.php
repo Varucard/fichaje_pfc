@@ -54,7 +54,9 @@ $ocultarLlavero ??= false;
               <a class="boton button_small" href="<?= url('/usuarios/' . $usuario['dni']) ?>">
                 <i class="fas fa-user"></i> Ver +
               </a>
-              <?php if ($usuario['asset']): ?>
+              <?php if (TipoUsuario::deUsuario($usuario) === TipoUsuario::Administrador): ?>
+                <a class="boton button_small" href="<?= url('/administradores') ?>"><i class="fas fa-user-shield"></i> Admin</a>
+              <?php elseif ($usuario['asset']): ?>
                 <form action="<?= url('/usuarios/' . $usuario['dni'] . '/desactivar') ?>" method="post"
                   data-confirmar="¿Desactivar a <?= e($usuario['user_name']) ?>?">
                   <?= csrf_field() ?>

@@ -41,6 +41,12 @@ final class PagoServiceTest extends TestCase
     self::assertTrue(PagoService::estaAlDia('2025-05-10', new DateTimeImmutable('2025-05-09 20:00')));
   }
 
+  public function testElDiaDelVencimientoTodaviaEstaAlDia(): void
+  {
+    // El comprobante dice "válida hasta el 10/05": ese día puede entrar.
+    self::assertTrue(PagoService::estaAlDia('2025-05-10', new DateTimeImmutable('2025-05-10 23:30')));
+  }
+
   public function testNoEstaAlDiaDespuesDelVencimiento(): void
   {
     self::assertFalse(PagoService::estaAlDia('2025-05-10', new DateTimeImmutable('2025-05-11 08:00')));

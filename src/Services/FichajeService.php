@@ -71,6 +71,10 @@ final class FichajeService
       throw new ValidacionException('El alumno aún no está registrado en ninguna clase.');
     }
 
+    if ($this->fichoRecientemente($idUsuario, $ahora)) {
+      throw new ValidacionException('El alumno ya registró su ingreso hace instantes (llavero o fichada manual).');
+    }
+
     $clase = $this->claseDeLaFichada($idUsuario, $ahora);
     $this->fichajes->registrar($idUsuario, $ahora, $clase['id_class'] ?? null);
     $this->auditoria->registrar(
@@ -95,8 +99,10 @@ final class FichajeService
     if ($usuario === null) {
       // Si el llavero nunca fue asignado lo dejamos pendiente para que el panel lo muestre.
       if ($this->usuarios->buscarUltimoPorRfid($uid) === null) {
-        $this->pendientes->registrar($uid);
-        $this->auditoria->registrar('lector.llavero_desconocido', "Se leyó el llavero desconocido {$uid}", 'llavero', $uid, actor: 'Lector RFID');
+        // Si se pasa varias veces, queda pendiente (y auditado) una sola vez.
+        if ($this->pendientes->registrar($uid)) {
+          $this->auditoria->registrar('lector.llavero_desconocido', "Se leyó el llavero desconocido {$uid}", 'llavero', $uid, actor: 'Lector RFID');
+        }
         return $this->respuesta(EstadoLectura::Desconocido);
       }
       return $this->respuesta(EstadoLectura::Inactivo);

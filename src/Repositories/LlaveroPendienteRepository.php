@@ -10,9 +10,14 @@ namespace App\Repositories;
  */
 final class LlaveroPendienteRepository extends Repository
 {
-  public function registrar(string $uid): void
+  /** Lo deja pendiente si todavía no lo está. Devuelve true si es nuevo. */
+  public function registrar(string $uid): bool
   {
+    if ($this->valor('SELECT EXISTS(SELECT 1 FROM uid_incomes WHERE uid = ?)', [$uid])) {
+      return false;
+    }
     $this->ejecutar('INSERT INTO uid_incomes (uid) VALUES (?)', [$uid]);
+    return true;
   }
 
   /** Devuelve los llaveros pendientes y los marca como vistos (los borra). */

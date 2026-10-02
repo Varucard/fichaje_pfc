@@ -36,6 +36,7 @@ final class App
   public static function ejecutar(): void
   {
     self::configurar();
+    self::encabezadosDeSeguridad();
     Session::iniciar();
 
     $request = Request::desdeGlobales((string) Config::get('app.base_path'));
@@ -55,8 +56,29 @@ final class App
     }
   }
 
+  /**
+   * CSP: solo scripts propios (sin inline), estilos propios + Font Awesome (cdnjs).
+   * Aunque apareciera un XSS, no podría cargar ni ejecutar scripts externos.
+   */
+  private static function encabezadosDeSeguridad(): void
+  {
+    if (headers_sent()) {
+      return;
+    }
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
+      . "font-src 'self' data: https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self'; "
+      . "frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'");
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: same-origin');
+    header('X-Frame-Options: DENY');
+  }
+
   private static function manejarError(Throwable $e, Request $request): void
   {
+    // Clave duplicada (ej. doble clic al matricular o registrar): no es un error del sistema.
+    if ($e instanceof \PDOException && $e->getCode() === '23000' && str_contains($e->getMessage(), 'Duplicate')) {
+      $e = new HttpException(409, 'Ese registro ya existe (¿se envió el formulario dos veces?). Volvé atrás y revisá.');
+    }
     $status = $e instanceof HttpException ? $e->status : 500;
     $mensaje = $e instanceof HttpException ? $e->getMessage() : 'Ocurrió un error inesperado.';
 

@@ -53,8 +53,8 @@ final class UsuarioRepository extends Repository
   {
     return $this->todos(
       "SELECT id_user, user_name, user_surname FROM users
-        WHERE asset = 1 AND DATE_FORMAT(birth_day, '%m-%d') = ?",
-      [$fecha->format('m-d')]
+        WHERE asset = 1 AND (DATE_FORMAT(birth_day, '%m-%d') = ? OR (? AND DATE_FORMAT(birth_day, '%m-%d') = '02-29'))",
+      [$fecha->format('m-d'), $fecha->format('m-d') === '02-28' && !$fecha->format('L') ? 1 : 0]
     );
   }
 
@@ -103,6 +103,18 @@ final class UsuarioRepository extends Repository
       "SELECT * FROM users WHERE type_user = ? AND asset = 1 AND acepta_emails = 1 AND email IS NOT NULL AND email <> ''",
       [TipoUsuario::Alumno->value]
     );
+  }
+
+  /** Bloquea la fila del usuario hasta el fin de la transacción (serializa sus pagos). */
+  public function bloquearParaActualizar(int $id): void
+  {
+    $this->uno('SELECT id_user FROM users WHERE id_user = ? FOR UPDATE', [$id]);
+  }
+
+  /** Desde cuándo se le vuelve a cobrar la cuota (al reactivarlo). */
+  public function establecerCuotaDesde(int $id, ?string $fecha): void
+  {
+    $this->ejecutar('UPDATE users SET cuota_desde = ? WHERE id_user = ?', [$fecha, $id]);
   }
 
   public function asignarTokenBaja(int $id, string $token): void

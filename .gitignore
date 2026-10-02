@@ -12,7 +12,7 @@ firmware/pfc/config.h
 !/storage/logs/.gitkeep
 !/storage/backups/.gitkeep
 !/storage/emails/.gitkeep
-backups/
+/backups/
 
 # Herramientas
 .phpunit.cache/

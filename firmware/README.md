@@ -12,7 +12,9 @@ Lector RFID que se instala en la entrada. Al pasar un llavero consulta al servid
 | LED verde / rojo / amarillo / azul | Pines 4 / 5 / 6 / 7 |
 | Buzzer | Pin 3 |
 
-Los LEDs indican: **amarillo** = encendido, **azul** = listo para leer, **verde** = acceso permitido, **rojo** = acceso denegado o error.
+Los LEDs indican: **amarillo** = encendido, **azul** = listo para leer (reposo), **verde** = acceso permitido, **rojo** = acceso denegado o error.
+
+> ⚠️ **No insertar una tarjeta microSD en el shield**: el LED verde usa el pin 4, que en el shield W5100 es el *chip select* de la microSD.
 
 La carcasa para imprimir en 3D está en [`carcasa-3d/`](carcasa-3d) (`CUERPO.stl` y `TAPA.stl`), y hay fotos del equipo armado en [`imagenes/`](imagenes).
 
@@ -32,7 +34,14 @@ Instalarlas desde **Arduino IDE → Herramientas → Administrar bibliotecas**:
 ## Configuración
 
 1. Copiar `pfc/config.example.h` como `pfc/config.h` (este archivo no se versiona).
-2. Completar las IPs de la red, la IP del servidor y el token.
+2. Completar las IPs de la red, la IP del servidor y el token. Según cómo esté instalado el servidor:
+
+   | Instalación | `PFC_SERVER_PORT` | `PFC_API_PATH` |
+   |---|---|---|
+   | Docker | `8080` | `/api/arduino/lectura` |
+   | XAMPP (`http://servidor/fichaje_pfc`) | `80` | `/fichaje_pfc/api/arduino/lectura` |
+
+   `PFC_HTTP_PORT` (puerto del reinicio remoto, por defecto 8080) tiene que coincidir con `ARDUINO_PORT` del `.env`.
 3. `PFC_API_TOKEN` debe ser **el mismo valor** que `ARDUINO_TOKEN` en el `.env` del servidor.
 4. Placa: **Arduino Mega or Mega 2560**. Subir `pfc/pfc.ino`.
 
@@ -71,15 +80,16 @@ GET /reiniciar
 X-PFC-Token: <token>
 ```
 
-Sin el token correcto, el pedido se rechaza con 403.
+Sin el token correcto, el pedido se rechaza con 403. Cualquier otra ruta responde 404 al instante: el panel la usa para saber si el lector está en línea (`GET /estado`).
 
 ## Robustez
 
-- Cada etapa de la consulta al servidor tiene timeout, así que el lector no se cuelga si el servidor no responde.
+- La consulta al servidor y la lectura de pedidos entrantes tienen un **plazo absoluto** (con lectura byte a byte), así que ni un servidor lento ni un equipo que manda datos de a poco pueden colgar el lector. Si el servidor conecta pero tarda, el lector muestra "Servidor lento / Sin respuesta" (la fichada pudo haberse registrado igual).
 - La respuesta se lee con un límite de 256 bytes, para no agotar la RAM.
 - Si el mismo llavero queda apoyado, se ignora durante 5 segundos.
 - El watchdog reinicia la placa sola si algo se traba más de 8 segundos.
-- Al arrancar avisa si no detecta el shield Ethernet o si el cable de red está desconectado.
+- Al arrancar avisa si no detecta el shield Ethernet. El aviso de cable desconectado solo funciona con los chips W5200/W5500; el **W5100 no informa el estado del cable**.
+- **Bootloader:** el reinicio (remoto y por watchdog) usa el watchdog del AVR. Algunos Arduino Mega o clones con el bootloader viejo quedan en un bucle de reinicios. Si pasa, actualizar el bootloader (Optiboot) desde el IDE (*Quemar bootloader*). Hay que probarlo una vez con la placa real.
 
 ## Pruebas de módulos
 

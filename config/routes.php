@@ -41,6 +41,9 @@ return function (Router $r): void {
   // Baja de avisos por email (link público incluido en cada aviso)
   $r->get('/emails/baja/{token:[0-9a-f]{32}}', [EmailController::class, 'mostrarBaja']);
   $r->post('/emails/baja/{token:[0-9a-f]{32}}', [EmailController::class, 'confirmarBaja']);
+  // Baja en un clic (RFC 8058): la envía Gmail sin token CSRF; la autentica el token del link.
+  $r->post('/emails/baja/{token:[0-9a-f]{32}}/un-clic', [EmailController::class, 'bajaUnClic'], ['sin_csrf']);
+  $r->get('/emails/baja/{token:[0-9a-f]{32}}/un-clic', [EmailController::class, 'mostrarBaja']);
 
   $r->grupo(['auth'], function (Router $r): void {
     $r->post('/logout', [AuthController::class, 'logout']);

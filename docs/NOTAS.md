@@ -22,8 +22,6 @@
 - [x] Liquidación de profesores.
 - [x] Stock.
 
-## Pendientes / errores conocidos
-
 ## Resueltos en 3.2.0
 - [x] Emails a los alumnos: vencimiento, deuda, cumpleaños, inasistencia, bienvenida y comprobante de pago.
 - [x] Mostrar en las fichadas a qué clase corresponden (deducido por horario).
@@ -36,6 +34,9 @@
 
 ## Resueltos en 3.4.0
 - [x] Backups automáticos, estado del lector con alertas, reporte de caja, exportación a Excel, gestión de administradores, protección del login y ventanas propias.
+
+## Pendientes / a verificar
+- [ ] Probar con la placa real el reinicio remoto y el watchdog (bootloader del Mega, ver firmware/README.md).
 
 ## Mejoras a futuro (consultar)
 - [ ] Factura electrónica de ARCA (ex AFIP): requiere CUIT, certificado digital y definir el tipo de factura.

@@ -34,17 +34,17 @@ $activo = (bool) $producto['activo'];
     <div class="resumen-dato"><span>Precio de venta</span><strong><?= e(dinero($producto['precio'])) ?></strong></div>
   </div>
 
-  <?php if ($activo): ?>
+  <?php if ($activo): $mov = old('tipo_movimiento'); ?>
     <h2>Registrar movimiento</h2>
     <div class="movimientos">
       <form action="<?= url($ruta . '/movimientos') ?>" method="post" class="tarjeta-movimiento">
         <?= csrf_field() ?>
         <input type="hidden" name="tipo" value="venta">
         <h3><i class="fas fa-cash-register"></i> Venta</h3>
-        <label>Cantidad <input type="number" name="cantidad" min="1" step="1" value="1" required></label>
-        <label>Precio unitario $ <input type="number" name="precio" min="0" step="0.01" value="<?= e($producto['precio']) ?>"></label>
-        <label>DNI del cliente (opcional) <input type="text" name="dni" inputmode="numeric" pattern="\d{7,8}"></label>
-        <label>Observación <input type="text" name="observacion" maxlength="255"></label>
+        <label>Cantidad <input type="number" name="cantidad" min="1" step="1" value="<?= e($mov === 'venta' ? old('cantidad', '1') : '1') ?>" required></label>
+        <label>Precio unitario $ <input type="number" name="precio" min="0" step="0.01" value="<?= e($mov === 'venta' ? old('precio', $producto['precio']) : $producto['precio']) ?>"></label>
+        <label>DNI del cliente (opcional) <input type="text" name="dni" inputmode="numeric" pattern="\d{7,8}" value="<?= e($mov === 'venta' ? old('dni') : '') ?>"></label>
+        <label>Observación <input type="text" name="observacion" maxlength="255" value="<?= e($mov === 'venta' ? old('observacion') : '') ?>"></label>
         <button type="submit">Registrar venta</button>
       </form>
 
@@ -74,7 +74,12 @@ $activo = (bool) $producto['activo'];
   <h2>Datos del producto</h2>
   <form action="<?= url($ruta . '/actualizar') ?>" method="post" class="form-container">
     <?= csrf_field() ?>
-    <?= $this->renderParcial('stock/_campos_producto', ['producto' => $producto]) ?>
+    <?= $this->renderParcial('stock/_campos_producto', ['producto' => [
+      'nombre' => old('nombre', $producto['nombre']),
+      'descripcion' => old('descripcion', $producto['descripcion']),
+      'precio' => old('precio', $producto['precio']),
+      'stock_minimo' => old('stock_minimo', $producto['stock_minimo']),
+    ]]) ?>
     <div class="form-botones">
       <button type="submit"><i class="fas fa-sync-alt"></i> Actualizar producto</button>
     </div>

@@ -63,14 +63,49 @@ function old(string $campo, mixed $default = ''): mixed
   return $viejos[$campo] ?? $default;
 }
 
+/**
+ * ¿Es una ruta interna de la app? Debe empezar con una sola "/" y no tener barras
+ * invertidas ni caracteres de control (los navegadores tratan "/\\sitio" como "//sitio").
+ */
+function es_ruta_interna(string $ruta): bool
+{
+  return (bool) preg_match('#^/(?![/\\\\])[^\\\\\x00-\x1f\x7f]*$#', $ruta);
+}
+
 /** Redirige a una ruta interna de la app. Rutas externas se ignoran (evita open redirect). */
 function redirigir(string $ruta): never
 {
-  if (!str_starts_with($ruta, '/') || str_starts_with($ruta, '//')) {
+  if (!es_ruta_interna($ruta)) {
     $ruta = '/dashboard';
   }
   header('Location: ' . url($ruta));
   exit;
+}
+
+/** Fecha AAAA-MM-DD estricta: rechaza fechas imposibles como 2025-02-30 (que PHP "corrige"). */
+function fecha_valida(?string $valor): ?DateTimeImmutable
+{
+  $valor = trim((string) $valor);
+  $fecha = DateTimeImmutable::createFromFormat('!Y-m-d', $valor);
+  return $fecha && $fecha->format('Y-m-d') === $valor ? $fecha : null;
+}
+
+/**
+ * Monto escrito a mano: "12500", "12.500", "12.500,50", "12500,5" o "12500.50".
+ * El punto con grupos de 3 dígitos es separador de miles; la coma, decimal.
+ */
+function monto_desde_texto(?string $valor): ?float
+{
+  $valor = str_replace(['$', ' '], '', trim((string) $valor));
+  if ($valor === '') {
+    return null;
+  }
+  if (str_contains($valor, ',')) {
+    $valor = str_replace(['.', ','], ['', '.'], $valor);
+  } elseif (preg_match('/^\d{1,3}(\.\d{3})+$/', $valor)) {
+    $valor = str_replace('.', '', $valor);
+  }
+  return is_numeric($valor) ? (float) $valor : null;
 }
 
 function fecha(?string $valor, string $formato = 'd-m-Y'): string
@@ -87,7 +122,9 @@ function fecha_hora(?string $valor): string
   return fecha($valor, 'd-m-Y H:i:s');
 }
 
+/** $12.500 o $12.500,50 (muestra centavos solo si los hay). */
 function dinero(int|float|string|null $monto): string
 {
-  return '$' . number_format((float) $monto, 0, ',', '.');
+  $monto = round((float) $monto, 2);
+  return ($monto < 0 ? '-$' : '$') . number_format(abs($monto), fmod($monto, 1.0) != 0.0 ? 2 : 0, ',', '.');
 }

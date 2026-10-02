@@ -28,11 +28,19 @@ final class AvisosTest extends TestCase
     $lunes = new DateTimeImmutable('2025-05-05');
     $bloque = AvisosService::bloqueDeDias($lunes, 7);
 
-    $mismoBloque = 0;
-    for ($i = 0; $i < 7; $i++) {
-      $mismoBloque += AvisosService::bloqueDeDias($lunes->modify("+{$i} days"), 7) === $bloque ? 1 : 0;
+    // Cada bloque (= un recordatorio como máximo) abarca 7 días consecutivos, nunca más.
+    $diasPorBloque = [];
+    $anterior = null;
+    $cambios = 0;
+    for ($i = 0; $i < 70; $i++) {
+      $actual = AvisosService::bloqueDeDias($lunes->modify("+{$i} days"), 7);
+      $diasPorBloque[$actual] = ($diasPorBloque[$actual] ?? 0) + 1;
+      $cambios += $anterior !== null && $actual !== $anterior ? 1 : 0;
+      $anterior = $actual;
     }
-    self::assertGreaterThanOrEqual(1, $mismoBloque);
+    self::assertLessThanOrEqual(7, max($diasPorBloque));
+    self::assertSame(count($diasPorBloque) - 1, $cambios, 'Los días de un bloque son consecutivos');
+    self::assertContains(count($diasPorBloque), [10, 11], '70 días = 10 u 11 bloques según dónde arranque');
     self::assertNotSame($bloque, AvisosService::bloqueDeDias($lunes->modify('+7 days'), 7), 'A los 7 días cambia el bloque');
   }
 
@@ -52,5 +60,21 @@ final class AvisosTest extends TestCase
   public function testNumeroDeComprobante(): void
   {
     self::assertSame('00000123', ComprobanteService::numero(123));
+  }
+
+  public function testCumpleaniosDel29DeFebrero(): void
+  {
+    self::assertTrue(AvisosService::cumpleHoy('2000-02-29', new DateTimeImmutable('2025-02-28')), 'Año no bisiesto: se saluda el 28/02');
+    self::assertFalse(AvisosService::cumpleHoy('2000-02-29', new DateTimeImmutable('2024-02-28')), 'Año bisiesto: se espera al 29');
+    self::assertTrue(AvisosService::cumpleHoy('2000-02-29', new DateTimeImmutable('2024-02-29')));
+    self::assertTrue(AvisosService::cumpleHoy('1990-05-10', new DateTimeImmutable('2025-05-10')));
+  }
+
+  public function testMontosConCentavosSoloCuandoLosHay(): void
+  {
+    self::assertSame('$12.500', dinero(12500));
+    self::assertSame('$0,40', dinero(0.4), 'Un saldo de 40 centavos no se muestra como $0');
+    self::assertSame('$3.333,33', dinero(3333.333));
+    self::assertSame('-$150', dinero(-150));
   }
 }

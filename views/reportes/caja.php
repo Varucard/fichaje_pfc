@@ -29,7 +29,7 @@ $alto = fn (float $valor) => $maximo > 0 ? round($valor / $maximo * 100, 2) : 0;
 <div class="resumen">
   <div class="resumen-dato"><span>Cuotas <?= (int) $anio ?> (<?= (int) $totales['pagos'] ?> pagos)</span><strong><?= e(dinero($totales['cuotas'])) ?></strong></div>
   <div class="resumen-dato"><span>Ventas de productos</span><strong><?= e(dinero($totales['ventas'])) ?></strong></div>
-  <div class="resumen-dato exito"><span>Total · vs. <?= (int) $anio - 1 ?>: <?= e($variacion($totales['variacion'])) ?></span><strong><?= e(dinero($totales['total'])) ?></strong></div>
+  <div class="resumen-dato exito"><span>Total · meses cerrados vs. <?= (int) $anio - 1 ?>: <?= e($variacion($totales['variacion'])) ?></span><strong><?= e(dinero($totales['total'])) ?></strong></div>
 </div>
 
 <figure class="grafico-caja" aria-labelledby="titulo-grafico">
@@ -49,6 +49,7 @@ $alto = fn (float $valor) => $maximo > 0 ? round($valor / $maximo * 100, 2) : 0;
     <div class="grafico-barras">
       <?php foreach ($meses as $m): ?>
         <a class="columna <?= $m['futuro'] ? 'futuro' : '' ?> <?= $m['mes'] === $mes_detalle ? 'elegida' : '' ?>"
+          <?= $m['futuro'] ? 'tabindex="-1" aria-hidden="true"' : '' ?>
           href="<?= url('/reportes/caja', ['anio' => $anio, 'mes' => $m['mes']]) ?>"
           data-tooltip="<?= e($m['nombre'] . ' ' . $anio . "\nCuotas: " . dinero($m['cuotas']) . "\nVentas: " . dinero($m['ventas']) . "\nTotal: " . dinero($m['total']) . ($m['variacion'] !== null ? "\nvs. año anterior: " . $variacion($m['variacion']) : '')) ?>"
           aria-label="<?= e($m['nombre'] . ': total ' . dinero($m['total'])) ?>">
@@ -76,7 +77,7 @@ $alto = fn (float $valor) => $maximo > 0 ? round($valor / $maximo * 100, 2) : 0;
           <td><?= e(dinero($m['cuotas'])) ?></td>
           <td><?= e(dinero($m['ventas'])) ?></td>
           <td><strong><?= e(dinero($m['total'])) ?></strong></td>
-          <td class="diminuto"><?= e($variacion($m['variacion'])) ?></td>
+          <td class="diminuto"><?= $m['en_curso'] ? 'en curso' : e($variacion($m['variacion'])) ?></td>
         </tr>
       <?php endforeach; ?>
     </tbody>

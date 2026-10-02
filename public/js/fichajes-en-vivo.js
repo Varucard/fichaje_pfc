@@ -27,6 +27,14 @@
     return td;
   }
 
+  // DNI con link a la ficha, igual que en la búsqueda.
+  function celdaDni(dni, clase) {
+    const td = celda('', clase);
+    const link = Object.assign(document.createElement('a'), { href: PFC.url('/usuarios/' + encodeURIComponent(dni)), textContent: dni });
+    td.appendChild(link);
+    return td;
+  }
+
   let ultimoId = null;
 
   function dibujar(fichajes) {
@@ -46,7 +54,7 @@
       const alerta = f.pago_cerca ? 'cerca-de-vencer' : '';
       fila.append(
         celda(f.rfid),
-        celda(f.dni, alerta),
+        celdaDni(f.dni, alerta),
         celda(f.alumno, 'diminuto'),
         celda(formatear(f.addmission_date, true), 'diminuto'),
         celda(f.clase ?? 'Sin clase', f.clase ? 'diminuto' : 'diminuto texto-aviso'),
@@ -56,12 +64,5 @@
     }));
   }
 
-  function actualizar() {
-    PFC.json('/api/fichajes/ultimos')
-      .then(dibujar)
-      .catch((error) => console.error('No se pudieron cargar los fichajes:', error));
-  }
-
-  actualizar();
-  setInterval(actualizar, INTERVALO_MS);
+  PFC.sondear(() => PFC.json('/api/fichajes/ultimos').then(dibujar), INTERVALO_MS);
 })();

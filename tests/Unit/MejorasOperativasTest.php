@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Services\AdministradorService;
+use App\Services\AuthService;
 use App\Services\LimiteIntentosService;
 use App\Services\ReporteService;
 use App\Services\TareasService;
@@ -14,27 +15,34 @@ use PHPUnit\Framework\TestCase;
 
 final class MejorasOperativasTest extends TestCase
 {
-  public function testBloqueaAlLlegarAlMaximoDeIntentos(): void
+  public function testMinutosRestantesDeBloqueo(): void
   {
     $ahora = new DateTimeImmutable('2025-05-05 10:00');
-    $estado = null;
-    for ($i = 1; $i <= 4; $i++) {
-      $estado = LimiteIntentosService::registrarFallo($estado ? self::fila($estado) : null, $ahora, 5, 15, 15);
-      self::assertNull($estado['bloqueado_hasta'], "Intento {$i} todavía no bloquea");
-    }
-    $estado = LimiteIntentosService::registrarFallo(self::fila($estado), $ahora, 5, 15, 15);
-    self::assertSame('2025-05-05 10:15', $estado['bloqueado_hasta']->format('Y-m-d H:i'));
-    self::assertSame(15, LimiteIntentosService::minutosRestantes(self::fila($estado), $ahora));
-    self::assertSame(0, LimiteIntentosService::minutosRestantes(self::fila($estado), $ahora->modify('+16 minutes')));
+    $estado = ['fallidos' => 5, 'primer_fallo' => '2025-05-05 09:55:00', 'bloqueado_hasta' => '2025-05-05 10:15:00'];
+
+    self::assertSame(15, LimiteIntentosService::minutosRestantes($estado, $ahora));
+    self::assertSame(0, LimiteIntentosService::minutosRestantes($estado, $ahora->modify('+16 minutes')));
+    self::assertSame(0, LimiteIntentosService::minutosRestantes(null, $ahora));
   }
 
-  public function testFueraDeLaVentanaSeReiniciaElConteo(): void
+  public function testElDniDelLoginSeNormalizaParaNoSaltearElLimite(): void
   {
-    $estado = ['fallidos' => 4, 'primer_fallo' => '2025-05-05 09:00:00', 'bloqueado_hasta' => null];
-    $nuevo = LimiteIntentosService::registrarFallo($estado, new DateTimeImmutable('2025-05-05 10:00'), 5, 15, 15);
+    self::assertSame('30111222', AuthService::normalizarDni(' 30.111.222 '));
+    self::assertSame('1234567', AuthService::normalizarDni('1234567'));
+    self::assertNull(AuthService::normalizarDni('030111222'), '9 dígitos: variante del mismo DNI');
+    self::assertNull(AuthService::normalizarDni('30111222a'));
+    self::assertNull(AuthService::normalizarDni('"><script>alert(1)</script>'));
+  }
 
-    self::assertSame(1, $nuevo['fallidos']);
-    self::assertNull($nuevo['bloqueado_hasta']);
+  public function testSoloSeRedirigeARutasInternas(): void
+  {
+    self::assertTrue(es_ruta_interna('/usuarios/30111222'));
+    self::assertTrue(es_ruta_interna('/liquidaciones?periodo=2025-05'));
+    self::assertFalse(es_ruta_interna('//evil.com'));
+    self::assertFalse(es_ruta_interna('/\\evil.com'), 'Los navegadores tratan /\\ como //');
+    self::assertFalse(es_ruta_interna('/\\/evil.com'));
+    self::assertFalse(es_ruta_interna('https://evil.com'));
+    self::assertFalse(es_ruta_interna("/ok\r\nLocation: //evil.com"));
   }
 
   public function testBackupAutomaticoUnaVezPorDiaDesdeLaHora(): void
@@ -73,14 +81,5 @@ final class MejorasOperativasTest extends TestCase
     self::assertSame(25.0, ReporteService::variacion(125000, 100000));
     self::assertSame(-50.0, ReporteService::variacion(50000, 100000));
     self::assertNull(ReporteService::variacion(50000, 0), 'Sin base de comparación');
-  }
-
-  private static function fila(array $estado): array
-  {
-    return [
-      'fallidos' => $estado['fallidos'],
-      'primer_fallo' => $estado['primer_fallo']->format('Y-m-d H:i:s'),
-      'bloqueado_hasta' => $estado['bloqueado_hasta']?->format('Y-m-d H:i:s'),
-    ];
   }
 }

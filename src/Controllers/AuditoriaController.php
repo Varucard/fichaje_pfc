@@ -50,6 +50,6 @@ final class AuditoriaController extends Controller
 
   private function fecha(?string $valor): string
   {
-    return $valor && \DateTimeImmutable::createFromFormat('!Y-m-d', $valor) ? $valor : '';
+    return fecha_valida($valor) ? (string) $valor : '';
   }
 }

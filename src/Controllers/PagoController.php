@@ -50,10 +50,10 @@ final class PagoController extends Controller
   public function manual(Request $request): void
   {
     $volver = $request->input('volver', '/dashboard');
-    $fecha = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $request->input('fecha', ''));
+    $fecha = fecha_valida($request->input('fecha'));
 
     try {
-      if ($fecha === false) {
+      if ($fecha === null) {
         throw new ValidacionException('La fecha de pago no es válida.');
       }
       $plan = $this->promociones->planDesde($request->input('plan'));
@@ -65,20 +65,15 @@ final class PagoController extends Controller
     $this->exito('Pago registrado exitosamente.', '/usuarios/' . $usuario['dni']);
   }
 
-  /** Monto opcional del formulario ("12.500,50" o "12500.50"). Vacío = cuota completa. */
+  /** Monto opcional del formulario. Vacío = precio del plan. */
   private function monto(Request $request): ?float
   {
-    $valor = str_replace(['$', ' '], '', (string) $request->input('monto', ''));
-    if ($valor === '') {
-      return null;
-    }
-    if (str_contains($valor, ',')) {
-      $valor = str_replace(['.', ','], ['', '.'], $valor);
-    }
-    if (!is_numeric($valor)) {
+    $texto = (string) $request->input('monto', '');
+    $monto = monto_desde_texto($texto);
+    if (trim($texto) !== '' && $monto === null) {
       throw new ValidacionException('El monto no es válido.');
     }
-    return (float) $valor;
+    return $monto;
   }
 
   public function eliminar(Request $request, string $idPago): void

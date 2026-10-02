@@ -57,6 +57,10 @@ $existente = $usuarios->buscarPorDni($dni);
 if ($existente) {
   $usuarios->actualizarPassword((int) $existente['id_user'], $hash);
   echo "Contraseña actualizada para {$existente['user_name']} (DNI {$dni}).\n";
+  if (!(int) $existente['asset']) {
+    $usuarios->cambiarEstado((int) $existente['id_user'], true);
+    echo "El usuario estaba inactivo: se reactivó para que pueda iniciar sesión.\n";
+  }
   if (TipoUsuario::deUsuario($existente) !== TipoUsuario::Administrador) {
     echo "Atención: el usuario no es de tipo ADMINISTRADOR, pero ya puede iniciar sesión.\n";
   }

@@ -12,7 +12,9 @@ use App\Exceptions\HttpException;
  * Middlewares disponibles:
  *  - auth:    exige sesión iniciada.
  *  - invitado: solo sin sesión (pantalla de login).
- * Toda ruta POST valida además el token CSRF.
+ *  - sin_csrf: no valida el token CSRF. SOLO para rutas autenticadas por un token propio
+ *    en la URL (la baja de emails en un clic, que la envía el cliente de correo).
+ * Toda otra ruta POST valida el token CSRF.
  */
 final class Router
 {
@@ -89,19 +91,24 @@ final class Router
 
   private function aplicarMiddleware(array $middleware, Request $request): void
   {
-    if ($request->metodo() === 'POST' && !Csrf::valido($request->input('_token'))) {
+    $sinCsrf = in_array('sin_csrf', $middleware, true);
+    if ($request->metodo() === 'POST' && !$sinCsrf && !Csrf::valido($request->input('_token'))) {
       throw new HttpException(403, 'La sesión expiró o el formulario es inválido. Volvé a cargar la página e intentá de nuevo.');
     }
 
     foreach ($middleware as $nombre) {
       switch ($nombre) {
         case 'auth':
-          if (!Auth::mantenerVigente(registrarActividad: !$request->esApi())) {
+          if (!Auth::mantenerVigente(registrarActividad: !$request->esApi())
+            || !$this->container->get(\App\Services\AuthService::class)->sesionVigente(Auth::usuario())) {
             if ($request->esApi()) {
               throw new HttpException(401, 'No autenticado');
             }
             redirigir('/login');
           }
+          break;
+        case 'sin_csrf':
+          // Solo para rutas autenticadas por un token propio en la URL (baja de emails).
           break;
         case 'invitado':
           if (Auth::check()) {

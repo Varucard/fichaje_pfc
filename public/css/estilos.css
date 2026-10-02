@@ -518,3 +518,11 @@ tr.resaltada td:first-child { box-shadow: inset 4px 0 0 #1c7ed6; }
 .dialogo input, .dialogo select { width: 100%; box-sizing: border-box; margin: 0; }
 .dialogo-botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
 .dialogo-botones button { margin: 0; }
+
+/* Tablas: water.css usa table-layout: fixed; con columnas de contenido variable
+   (emails, asuntos, formularios en celdas) se desbordaban. */
+.tabla table, .detalle table { table-layout: auto; }
+.tabla td, .detalle td { overflow-wrap: anywhere; }
+.etiqueta-neutra, .etiqueta-debug { background: var(--background); color: var(--text-muted); }
+.estado-lector.sin-configurar { color: var(--pfc-aviso); }
+.estado-lector.sin-configurar .punto { background: var(--pfc-aviso); }

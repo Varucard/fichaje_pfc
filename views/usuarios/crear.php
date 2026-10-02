@@ -40,6 +40,7 @@ $clasesElegidas = array_map('intval', (array) old('clases', []));
   </div>
 
   <fieldset class="opciones-alta">
+    <legend>Tipo de alta:</legend>
     <label><input type="radio" name="opcion_alta" value="" <?= $opcion === '' ? 'checked' : '' ?>> Cliente sin pago</label>
     <label><input type="radio" name="opcion_alta" value="pago" <?= $opcion === 'pago' ? 'checked' : '' ?>> Cliente con pago</label>
     <label><input type="radio" name="opcion_alta" value="profesor" <?= $opcion === 'profesor' ? 'checked' : '' ?>> Profesor</label>

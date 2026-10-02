@@ -27,7 +27,9 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
   <h1><?= e($titulo) ?></h1>
   <div class="cabecera-acciones">
     <a class="boton" href="<?= url($rutaLista) ?>"><i class="fas fa-undo-alt"></i> Volver</a>
-    <?php if ($activo): ?>
+    <?php if ($tipo === TipoUsuario::Administrador): ?>
+      <a class="boton" href="<?= url('/administradores') ?>"><i class="fas fa-user-shield"></i> Gestionar en Administradores</a>
+    <?php elseif ($activo): ?>
       <form action="<?= url($rutaUsuario . '/desactivar') ?>" method="post" data-confirmar="¿Inhabilitar a <?= e($usuario['user_name']) ?>?">
         <?= csrf_field() ?>
         <button type="submit" class="peligro"><i class="fas fa-trash"></i> Inhabilitar <?= e($etiqueta) ?></button>
@@ -52,29 +54,29 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
 
     <div class="form-group">
       <label for="rfid">N° de llavero:</label>
-      <input type="text" id="rfid" name="rfid" value="<?= e($usuario['rfid']) ?>">
+      <input type="text" id="rfid" name="rfid" value="<?= e(old('rfid', $usuario['rfid'])) ?>">
 
       <label for="dni">N° de DNI:</label>
       <input type="text" id="dni" name="dni" inputmode="numeric" pattern="\d{7,8}" value="<?= e($usuario['dni']) ?>" required>
 
       <label for="name">Nombre:</label>
-      <input type="text" id="name" name="name" value="<?= e($usuario['user_name']) ?>" required>
+      <input type="text" id="name" name="name" value="<?= e(old('name', $usuario['user_name'])) ?>" required>
     </div>
 
     <div class="form-group">
       <label for="surname">Apellido:</label>
-      <input type="text" id="surname" name="surname" value="<?= e($usuario['user_surname']) ?>">
+      <input type="text" id="surname" name="surname" value="<?= e(old('surname', $usuario['user_surname'])) ?>">
 
       <label for="birth_day">Fecha de Nacimiento:</label>
-      <input type="date" id="birth_day" name="birth_day" value="<?= e($usuario['birth_day']) ?>">
+      <input type="date" id="birth_day" name="birth_day" value="<?= e(old('birth_day', $usuario['birth_day'])) ?>">
     </div>
 
     <div class="form-group">
       <label for="email">Email:</label>
-      <input type="email" id="email" name="email" value="<?= e($usuario['email']) ?>">
+      <input type="email" id="email" name="email" value="<?= e(old('email', $usuario['email'])) ?>">
 
       <label for="phone">Teléfono:</label>
-      <input type="tel" id="phone" name="phone" value="<?= e($usuario['phone_number']) ?>">
+      <input type="tel" id="phone" name="phone" value="<?= e(old('phone', $usuario['phone_number'])) ?>">
     </div>
 
     <?php if ($activo): ?>
@@ -124,7 +126,7 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
 
         <form action="<?= url('/pagos/manual') ?>" method="post" class="form-en-linea" data-form-pago data-cuota="<?= e((string) $deuda['cuota']) ?>">
           <?= csrf_field() ?>
-          <input type="hidden" name="dni" value="<?= e($usuario['dni']) ?>">
+          <input type="hidden" name="dni" value="<?= e(old('dni', $usuario['dni'])) ?>">
           <input type="hidden" name="volver" value="<?= e($rutaUsuario) ?>">
           <label for="plan_pago">Plan:</label>
           <select id="plan_pago" name="plan">
@@ -146,6 +148,8 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
       </div>
       <?php if ($deuda['renovacion'] && $deuda['meses'] === 0): ?>
         <p class="diminuto">💡 La cuota está al día hasta el <?= e(fecha($deuda['renovacion'])) ?>: si paga ahora, los meses se suman desde esa fecha (no pierde días).</p>
+      <?php elseif ($deuda['meses'] > 0): ?>
+        <p class="diminuto">💡 Adeuda <?= (int) $deuda['meses'] ?> cuota(s): el próximo pago cubre primero la cuota más vieja adeudada.</p>
       <?php endif; ?>
       <?php if ($deuda['cuota'] <= 0): ?>
         <p class="diminuto texto-peligro">El alumno no está en ninguna clase: su cuota es $0.</p>
@@ -164,6 +168,7 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
           </tr>
         </thead>
         <tbody>
+          <?php $idUltimoPago = max(array_map('intval', array_column($pagos, 'id_payment'))); ?>
           <?php foreach ($pagos as $pago): ?>
             <tr>
               <td><?= e(fecha($pago['discharge_date'])) ?></td>
@@ -185,12 +190,14 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
               </td>
               <td class="celda-acciones">
                 <a class="boton button_small" href="<?= url('/pagos/' . $pago['id_payment'] . '/comprobante') ?>" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> Comprobante</a>
-                <form action="<?= url('/pagos/' . $pago['id_payment'] . '/eliminar') ?>" method="post"
-                  data-confirmar="¿Eliminar el pago del <?= e(fecha($pago['discharge_date'])) ?>?">
-                  <?= csrf_field() ?>
-                  <input type="hidden" name="volver" value="<?= e($rutaUsuario) ?>">
-                  <button type="submit" class="button_small peligro"><i class="fas fa-trash"></i> Eliminar pago</button>
-                </form>
+                <?php if ((int) $pago['id_payment'] === $idUltimoPago): ?>
+                  <form action="<?= url('/pagos/' . $pago['id_payment'] . '/eliminar') ?>" method="post"
+                    data-confirmar="¿Eliminar el pago del <?= e(fecha($pago['discharge_date'])) ?>?">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="volver" value="<?= e($rutaUsuario) ?>">
+                    <button type="submit" class="button_small peligro"><i class="fas fa-trash"></i> Eliminar pago</button>
+                  </form>
+                <?php endif; ?>
               </td>
             </tr>
           <?php endforeach; ?>
