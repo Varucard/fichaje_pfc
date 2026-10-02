@@ -1,3 +1,20 @@
+# Configuración local y secretos
 .env
-.vscode
-backups
+firmware/pfc/config.h
+
+# Dependencias
+/vendor/
+
+# Archivos generados en ejecución
+/storage/logs/*
+/storage/backups/*
+!/storage/logs/.gitkeep
+!/storage/backups/.gitkeep
+backups/
+
+# Herramientas
+.phpunit.cache/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

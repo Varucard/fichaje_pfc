@@ -1,0 +1,10 @@
+# Normaliza fines de línea a LF en el repositorio (evita diffs fantasma CRLF/LF en Windows/WSL)
+* text=auto eol=lf
+
+*.bat  text eol=crlf
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary
+*.stl  binary
+*.pdf  binary
