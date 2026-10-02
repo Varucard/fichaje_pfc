@@ -13,8 +13,10 @@ final class PagoRepository extends Repository
   public function ultimosDeUsuario(int $idUsuario, int $limite = 5): array
   {
     $stmt = $this->pdo->prepare(
-      'SELECT id_payment, id_user, discharge_date, date_of_renovation, monto, monto_cuota FROM payments
-        WHERE id_user = :id ORDER BY discharge_date DESC, id_payment DESC LIMIT :limite'
+      'SELECT p.id_payment, p.id_user, p.discharge_date, p.date_of_renovation, p.monto, p.monto_cuota,
+          p.meses_cubiertos, pr.nombre AS promocion
+        FROM payments p LEFT JOIN promociones pr ON pr.id = p.id_promocion
+        WHERE p.id_user = :id ORDER BY p.discharge_date DESC, p.id_payment DESC LIMIT :limite'
     );
     $stmt->bindValue('id', $idUsuario, PDO::PARAM_INT);
     $stmt->bindValue('limite', $limite, PDO::PARAM_INT);
@@ -84,10 +86,13 @@ final class PagoRepository extends Repository
     DateTimeInterface $fechaRenovacion,
     float $monto,
     float $cuota,
+    int $mesesCubiertos = 1,
+    ?int $idPromocion = null,
   ): int {
     $this->ejecutar(
-      'INSERT INTO payments (id_user, discharge_date, date_of_renovation, monto, monto_cuota) VALUES (?, ?, ?, ?, ?)',
-      [$idUsuario, $fechaPago->format('Y-m-d'), $fechaRenovacion->format('Y-m-d'), $monto, $cuota]
+      'INSERT INTO payments (id_user, discharge_date, date_of_renovation, monto, monto_cuota, meses_cubiertos, id_promocion)
+        VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [$idUsuario, $fechaPago->format('Y-m-d'), $fechaRenovacion->format('Y-m-d'), $monto, $cuota, $mesesCubiertos, $idPromocion]
     );
     return (int) $this->pdo->lastInsertId();
   }
@@ -102,20 +107,37 @@ final class PagoRepository extends Repository
   }
 
   /**
-   * Total cobrado por cada clase entre dos fechas (según la fecha de pago).
+   * Lo cobrado por cada clase que corresponde a un mes (AAAA-MM).
+   * Un pago de varios meses se reparte en partes iguales entre los meses que cubre,
+   * empezando por el mes del pago (un pago de 3 meses suma 1/3 a cada mes).
    *
    * @return array<int, float> id_class => monto
    */
-  public function cobradoPorClase(DateTimeInterface $desde, DateTimeInterface $hasta): array
+  public function cobradoPorClase(string $periodo): array
   {
+    [$anio, $mes] = array_map('intval', explode('-', $periodo));
     $filas = $this->todos(
-      'SELECT pc.id_class, SUM(pc.monto) AS total
+      'SELECT pc.id_class, SUM(pc.monto / p.meses_cubiertos) AS total
         FROM payment_classes pc JOIN payments p ON p.id_payment = pc.id_payment
-        WHERE p.discharge_date BETWEEN ? AND ? AND pc.id_class IS NOT NULL
+        WHERE pc.id_class IS NOT NULL
+          AND ? BETWEEN (YEAR(p.discharge_date) * 12 + MONTH(p.discharge_date))
+                    AND (YEAR(p.discharge_date) * 12 + MONTH(p.discharge_date) + p.meses_cubiertos - 1)
         GROUP BY pc.id_class',
-      [$desde->format('Y-m-d'), $hasta->format('Y-m-d')]
+      [$anio * 12 + $mes]
     );
     return array_column(array_map(fn ($f) => ['id' => (int) $f['id_class'], 'total' => (float) $f['total']], $filas), 'total', 'id');
+  }
+
+  /** Texto del plan de un pago para el comprobante. */
+  public function descripcionPlan(array $pago): string
+  {
+    $meses = (int) ($pago['meses_cubiertos'] ?? 1);
+    $texto = $meses === 1 ? '1 mes' : "{$meses} meses";
+    if (!empty($pago['id_promocion'])) {
+      $nombre = $this->valor('SELECT nombre FROM promociones WHERE id = ?', [$pago['id_promocion']]);
+      $texto .= $nombre ? " — Promoción {$nombre}" : '';
+    }
+    return $texto;
   }
 
   /** Reparto del pago por clase. */

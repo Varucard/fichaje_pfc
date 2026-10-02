@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\Config;
+use App\Domain\PlanDePago;
 use App\Domain\TipoUsuario;
 use App\Exceptions\ValidacionException;
 use App\Repositories\MatriculaRepository;
@@ -38,11 +39,35 @@ final class PagoService
    */
   public static function calcularRenovacion(DateTimeImmutable $fechaPago): DateTimeImmutable
   {
-    $renovacion = $fechaPago->modify('+1 month');
-    if ((int) $renovacion->format('d') < (int) $fechaPago->format('d')) {
-      $renovacion = $renovacion->modify('last day of previous month');
+    return self::sumarMeses($fechaPago, 1);
+  }
+
+  /**
+   * Suma N meses conservando el día; si ese día no existe en el mes destino,
+   * usa el último día del mes (31/01 + 1 = 28/02; 31/01 + 3 = 30/04).
+   */
+  public static function sumarMeses(DateTimeImmutable $fecha, int $meses): DateTimeImmutable
+  {
+    $destino = $fecha->modify('first day of this month')->modify("+{$meses} month");
+    $dia = min((int) $fecha->format('d'), (int) $destino->format('t'));
+    return $destino->setDate((int) $destino->format('Y'), (int) $destino->format('m'), $dia);
+  }
+
+  /**
+   * Nuevo vencimiento de un pago que cubre N meses.
+   * Si el alumno paga antes de que venza (adelanto), los meses se suman desde su
+   * vencimiento actual para que no pierda días; si ya venció, desde la fecha de pago.
+   */
+  public static function calcularVencimiento(DateTimeImmutable $fechaPago, ?string $vencimientoActual, int $meses): DateTimeImmutable
+  {
+    $base = $fechaPago;
+    if ($vencimientoActual !== null) {
+      $actual = new DateTimeImmutable($vencimientoActual);
+      if ($fechaPago <= $actual) {
+        $base = $actual;
+      }
     }
-    return $renovacion;
+    return self::sumarMeses($base, $meses);
   }
 
   /** La cuota está al día si la fecha actual no superó el vencimiento. */
@@ -104,9 +129,10 @@ final class PagoService
   }
 
   /**
-   * Registra un pago. Sin fecha se usa hoy; sin monto se cobra la cuota completa.
+   * Registra un pago. Sin fecha se usa hoy; sin plan, 1 mes; sin monto se cobra el
+   * precio del plan (cuota × meses, o el precio de la promoción).
    */
-  public function registrar(int $idUsuario, ?DateTimeImmutable $fechaPago = null, ?float $monto = null): array
+  public function registrar(int $idUsuario, ?DateTimeImmutable $fechaPago = null, ?float $monto = null, ?PlanDePago $plan = null): array
   {
     $usuario = $this->usuarios->buscarPorId($idUsuario)
       ?? throw new ValidacionException('El usuario no existe.');
@@ -118,9 +144,11 @@ final class PagoService
       throw new ValidacionException('Solo los alumnos pagan cuota.');
     }
 
+    $plan ??= PlanDePago::meses(1);
     $clases = $this->matriculas->clasesDeAlumno($idUsuario);
     $cuota = self::cuota($clases);
-    $monto = round($monto ?? $cuota, 2);
+    $precio = $plan->precio($cuota);
+    $monto = round($monto ?? $precio, 2);
     if ($monto < 0) {
       throw new ValidacionException('El monto no puede ser negativo.');
     }
@@ -129,29 +157,33 @@ final class PagoService
     if ($fechaPago > new DateTimeImmutable('today')) {
       throw new ValidacionException('La fecha de pago no puede ser futura.');
     }
-    $renovacion = self::calcularRenovacion($fechaPago);
+    $vencimientoActual = $this->pagos->ultimaRenovacion($idUsuario);
+    $renovacion = self::calcularVencimiento($fechaPago, $vencimientoActual, $plan->mesesCubiertos());
 
-    $this->pagos->transaccion(function () use ($idUsuario, $usuario, $fechaPago, $renovacion, $monto, $cuota, $clases): void {
-      $idPago = $this->pagos->crear($idUsuario, $fechaPago, $renovacion, $monto, $cuota);
+    $this->pagos->transaccion(function () use ($idUsuario, $usuario, $fechaPago, $renovacion, $monto, $precio, $clases, $plan, $vencimientoActual): void {
+      $idPago = $this->pagos->crear($idUsuario, $fechaPago, $renovacion, $monto, $precio, $plan->mesesCubiertos(), $plan->idPromocion);
       foreach (self::prorratear($monto, $clases) as $parte) {
         $this->pagos->agregarDetalle($idPago, $parte);
       }
 
-      $saldo = $cuota - $monto;
+      $saldo = $precio - $monto;
+      $adelanto = $vencimientoActual !== null && $fechaPago <= new DateTimeImmutable($vencimientoActual);
       $this->auditoria->registrar(
         'pago.alta',
         sprintf(
-          'Pago de %s %s por %s del %s (vence %s)%s',
+          'Pago de %s %s por %s del %s — %s (vence %s)%s%s',
           $usuario['user_name'],
           $usuario['user_surname'],
           dinero($monto),
           $fechaPago->format('d-m-Y'),
+          $plan->descripcion(),
           $renovacion->format('d-m-Y'),
+          $adelanto ? ', adelantado desde el vencimiento ' . fecha($vencimientoActual) : '',
           $saldo > 0 ? ' — queda un saldo de ' . dinero($saldo) : ''
         ),
         'usuario',
         $usuario['dni'],
-        ['id_pago' => $idPago, 'monto' => $monto, 'cuota' => $cuota],
+        ['id_pago' => $idPago, 'monto' => $monto, 'precio' => $precio, 'meses' => $plan->mesesCubiertos(), 'id_promocion' => $plan->idPromocion],
       );
       $this->avisos->comprobante($idPago, $usuario);
     });
@@ -159,12 +191,12 @@ final class PagoService
     return $usuario;
   }
 
-  public function registrarPorDni(string $dni, ?DateTimeImmutable $fechaPago = null, ?float $monto = null): array
+  public function registrarPorDni(string $dni, ?DateTimeImmutable $fechaPago = null, ?float $monto = null, ?PlanDePago $plan = null): array
   {
     $usuario = $this->usuarios->buscarPorDni($dni)
       ?? throw new ValidacionException('No existe un usuario con ese DNI.');
 
-    return $this->registrar((int) $usuario['id_user'], $fechaPago, $monto);
+    return $this->registrar((int) $usuario['id_user'], $fechaPago, $monto, $plan);
   }
 
   /** Elimina un pago y devuelve el usuario al que pertenecía. */

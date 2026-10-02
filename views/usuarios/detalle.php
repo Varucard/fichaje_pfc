@@ -12,6 +12,7 @@
  * @var array $fichajes
  * @var array $historial
  * @var array $emails
+ * @var array<int, App\Domain\PlanDePago> $promociones
  */
 use App\Domain\TipoUsuario;
 
@@ -121,17 +122,31 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
           <button type="submit"><i class="fas fa-wallet"></i> Renovar pago hoy (<?= e(dinero($deuda['cuota'])) ?>)</button>
         </form>
 
-        <form action="<?= url('/pagos/manual') ?>" method="post" class="form-en-linea">
+        <form action="<?= url('/pagos/manual') ?>" method="post" class="form-en-linea" data-form-pago data-cuota="<?= e((string) $deuda['cuota']) ?>">
           <?= csrf_field() ?>
           <input type="hidden" name="dni" value="<?= e($usuario['dni']) ?>">
           <input type="hidden" name="volver" value="<?= e($rutaUsuario) ?>">
+          <label for="plan_pago">Plan:</label>
+          <select id="plan_pago" name="plan">
+            <?php foreach ([1, 2, 3, 6, 12] as $meses): ?>
+              <option value="meses:<?= $meses ?>" data-pagos="<?= $meses ?>" data-bonificados="0" data-descuento="0"><?= $meses === 1 ? '1 mes' : "{$meses} meses" ?></option>
+            <?php endforeach; ?>
+            <?php foreach ($promociones as $promo): ?>
+              <option value="promo:<?= (int) $promo->idPromocion ?>" data-pagos="<?= $promo->mesesPagos ?>"
+                data-bonificados="<?= $promo->mesesBonificados ?>" data-descuento="<?= e((string) $promo->descuento) ?>">🏷️ <?= e($promo->descripcion()) ?></option>
+            <?php endforeach; ?>
+          </select>
           <label for="fecha_pago">Fecha:</label>
           <input type="date" id="fecha_pago" name="fecha" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" required>
           <label for="monto_pago">Monto $:</label>
           <input type="number" id="monto_pago" name="monto" min="0" step="0.01" value="<?= e((string) $deuda['cuota']) ?>" class="input-monto" required>
-          <button type="submit"><i class="fas fa-hand-paper"></i> Pago manual</button>
+          <button type="submit"><i class="fas fa-hand-paper"></i> Registrar pago</button>
+          <span class="diminuto" data-detalle-plan></span>
         </form>
       </div>
+      <?php if ($deuda['renovacion'] && $deuda['meses'] === 0): ?>
+        <p class="diminuto">💡 La cuota está al día hasta el <?= e(fecha($deuda['renovacion'])) ?>: si paga ahora, los meses se suman desde esa fecha (no pierde días).</p>
+      <?php endif; ?>
       <?php if ($deuda['cuota'] <= 0): ?>
         <p class="diminuto texto-peligro">El alumno no está en ninguna clase: su cuota es $0.</p>
       <?php endif; ?>
@@ -152,7 +167,12 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
           <?php foreach ($pagos as $pago): ?>
             <tr>
               <td><?= e(fecha($pago['discharge_date'])) ?></td>
-              <td><?= e(fecha($pago['date_of_renovation'])) ?></td>
+              <td>
+                <?= e(fecha($pago['date_of_renovation'])) ?>
+                <?php if ((int) $pago['meses_cubiertos'] > 1 || $pago['promocion']): ?>
+                  <br><span class="diminuto"><?= (int) $pago['meses_cubiertos'] ?> meses<?= $pago['promocion'] ? ' · ' . e($pago['promocion']) : '' ?></span>
+                <?php endif; ?>
+              </td>
               <td>
                 <?php if ($pago['monto'] === null): ?>
                   <span class="diminuto">Sin dato</span>
@@ -201,14 +221,14 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
     <h2>Liquidaciones</h2>
     <table>
       <thead>
-        <tr><th>Período</th><th>Base</th><th>%</th><th>Monto</th><th>Estado</th></tr>
+        <tr><th>Período</th><th>Base</th><th>Modo</th><th>Monto</th><th>Estado</th></tr>
       </thead>
       <tbody>
         <?php foreach ($liquidaciones as $liquidacion): ?>
           <tr>
             <td><a href="<?= url('/liquidaciones', ['periodo' => $liquidacion['periodo']]) ?>"><?= e($liquidacion['periodo']) ?></a></td>
-            <td><?= e(dinero($liquidacion['monto_base'])) ?></td>
-            <td><?= e($liquidacion['porcentaje'] + 0) ?>%</td>
+            <td><?= $liquidacion['modo'] === 'asistencia' ? e($liquidacion['monto_base'] + 0) . ' asist.' : e(dinero($liquidacion['monto_base'])) ?></td>
+            <td><?= $liquidacion['modo'] === 'asistencia' ? e(dinero($liquidacion['monto_por_asistencia'])) . ' / asist.' : e($liquidacion['porcentaje'] + 0) . '%' ?></td>
             <td><?= e(dinero($liquidacion['monto'])) ?></td>
             <td><?= $liquidacion['pagada'] ? 'Pagada ' . e(fecha($liquidacion['fecha_pago'])) : 'Pendiente de pago' ?></td>
           </tr>

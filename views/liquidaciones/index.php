@@ -22,8 +22,9 @@
 </div>
 
 <p class="diminuto">
-  Base = lo cobrado en el mes en las clases del profesor (dividido si la clase tiene varios profesores).
-  Monto = base × porcentaje. Los pagos anteriores a la versión 3.1 no tienen reparto por clase y no se incluyen.
+  <strong>% de lo cobrado:</strong> base = lo cobrado en el mes en sus clases (los pagos de varios meses se reparten entre esos meses).
+  <strong>Por asistencia:</strong> base = ingresos de alumnos a sus clases en el mes (según la clase de cada fichada).
+  Si una clase tiene varios profesores, su base se divide entre ellos.
 </p>
 
 <div class="tabla">
@@ -36,7 +37,7 @@
           <th>Profesor</th>
           <th>Clases</th>
           <th>Base</th>
-          <th>%</th>
+          <th>Modo</th>
           <th>Monto</th>
           <th>Estado</th>
         </tr>
@@ -56,22 +57,32 @@
                 Sin clases
               <?php else: ?>
                 <?php foreach ($calculo['detalle'] as $clase): ?>
-                  <?= e($clase['clase']) ?>: <?= e(dinero($clase['cobrado'])) ?><?= $clase['profesores'] > 1 ? ' ÷ ' . (int) $clase['profesores'] : '' ?><br>
+                  <?= e($clase['clase']) ?>:
+                  <?= isset($clase['asistencias']) ? (int) $clase['asistencias'] . ' asist.' : e(dinero($clase['cobrado'])) ?><?= $clase['profesores'] > 1 ? ' ÷ ' . (int) $clase['profesores'] : '' ?><br>
                 <?php endforeach; ?>
               <?php endif; ?>
             </td>
-            <td><?= e(dinero($calculo['base'])) ?></td>
+            <td><?= $calculo['modo'] === 'asistencia' ? e($calculo['base'] + 0) . ' asist.' : e(dinero($calculo['base'])) ?></td>
             <td>
               <?php if ($registrada): ?>
-                <?= e($calculo['porcentaje'] + 0) ?>%
-              <?php else: ?>
-                <form action="<?= url('/liquidaciones/profesores/' . $profesor['id_user'] . '/porcentaje') ?>" method="post" class="form-porcentaje">
+                <?= $calculo['modo'] === 'asistencia' ? e(dinero($calculo['monto_por_asistencia'])) . ' / asist.' : e($calculo['porcentaje'] + 0) . '%' ?>
+              <?php else:
+                $esAsistencia = $calculo['modo'] === 'asistencia';
+                $valor = $esAsistencia
+                  ? (string) ($profesor['monto_por_asistencia'] ?? '')
+                  : ($fila['porcentaje_propio'] ? (string) ($calculo['porcentaje'] + 0) : '');
+              ?>
+                <form action="<?= url('/liquidaciones/profesores/' . $profesor['id_user'] . '/configuracion') ?>" method="post" class="form-porcentaje">
                   <?= csrf_field() ?>
                   <input type="hidden" name="periodo" value="<?= e($periodo) ?>">
-                  <input type="number" name="porcentaje" min="0" max="100" step="0.5"
-                    value="<?= $fila['porcentaje_propio'] ? e($calculo['porcentaje'] + 0) : '' ?>"
-                    placeholder="<?= e($calculo['porcentaje'] + 0) ?>" title="Vacío = porcentaje por defecto">
-                  <button type="submit" class="button_small" title="Guardar porcentaje"><i class="fas fa-check"></i></button>
+                  <select name="modo" aria-label="Modo de liquidación">
+                    <option value="porcentaje" <?= $esAsistencia ? '' : 'selected' ?>>% cobrado</option>
+                    <option value="asistencia" <?= $esAsistencia ? 'selected' : '' ?>>$ por asistencia</option>
+                  </select>
+                  <input type="number" name="valor" min="0" step="0.01" value="<?= e($valor) ?>"
+                    placeholder="<?= $esAsistencia ? '$' : e($fila['porcentaje_defecto'] + 0) . '%' ?>"
+                    title="Porcentaje (vacío = por defecto) o monto por asistencia">
+                  <button type="submit" class="button_small" title="Guardar"><i class="fas fa-check"></i></button>
                 </form>
               <?php endif; ?>
             </td>

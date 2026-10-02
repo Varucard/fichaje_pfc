@@ -7,6 +7,7 @@
  * @var string $numero
  * @var array $gimnasio
  * @var string|null $logo
+ * @var string $plan
  */
 ?>
 <!DOCTYPE html>
@@ -45,7 +46,8 @@
     <tr><th>Cliente</th><td><?= e(trim($usuario['user_name'] . ' ' . $usuario['user_surname'])) ?></td></tr>
     <tr><th>DNI</th><td><?= e($usuario['dni']) ?></td></tr>
     <tr><th>Fecha de pago</th><td><?= e(fecha($pago['discharge_date'])) ?></td></tr>
-    <tr><th>Período cubierto</th><td>Del <?= e(fecha($pago['discharge_date'])) ?> al <?= e(fecha($pago['date_of_renovation'])) ?></td></tr>
+    <tr><th>Plan</th><td><?= e($plan) ?></td></tr>
+    <tr><th>Cuota válida hasta</th><td><?= e(fecha($pago['date_of_renovation'])) ?></td></tr>
   </table>
 
   <table>
@@ -54,7 +56,7 @@
       <?php if ($detalle): ?>
         <?php foreach ($detalle as $linea): ?>
           <tr>
-            <td>Cuota mensual — <?= e($linea['nombre_clase']) ?></td>
+            <td>Cuota — <?= e($linea['nombre_clase']) ?><?= (int) $pago['meses_cubiertos'] > 1 ? ' (' . (int) $pago['meses_cubiertos'] . ' meses)' : '' ?></td>
             <td class="num"><?= e(dinero($linea['precio_clase'])) ?></td>
             <td class="num"><?= e(dinero($linea['monto'])) ?></td>
           </tr>

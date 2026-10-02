@@ -4,7 +4,7 @@ Sistema de control de asistencia, pagos de cuotas y clases para el **Palillo Fig
 
 - Alta y gestión de clientes (alumnos) y profesores.
 - Clases con profesores y alumnos matriculados.
-- Pagos de cuotas con monto, cálculo automático de vencimiento y control de deuda.
+- Pagos de cuotas con monto, de varios meses o con promociones (ej: 3 + 1 gratis), adelantos sin pérdida de días y control de deuda.
 - Fichadas automáticas con llavero RFID o manuales desde el panel, con la clase deducida por horario.
 - Control de deuda y liquidación mensual de profesores.
 - Stock de productos con ventas, entradas y ajustes de inventario.
@@ -118,10 +118,13 @@ Resumen: el lector consulta `GET /api/arduino/lectura?uid=…&auth=<ARDUINO_TOKE
   - el **monto cobrado** (por defecto la cuota completa; se puede cargar otro valor en *Pago manual*),
   - la **cuota** que correspondía en ese momento,
   - el **reparto por clase**, proporcional al precio (tabla `payment_classes`), que es la base de la liquidación de profesores.
+- **Plan del pago**: 1, 2, 3, 6 o 12 meses (cuota × meses) o una **promoción** activa. El monto se completa solo según el plan y se puede modificar (pago parcial).
+- **Adelanto**: si el alumno paga **antes** de que venza, los meses se suman desde su vencimiento actual (no pierde días). Si ya venció, se cuentan desde la fecha de pago.
+- **Promociones** (panel → *Promociones*): "N meses pagos + M bonificados", con descuento opcional. Ejemplos: "3 + 1 gratis" (3 pagos, 1 bonificado) o "Semestral 10 % off" (6 pagos, 10 %). No se borran: se desactivan, para conservar el historial de los pagos que las usaron.
 - **Deuda** = cuotas vencidas × cuota actual + saldos de pagos parciales (cuota − monto cobrado). Un alumno con clases que nunca pagó adeuda una cuota. Los pagos anteriores a la v3.1 (sin monto) se consideran completos.
 - **Deudores** (panel → *Deudores*): alumnos activos con deuda, de mayor a menor, con la deuda total.
 - No se puede desactivar a un alumno con deuda.
-- En el alta, el cliente se puede matricular directamente en sus clases. Para el alta *con pago*, elegir al menos una.
+- En el alta, el cliente se puede matricular directamente en sus clases, y al crear una clase se pueden elegir sus profesores y alumnos. Para el alta *con pago*, elegir al menos una.
 
 ---
 
@@ -129,8 +132,14 @@ Resumen: el lector consulta `GET /api/arduino/lectura?uid=…&auth=<ARDUINO_TOKE
 
 Panel → *Liquidaciones* (o el botón *Liquidar* en la ficha del profesor).
 
-- **Base** = lo cobrado en el mes (según la fecha de pago) en las clases que dicta el profesor, tomando el reparto por clase de cada pago. Si una clase tiene varios profesores, lo cobrado se divide en partes iguales.
-- **Monto** = base × porcentaje del profesor. Cada profesor puede tener su propio porcentaje (se edita en la misma pantalla); si no tiene uno, se usa `LIQUIDACION_PORCENTAJE` (por defecto 50 %).
+Cada profesor se liquida en uno de dos modos, que se elige en la misma pantalla:
+
+| Modo | Base | Monto |
+|---|---|---|
+| **% de lo cobrado** (por defecto) | Lo cobrado en el mes en sus clases, según el reparto por clase de cada pago. Un pago de varios meses se reparte en partes iguales entre los meses que cubre. | Base × porcentaje del profesor (si no tiene uno propio, `LIQUIDACION_PORCENTAJE`, por defecto 50 %) |
+| **$ por asistencia** | Ingresos de alumnos a sus clases en el mes, según la clase de cada fichada (ver *Horarios*) | Base × monto por asistencia |
+
+Si una clase tiene varios profesores, la base de esa clase se divide en partes iguales.
 - Flujo: el cálculo se ve en vivo → **Registrar** (guarda el monto y el detalle; no cambia aunque después entren más pagos) → **Pagar**. Una liquidación registrada y no pagada se puede **Anular** para recalcularla.
 - Se usan los profesores asignados actualmente a cada clase. Los pagos anteriores a la v3.1 no tienen reparto por clase y no cuentan.
 
@@ -221,6 +230,7 @@ Cada migración aplicada se registra en la tabla `migraciones`, así que es segu
 | 007 | Tablas `productos` y `movimientos_stock` |
 | 008 | Emails: `emails_cola`, `configuracion` y preferencia de avisos en `users` |
 | 009 | Horarios de clases (`clase_horarios`) y clase de cada fichada (`incomes.id_class`) |
+| 010 | Promociones, meses cubiertos por pago y liquidación por asistencia |
 
 ---
 
@@ -277,6 +287,7 @@ Convenciones:
 | `user_class` / `teacher_class` | Matriculaciones de alumnos / profesores |
 | `payments` | Pagos: fecha, vencimiento (`date_of_renovation`), monto cobrado y cuota |
 | `payment_classes` | Parte de cada pago asignada a cada clase |
+| `promociones` | Promociones de pago (meses pagos, bonificados, descuento) |
 | `liquidaciones` | Liquidaciones mensuales de profesores (una por profesor y período) |
 | `productos` / `movimientos_stock` | Productos y su historial de entradas, ventas y ajustes |
 | `emails_cola` | Emails encolados, enviados o con error |

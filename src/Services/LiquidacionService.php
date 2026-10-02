@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\Config;
 use App\Domain\TipoUsuario;
 use App\Exceptions\ValidacionException;
+use App\Repositories\FichajeRepository;
 use App\Repositories\LiquidacionRepository;
 use App\Repositories\MatriculaRepository;
 use App\Repositories\PagoRepository;
@@ -15,14 +16,15 @@ use App\Repositories\UsuarioRepository;
 use DateTimeImmutable;
 
 /**
- * Liquidación mensual de profesores.
+ * Liquidación mensual de profesores. Cada profesor se liquida en uno de dos modos:
  *
- * Para cada clase que dicta el profesor se toma lo cobrado en el mes (según la fecha de
- * pago y el reparto por clase de cada pago). Si la clase tiene varios profesores, ese
- * monto se divide en partes iguales. Al total se le aplica el porcentaje del profesor.
+ * - porcentaje: % de lo cobrado en el mes en sus clases (según el reparto por clase de
+ *   cada pago; un pago de varios meses se reparte entre esos meses).
+ * - asistencia: $ fijo por cada ingreso de un alumno a sus clases en el mes (según la
+ *   clase deducida por horario en cada fichada).
  *
- * Se usan los profesores asignados actualmente a cada clase. Los pagos registrados
- * antes de la v3.1 no tienen reparto por clase y no se incluyen.
+ * Si una clase tiene varios profesores, la base de esa clase se divide en partes iguales.
+ * Se usan los profesores asignados actualmente a cada clase.
  */
 final class LiquidacionService
 {
@@ -32,6 +34,7 @@ final class LiquidacionService
     private readonly MatriculaRepository $matriculas,
     private readonly UsuarioRepository $usuarios,
     private readonly AuditoriaService $auditoria,
+    private readonly FichajeRepository $fichajes,
   ) {
   }
 
@@ -68,6 +71,38 @@ final class LiquidacionService
     ];
   }
 
+  /**
+   * Cálculo puro del modo asistencia.
+   *
+   * @param array<int, int> $asistenciasPorClase id_class => ingresos en el período
+   * @return array{detalle: array, base: float, monto_por_asistencia: float, monto: float}
+   */
+  public static function calcularAsistencia(array $clases, array $asistenciasPorClase, float $montoPorAsistencia): array
+  {
+    $detalle = [];
+    $base = 0.0;
+    foreach ($clases as $clase) {
+      $asistencias = (int) ($asistenciasPorClase[(int) $clase['id_class']] ?? 0);
+      $profesores = max(1, (int) $clase['profesores_en_clase']);
+      $parte = round($asistencias / $profesores, 2);
+      $base += $parte;
+      $detalle[] = [
+        'id_class' => (int) $clase['id_class'],
+        'clase' => $clase['name_class'],
+        'asistencias' => $asistencias,
+        'profesores' => $profesores,
+        'base' => $parte,
+      ];
+    }
+
+    return [
+      'detalle' => $detalle,
+      'base' => round($base, 2),
+      'monto_por_asistencia' => $montoPorAsistencia,
+      'monto' => round($base * $montoPorAsistencia, 2),
+    ];
+  }
+
   public static function validarPeriodo(?string $periodo): string
   {
     $periodo = (string) $periodo;
@@ -84,6 +119,32 @@ final class LiquidacionService
       : (float) Config::get('liquidaciones.porcentaje_defecto', 50);
   }
 
+  public static function modoDe(array $profesor): string
+  {
+    return ($profesor['modo_liquidacion'] ?? null) === 'asistencia' ? 'asistencia' : 'porcentaje';
+  }
+
+  /** Calcula la liquidación de un profesor según su modo. Devuelve el cálculo con 'modo'. */
+  private function calcularPara(array $profesor, array $clases, array $cobrado, array $asistencias): array
+  {
+    if (self::modoDe($profesor) === 'asistencia') {
+      return ['modo' => 'asistencia', 'porcentaje' => null]
+        + self::calcularAsistencia($clases, $asistencias, (float) ($profesor['monto_por_asistencia'] ?? 0));
+    }
+    return ['modo' => 'porcentaje', 'monto_por_asistencia' => null]
+      + self::calcular($clases, $cobrado, $this->porcentajeDe($profesor));
+  }
+
+  /** @return array{0: array<int, float>, 1: array<int, int>} cobrado y asistencias por clase del período */
+  private function basesDelPeriodo(string $periodo): array
+  {
+    $desde = new DateTimeImmutable($periodo . '-01');
+    return [
+      $this->pagos->cobradoPorClase($periodo),
+      $this->fichajes->asistenciasPorClase($desde, $desde->modify('last day of this month')),
+    ];
+  }
+
   /**
    * Liquidación de todos los profesores activos para un período (AAAA-MM).
    * Las ya registradas muestran los valores guardados; las demás, el cálculo actual.
@@ -91,8 +152,7 @@ final class LiquidacionService
   public function resumen(string $periodo): array
   {
     $periodo = self::validarPeriodo($periodo);
-    $desde = new DateTimeImmutable($periodo . '-01');
-    $cobrado = $this->pagos->cobradoPorClase($desde, $desde->modify('last day of this month'));
+    [$cobrado, $asistencias] = $this->basesDelPeriodo($periodo);
     $registradas = $this->liquidaciones->delPeriodo($periodo);
 
     $clasesPorProfesor = [];
@@ -111,12 +171,14 @@ final class LiquidacionService
 
       $calculo = $registrada
         ? [
+          'modo' => $registrada['modo'],
           'detalle' => json_decode((string) $registrada['detalle'], true) ?: [],
           'base' => (float) $registrada['monto_base'],
-          'porcentaje' => (float) $registrada['porcentaje'],
+          'porcentaje' => $registrada['porcentaje'] !== null ? (float) $registrada['porcentaje'] : null,
+          'monto_por_asistencia' => $registrada['monto_por_asistencia'] !== null ? (float) $registrada['monto_por_asistencia'] : null,
           'monto' => (float) $registrada['monto'],
         ]
-        : self::calcular($clasesPorProfesor[$id] ?? [], $cobrado, $this->porcentajeDe($profesor));
+        : $this->calcularPara($profesor, $clasesPorProfesor[$id] ?? [], $cobrado, $asistencias);
 
       $totales['a_liquidar'] += $calculo['monto'];
       if ($registrada) {
@@ -131,6 +193,7 @@ final class LiquidacionService
         'calculo' => $calculo,
         'registrada' => $registrada,
         'porcentaje_propio' => $profesor['porcentaje_liquidacion'] !== null,
+        'porcentaje_defecto' => (float) Config::get('liquidaciones.porcentaje_defecto', 50),
       ];
     }
 
@@ -149,16 +212,12 @@ final class LiquidacionService
       throw new ValidacionException("La liquidación de {$profesor['user_name']} para {$periodo} ya está registrada.");
     }
 
-    $desde = new DateTimeImmutable($periodo . '-01');
     $clases = array_values(array_filter(
       $this->matriculas->clasesDeProfesores(),
       fn (array $fila) => (int) $fila['id_user'] === $idProfesor
     ));
-    $calculo = self::calcular(
-      $clases,
-      $this->pagos->cobradoPorClase($desde, $desde->modify('last day of this month')),
-      $this->porcentajeDe($profesor)
-    );
+    [$cobrado, $asistencias] = $this->basesDelPeriodo($periodo);
+    $calculo = $this->calcularPara($profesor, $clases, $cobrado, $asistencias);
 
     $this->liquidaciones->transaccion(function () use ($idProfesor, $periodo, $calculo, $profesor): void {
       $id = $this->liquidaciones->crear([
@@ -166,13 +225,24 @@ final class LiquidacionService
         'periodo' => $periodo,
         'monto_base' => $calculo['base'],
         'porcentaje' => $calculo['porcentaje'],
+        'modo' => $calculo['modo'],
+        'monto_por_asistencia' => $calculo['monto_por_asistencia'],
         'monto' => $calculo['monto'],
         'detalle' => json_encode($calculo['detalle'], JSON_UNESCAPED_UNICODE),
         'id_admin' => Auth::usuario()['id'] ?? null,
       ]);
       $this->auditoria->registrar(
         'liquidacion.alta',
-        sprintf('Liquidación %s de %s %s: %s (%s%% de %s)', $periodo, $profesor['user_name'], $profesor['user_surname'], dinero($calculo['monto']), $calculo['porcentaje'] + 0, dinero($calculo['base'])),
+        sprintf(
+          'Liquidación %s de %s %s: %s (%s)',
+          $periodo,
+          $profesor['user_name'],
+          $profesor['user_surname'],
+          dinero($calculo['monto']),
+          $calculo['modo'] === 'asistencia'
+            ? ($calculo['base'] + 0) . ' asistencias × ' . dinero($calculo['monto_por_asistencia'])
+            : ($calculo['porcentaje'] + 0) . '% de ' . dinero($calculo['base'])
+        ),
         'usuario',
         $profesor['dni'],
         ['id_liquidacion' => $id] + $calculo,
@@ -218,21 +288,37 @@ final class LiquidacionService
     return $liquidacion;
   }
 
-  /** Porcentaje propio del profesor. Vacío = usa el valor por defecto. */
-  public function actualizarPorcentaje(int $idProfesor, ?float $porcentaje): void
+  /**
+   * Modo de liquidación del profesor y su valor:
+   * - porcentaje: % (vacío = porcentaje por defecto)
+   * - asistencia: $ por asistencia (obligatorio)
+   */
+  public function actualizarConfiguracion(int $idProfesor, string $modo, ?float $valor): void
   {
     $profesor = $this->profesor($idProfesor);
-    if ($porcentaje !== null && ($porcentaje < 0 || $porcentaje > 100)) {
-      throw new ValidacionException('El porcentaje debe estar entre 0 y 100.');
+
+    if ($modo === 'asistencia') {
+      if ($valor === null || $valor <= 0) {
+        throw new ValidacionException('Ingresá el monto por asistencia.');
+      }
+      $this->usuarios->actualizarLiquidacion($idProfesor, 'asistencia', $profesor['porcentaje_liquidacion'] !== null ? (float) $profesor['porcentaje_liquidacion'] : null, $valor);
+      $detalle = dinero($valor) . ' por asistencia';
+    } elseif ($modo === 'porcentaje') {
+      if ($valor !== null && ($valor < 0 || $valor > 100)) {
+        throw new ValidacionException('El porcentaje debe estar entre 0 y 100.');
+      }
+      $this->usuarios->actualizarLiquidacion($idProfesor, null, $valor, $profesor['monto_por_asistencia'] !== null ? (float) $profesor['monto_por_asistencia'] : null);
+      $detalle = $valor === null ? 'porcentaje por defecto' : ($valor + 0) . '% de lo cobrado';
+    } else {
+      throw new ValidacionException('Modo de liquidación no válido.');
     }
 
-    $this->usuarios->actualizarPorcentajeLiquidacion($idProfesor, $porcentaje);
     $this->auditoria->registrar(
-      'liquidacion.porcentaje',
-      sprintf('Porcentaje de liquidación de %s %s: %s', $profesor['user_name'], $profesor['user_surname'], $porcentaje === null ? 'valor por defecto' : ($porcentaje + 0) . '%'),
+      'liquidacion.configuracion',
+      "Liquidación de {$profesor['user_name']} {$profesor['user_surname']}: {$detalle}",
       'usuario',
       $profesor['dni'],
-      ['antes' => $profesor['porcentaje_liquidacion'], 'despues' => $porcentaje],
+      ['modo' => $modo, 'valor' => $valor],
     );
   }
 

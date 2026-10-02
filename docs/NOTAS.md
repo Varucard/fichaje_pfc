@@ -28,6 +28,11 @@
 - [x] Emails a los alumnos: vencimiento, deuda, cumpleaños, inasistencia, bienvenida y comprobante de pago.
 - [x] Mostrar en las fichadas a qué clase corresponden (deducido por horario).
 
+## Resueltos en 3.3.0
+- [x] Promociones (ej: abono de 3 meses y 1 gratis).
+- [x] Adelanto de pagos y pagos de varios meses.
+- [x] Agregar alumnos al momento de crear una clase.
+- [x] Liquidación de profesores por asistencia.
+
 ## Mejoras a futuro (consultar)
 - [ ] Factura electrónica de ARCA (ex AFIP): requiere CUIT, certificado digital y definir el tipo de factura.
-- [ ] Liquidar a los profesores por asistencia (ahora que cada fichada tiene clase), como alternativa al % de lo cobrado.
