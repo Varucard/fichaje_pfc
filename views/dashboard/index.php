@@ -35,6 +35,7 @@ $this->script('llaveros-pendientes');
   <a class="boton" href="<?= url('/clientes') ?>"><i class="fas fa-users"></i> Clientes</a>
   <a class="boton" href="<?= url('/profesores') ?>"><i class="fas fa-user-graduate"></i> Profesores</a>
   <a class="boton" href="<?= url('/fichajes') ?>"><i class="fas fa-clipboard-check"></i> Últimos Ingresos</a>
+  <a class="boton" href="<?= url('/deudores') ?>"><i class="fas fa-file-invoice-dollar"></i> Deudores</a>
 </section>
 
 <section class="acciones acciones-sistema">

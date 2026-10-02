@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.1.0] - Sin publicar
+
+### Logs y auditoría
+- Auditoría de acciones (quién hizo qué y cuándo, con los cambios realizados): pantalla *Auditoría* con filtros, e historial en la ficha de cada usuario.
+- Logs técnicos con niveles, contexto de la petición, registro de accesos rechazados y 404, limpieza automática y visor en el panel.
+
+### Base de datos
+- Migrador (`bin/migrar.php`) con control de migraciones aplicadas.
+- DNI único, claves foráneas y limpieza de matriculaciones huérfanas o repetidas.
+
+### Pagos y deuda
+- Los pagos guardan el monto cobrado y la cuota (suma de las clases del alumno), y se reparten por clase.
+- Pagos parciales: la diferencia queda como saldo adeudado.
+- Cálculo de deuda, listado de deudores y bloqueo de la desactivación de alumnos con deuda.
+- Alta de clientes con matriculación en sus clases.
+
+### Mejoras
+- Últimos ingresos en la ficha del alumno.
+- Sonido en los avisos de llavero desconocido y en los ingresos nuevos.
+
 ## [3.0.0] - 2026-10-02
 
 Reestructuración completa del proyecto: separación en capas, seguridad y firmware.

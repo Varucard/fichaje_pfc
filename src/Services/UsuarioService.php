@@ -8,6 +8,7 @@ use App\Domain\Llavero;
 use App\Domain\TipoUsuario;
 use App\Exceptions\ValidacionException;
 use App\Repositories\ClaseRepository;
+use App\Repositories\FichajeRepository;
 use App\Repositories\MatriculaRepository;
 use App\Repositories\PagoRepository;
 use App\Repositories\UsuarioRepository;
@@ -25,6 +26,8 @@ final class UsuarioService
     private readonly ClaseRepository $clases,
     private readonly PagoService $pagoService,
     private readonly AuditoriaService $auditoria,
+    private readonly DeudaService $deudas,
+    private readonly FichajeRepository $fichajes,
   ) {
   }
 
@@ -45,6 +48,11 @@ final class UsuarioService
   public function listar(TipoUsuario $tipo): array
   {
     return $this->usuarios->listarPorTipo($tipo);
+  }
+
+  public function clases(): array
+  {
+    return $this->clases->listar();
   }
 
   public function profesoresActivos(): array
@@ -81,6 +89,8 @@ final class UsuarioService
       'clases' => $clases,
       'clasesDisponibles' => $clasesDisponibles,
       'pagos' => $tipo === TipoUsuario::Alumno ? $this->pagos->ultimosDeUsuario($idUsuario) : [],
+      'deuda' => $tipo === TipoUsuario::Alumno ? $this->deudas->deudaDe($idUsuario) : null,
+      'fichajes' => $tipo === TipoUsuario::Alumno ? $this->fichajes->deUsuario($idUsuario) : [],
       'historial' => $this->auditoria->historialDe('usuario', $usuario['dni']),
     ];
   }
@@ -88,8 +98,12 @@ final class UsuarioService
   /**
    * Da de alta un cliente o profesor. Opcionalmente registra el primer pago.
    */
-  public function crear(array $entrada, bool $esProfesor, bool $conPago): array
+  public function crear(array $entrada, bool $esProfesor, bool $conPago, array $idsClases = []): array
   {
+    $idsClases = array_values(array_unique(array_filter(array_map('intval', $idsClases))));
+    if ($conPago && !$esProfesor && !$idsClases) {
+      throw new ValidacionException('Para registrar el pago elegí al menos una clase: la cuota es la suma de sus clases.');
+    }
     $datos = $this->normalizar($entrada, $esProfesor ? TipoUsuario::Profesor : TipoUsuario::Alumno);
 
     $existente = $this->usuarios->buscarPorDni($datos['dni']);
@@ -100,7 +114,7 @@ final class UsuarioService
     }
     $this->validarLlaveroLibre($datos['rfid']);
 
-    return $this->usuarios->transaccion(function () use ($datos, $esProfesor, $conPago): array {
+    return $this->usuarios->transaccion(function () use ($datos, $esProfesor, $conPago, $idsClases): array {
       $id = $this->usuarios->crear($datos);
       $this->auditoria->registrar(
         'usuario.alta',
@@ -108,6 +122,14 @@ final class UsuarioService
         'usuario',
         $datos['dni'],
       );
+      foreach ($idsClases as $idClase) {
+        $clase = $this->clases->buscarPorId($idClase)
+          ?? throw new ValidacionException('Una de las clases elegidas no existe.');
+        $esProfesor
+          ? $this->matriculas->asignarProfesor($id, $idClase)
+          : $this->matriculas->inscribirAlumno($id, $idClase);
+        $this->auditoria->registrar('matricula.alta', "{$datos['nombre']} {$datos['apellido']} agregado/a a {$clase['name_class']} en el alta", 'usuario', $datos['dni'], ['id_clase' => $idClase]);
+      }
       if ($conPago && !$esProfesor) {
         $this->pagoService->registrar($id);
       }
@@ -166,6 +188,12 @@ final class UsuarioService
     $usuario = $this->usuarios->buscarPorDni($dni)
       ?? throw new ValidacionException('El usuario no existe.');
 
+    if (TipoUsuario::deUsuario($usuario) === TipoUsuario::Alumno) {
+      $deuda = $this->deudas->deudaDe((int) $usuario['id_user']);
+      if ($deuda['total'] > 0) {
+        throw new ValidacionException('El alumno tiene una deuda de ' . dinero($deuda['total']) . '. Debe saldarla antes de desactivarlo.');
+      }
+    }
     if ($this->matriculas->tieneMatriculaciones((int) $usuario['id_user'])) {
       throw new ValidacionException('El usuario tiene matriculaciones activas. Quitelo de sus clases antes de desactivarlo.');
     }

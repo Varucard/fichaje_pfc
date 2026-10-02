@@ -50,7 +50,10 @@ final class UsuarioController extends Controller
 
   public function crear(Request $request): void
   {
-    $this->render('usuarios/crear', ['titulo' => 'Registrar nuevo Cliente/ Profesor']);
+    $this->render('usuarios/crear', [
+      'titulo' => 'Registrar nuevo Cliente/ Profesor',
+      'clases' => $this->usuarios->clases(),
+    ]);
   }
 
   public function guardar(Request $request): void
@@ -61,9 +64,9 @@ final class UsuarioController extends Controller
     $conPago = $opcion === 'pago';
 
     try {
-      $usuario = $this->usuarios->crear($entrada, $esProfesor, $conPago);
+      $usuario = $this->usuarios->crear($entrada, $esProfesor, $conPago, $request->inputArray('clases'));
     } catch (ValidacionException $e) {
-      $this->error($e->getMessage(), '/usuarios/nuevo', $entrada + ['profesor' => $esProfesor]);
+      $this->error($e->getMessage(), '/usuarios/nuevo', $entrada + ['opcion_alta' => $opcion, 'clases' => $request->inputArray('clases')]);
     }
 
     $mensaje = match (true) {

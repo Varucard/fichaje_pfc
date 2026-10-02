@@ -8,6 +8,7 @@ use App\Controllers\AuditoriaController;
 use App\Controllers\AuthController;
 use App\Controllers\ClaseController;
 use App\Controllers\DashboardController;
+use App\Controllers\DeudaController;
 use App\Controllers\FichajeController;
 use App\Controllers\PagoController;
 use App\Controllers\SistemaController;
@@ -51,6 +52,9 @@ return function (Router $r): void {
     $r->post('/usuarios/{dni:\d+}/pagos', [PagoController::class, 'renovar']);
     $r->post('/pagos/manual', [PagoController::class, 'manual']);
     $r->post('/pagos/{id:\d+}/eliminar', [PagoController::class, 'eliminar']);
+
+    // Deudas
+    $r->get('/deudores', [DeudaController::class, 'index']);
 
     // Clases
     $r->get('/clases', [ClaseController::class, 'index']);

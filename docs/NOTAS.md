@@ -11,17 +11,21 @@
 - [x] Íconos en los mensajes de aviso.
 - [x] Buscar administradores (la búsqueda incluye todos los tipos y muestra la columna Tipo).
 
+## Resueltos en 3.1.0
+- [x] Que las notificaciones suenen en el equipo.
+- [x] Claves foráneas e índice único en `users.dni`.
+- [x] Deuda de alumnos.
+- [x] No permitir eliminar (desactivar) un alumno con deuda.
+- [x] Mostrar los últimos fichajes en la ficha del usuario.
+- [x] Poder matricular al alumno en sus clases desde el alta.
+- [x] Sistema de logs y auditoría.
+
 ## Pendientes / errores conocidos
-- [ ] Que las notificaciones suenen en el equipo.
-- [ ] Agregar claves foráneas e índice único en `users.dni` (revisar antes los datos existentes).
 
 ## Módulos a crear
-- [ ] Deuda de alumnos.
 - [ ] Liquidación de profesores (el botón "Liquidar" ya está en la ficha, deshabilitado).
 - [ ] Stock.
 
 ## Mejoras a futuro (consultar)
 - [ ] Enviar información de las clases por email a los alumnos.
-- [ ] No permitir eliminar un alumno con deuda, ya sea de una clase o del sistema.
 - [ ] Si el alumno está en más de una clase, mostrar en sus fichadas a qué clase corresponden, con pagos por clase.
-- [ ] Mostrar los últimos fichajes en la ficha del usuario.

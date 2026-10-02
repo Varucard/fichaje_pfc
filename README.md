@@ -4,7 +4,7 @@ Sistema de control de asistencia, pagos de cuotas y clases para el **Palillo Fig
 
 - Alta y gestión de clientes (alumnos) y profesores.
 - Clases con profesores y alumnos matriculados.
-- Pagos de cuotas con cálculo automático de vencimiento.
+- Pagos de cuotas con monto, cálculo automático de vencimiento y control de deuda.
 - Fichadas automáticas con llavero RFID o manuales desde el panel.
 - Aviso de cumpleaños, llaveros desconocidos y cuotas por vencer.
 - Respaldo de la base de datos y reinicio remoto del lector.
@@ -102,6 +102,20 @@ Resumen: el lector consulta `GET /api/arduino/lectura?uid=…&auth=<ARDUINO_TOKE
 
 ---
 
+## 💰 Cuotas, pagos y deuda
+
+- **Cuota mensual** de un alumno = suma de los precios de sus clases.
+- Cada **pago** cubre un mes desde su fecha (si el día no existe en el mes siguiente, vence el último día del mes) y guarda:
+  - el **monto cobrado** (por defecto la cuota completa; se puede cargar otro valor en *Pago manual*),
+  - la **cuota** que correspondía en ese momento,
+  - el **reparto por clase**, proporcional al precio (tabla `payment_classes`), que es la base de la liquidación de profesores.
+- **Deuda** = cuotas vencidas × cuota actual + saldos de pagos parciales (cuota − monto cobrado). Un alumno con clases que nunca pagó adeuda una cuota. Los pagos anteriores a la v3.1 (sin monto) se consideran completos.
+- **Deudores** (panel → *Deudores*): alumnos activos con deuda, de mayor a menor, con la deuda total.
+- No se puede desactivar a un alumno con deuda.
+- En el alta, el cliente se puede matricular directamente en sus clases. Para el alta *con pago*, elegir al menos una.
+
+---
+
 ## 🗃️ Migraciones
 
 Los cambios de estructura de la base viven en `database/migrations/NNN_descripcion.sql` y se aplican con:
@@ -119,6 +133,7 @@ Cada migración aplicada se registra en la tabla `migraciones`, así que es segu
 | 002 | Limpia matriculaciones huérfanas o repetidas y hace único el DNI |
 | 003 | Claves foráneas entre usuarios, clases, pagos y fichadas |
 | 004 | Tabla `auditoria` |
+| 005 | Monto y cuota en `payments`; reparto por clase en `payment_classes` |
 
 ---
 
@@ -173,7 +188,8 @@ Convenciones:
 | `users` | Clientes, profesores y administradores (`type_user`: 1 profesor, 2 alumno, 3 admin; `asset`: activo) |
 | `classes` | Clases y precio |
 | `user_class` / `teacher_class` | Matriculaciones de alumnos / profesores |
-| `payments` | Pagos con fecha de pago y de vencimiento (`date_of_renovation`) |
+| `payments` | Pagos: fecha, vencimiento (`date_of_renovation`), monto cobrado y cuota |
+| `payment_classes` | Parte de cada pago asignada a cada clase |
 | `incomes` | Fichadas (ingresos) |
 | `uid_incomes` | Llaveros desconocidos pendientes de mostrar en el panel |
 | `types_users` | Catálogo de tipos de usuario |
