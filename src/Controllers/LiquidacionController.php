@@ -59,21 +59,25 @@ final class LiquidacionController extends Controller
     $this->exito('Liquidación anulada.', $this->volver($liquidacion['periodo']));
   }
 
-  public function porcentaje(Request $request, string $id): void
+  /** Modo de liquidación del profesor (porcentaje o asistencia) y su valor. */
+  public function configuracion(Request $request, string $id): void
   {
-    $valor = trim(str_replace(['%', ','], ['', '.'], (string) $request->input('porcentaje', '')));
+    $valor = trim(str_replace(['%', '$', ' '], '', (string) $request->input('valor', '')));
+    if (str_contains($valor, ',')) {
+      $valor = str_replace(['.', ','], ['', '.'], $valor);
+    }
     $periodo = $request->input('periodo');
 
     try {
       if ($valor !== '' && !is_numeric($valor)) {
-        throw new ValidacionException('El porcentaje no es válido.');
+        throw new ValidacionException('El valor no es válido.');
       }
-      $this->liquidaciones->actualizarPorcentaje((int) $id, $valor === '' ? null : (float) $valor);
+      $this->liquidaciones->actualizarConfiguracion((int) $id, (string) $request->input('modo', ''), $valor === '' ? null : (float) $valor);
     } catch (ValidacionException $e) {
       $this->error($e->getMessage(), $this->volver($periodo));
     }
 
-    $this->exito('Porcentaje actualizado.', $this->volver($periodo));
+    $this->exito('Configuración de liquidación actualizada.', $this->volver($periodo));
   }
 
   private function volver(?string $periodo): string

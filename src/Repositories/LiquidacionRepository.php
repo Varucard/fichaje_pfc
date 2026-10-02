@@ -45,8 +45,9 @@ final class LiquidacionRepository extends Repository
   public function crear(array $datos): int
   {
     $this->ejecutar(
-      'INSERT INTO liquidaciones (id_profesor, periodo, monto_base, porcentaje, monto, detalle, fecha_registro, id_admin)
-        VALUES (:id_profesor, :periodo, :monto_base, :porcentaje, :monto, :detalle, NOW(), :id_admin)',
+      'INSERT INTO liquidaciones
+          (id_profesor, periodo, modo, monto_base, porcentaje, monto_por_asistencia, monto, detalle, fecha_registro, id_admin)
+        VALUES (:id_profesor, :periodo, :modo, :monto_base, :porcentaje, :monto_por_asistencia, :monto, :detalle, NOW(), :id_admin)',
       $datos
     );
     return (int) $this->pdo->lastInsertId();

@@ -13,6 +13,7 @@ use App\Controllers\EmailController;
 use App\Controllers\FichajeController;
 use App\Controllers\LiquidacionController;
 use App\Controllers\PagoController;
+use App\Controllers\PromocionController;
 use App\Controllers\SistemaController;
 use App\Controllers\StockController;
 use App\Controllers\UsuarioController;
@@ -61,6 +62,11 @@ return function (Router $r): void {
     $r->post('/pagos/{id:\d+}/eliminar', [PagoController::class, 'eliminar']);
     $r->get('/pagos/{id:\d+}/comprobante', [PagoController::class, 'comprobante']);
 
+    // Promociones
+    $r->get('/promociones', [PromocionController::class, 'index']);
+    $r->post('/promociones', [PromocionController::class, 'guardar']);
+    $r->post('/promociones/{id:\d+}/activa', [PromocionController::class, 'cambiarActiva']);
+
     // Deudas
     $r->get('/deudores', [DeudaController::class, 'index']);
 
@@ -69,7 +75,7 @@ return function (Router $r): void {
     $r->post('/liquidaciones', [LiquidacionController::class, 'registrar']);
     $r->post('/liquidaciones/{id:\d+}/pagar', [LiquidacionController::class, 'pagar']);
     $r->post('/liquidaciones/{id:\d+}/anular', [LiquidacionController::class, 'anular']);
-    $r->post('/liquidaciones/profesores/{id:\d+}/porcentaje', [LiquidacionController::class, 'porcentaje']);
+    $r->post('/liquidaciones/profesores/{id:\d+}/configuracion', [LiquidacionController::class, 'configuracion']);
 
     // Stock
     $r->get('/stock', [StockController::class, 'index']);

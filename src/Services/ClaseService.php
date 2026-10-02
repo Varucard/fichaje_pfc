@@ -57,7 +57,7 @@ final class ClaseService
    * @param array<int, string|int> $idsProfesores
    * @return array{id: int, omitidos: array<int, string>}
    */
-  public function crear(string $nombre, string $precio, array $idsProfesores): array
+  public function crear(string $nombre, string $precio, array $idsProfesores, array $idsAlumnos = []): array
   {
     [$nombre, $precio] = $this->validar($nombre, $precio);
 
@@ -65,7 +65,7 @@ final class ClaseService
       throw new ValidacionException("La clase \"{$nombre}\" ya existe.");
     }
 
-    return $this->clases->transaccion(function () use ($nombre, $precio, $idsProfesores): array {
+    return $this->clases->transaccion(function () use ($nombre, $precio, $idsProfesores, $idsAlumnos): array {
       $id = $this->clases->crear($nombre, $precio);
       $omitidos = [];
       $asignados = [];
@@ -80,8 +80,21 @@ final class ClaseService
         $asignados[] = trim($profesor['user_name'] . ' ' . $profesor['user_surname']);
       }
 
-      $this->auditoria->registrar('clase.alta', "Alta de la clase {$nombre} (" . dinero($precio) . ')', 'clase', $id, [
+      $alumnos = [];
+      foreach (array_unique(array_map('intval', $idsAlumnos)) as $idAlumno) {
+        $alumno = $this->usuarios->buscarPorId($idAlumno);
+        if (!$alumno || TipoUsuario::deUsuario($alumno) !== TipoUsuario::Alumno || !(int) $alumno['asset']) {
+          $omitidos[] = $alumno['user_name'] ?? "ID {$idAlumno}";
+          continue;
+        }
+        $this->matriculas->inscribirAlumno($idAlumno, $id);
+        $alumnos[] = trim($alumno['user_name'] . ' ' . $alumno['user_surname']);
+      }
+
+      $this->auditoria->registrar('clase.alta', "Alta de la clase {$nombre} (" . dinero($precio) . ')'
+        . ($alumnos ? ' con ' . count($alumnos) . ' alumno(s)' : ''), 'clase', $id, [
         'profesores' => $asignados,
+        'alumnos' => $alumnos,
       ]);
       return ['id' => $id, 'omitidos' => $omitidos];
     });

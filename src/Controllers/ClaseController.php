@@ -41,6 +41,7 @@ final class ClaseController extends Controller
     $this->render('clases/crear', [
       'titulo' => 'Registrar nueva clase',
       'profesores' => $this->usuarios->profesoresActivos(),
+      'alumnos' => $this->usuarios->alumnosActivos(),
     ]);
   }
 
@@ -50,7 +51,7 @@ final class ClaseController extends Controller
     $precio = (string) $request->input('precio', '');
 
     try {
-      $resultado = $this->clases->crear($nombre, $precio, $request->inputArray('profesores'));
+      $resultado = $this->clases->crear($nombre, $precio, $request->inputArray('profesores'), $request->inputArray('alumnos'));
     } catch (ValidacionException $e) {
       $this->error($e->getMessage(), '/clases/nueva', ['nombre_clase' => $nombre, 'precio' => $precio]);
     }

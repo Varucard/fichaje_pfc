@@ -32,6 +32,7 @@ final class UsuarioService
     private readonly LiquidacionRepository $liquidaciones,
     private readonly AvisosService $avisos,
     private readonly EmailService $emails,
+    private readonly PromocionService $promociones,
   ) {
   }
 
@@ -57,6 +58,11 @@ final class UsuarioService
   public function clases(): array
   {
     return $this->clases->listar();
+  }
+
+  public function alumnosActivos(): array
+  {
+    return $this->usuarios->listarPorTipo(TipoUsuario::Alumno, soloActivos: true);
   }
 
   public function profesoresActivos(): array
@@ -97,6 +103,7 @@ final class UsuarioService
       'fichajes' => $tipo === TipoUsuario::Alumno ? $this->fichajes->deUsuario($idUsuario) : [],
       'liquidaciones' => $tipo === TipoUsuario::Profesor ? $this->liquidaciones->deProfesor($idUsuario) : [],
       'emails' => $this->emails->deUsuario($idUsuario),
+      'promociones' => $tipo === TipoUsuario::Alumno ? $this->promociones->planesActivos() : [],
       'historial' => $this->auditoria->historialDe('usuario', $usuario['dni']),
     ];
   }

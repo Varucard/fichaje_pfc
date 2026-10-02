@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Exceptions\ValidacionException;
 use App\Services\ComprobanteService;
 use App\Services\PagoService;
+use App\Services\PromocionService;
 use DateTimeImmutable;
 
 final class PagoController extends Controller
@@ -15,6 +16,7 @@ final class PagoController extends Controller
   public function __construct(
     private readonly PagoService $pagos,
     private readonly ComprobanteService $comprobantes,
+    private readonly PromocionService $promociones,
   ) {
   }
 
@@ -54,7 +56,8 @@ final class PagoController extends Controller
       if ($fecha === false) {
         throw new ValidacionException('La fecha de pago no es válida.');
       }
-      $usuario = $this->pagos->registrarPorDni((string) $request->input('dni', ''), $fecha, $this->monto($request));
+      $plan = $this->promociones->planDesde($request->input('plan'));
+      $usuario = $this->pagos->registrarPorDni((string) $request->input('dni', ''), $fecha, $this->monto($request), $plan);
     } catch (ValidacionException $e) {
       $this->error($e->getMessage(), $volver);
     }

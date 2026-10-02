@@ -42,6 +42,7 @@ final class ComprobanteService
       'usuario' => $usuario,
       'detalle' => $this->pagos->detalle($idPago),
       'numero' => self::numero($idPago),
+      'plan' => $this->pagos->descripcionPlan($pago),
       'gimnasio' => [
         'nombre' => (string) Config::get('app.nombre'),
         'direccion' => $this->config->get('gimnasio.direccion'),

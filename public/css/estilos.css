@@ -392,7 +392,8 @@ tr.inactivo td { opacity: 0.6; }
 .etiqueta-exito { background: var(--pfc-exito); color: #fff; }
 tr.resaltada td { background-color: rgba(28, 126, 214, 0.25) !important; }
 tr.resaltada td:first-child { box-shadow: inset 4px 0 0 #1c7ed6; }
-.form-porcentaje { display: flex; gap: 4px; justify-content: center; margin: 0; }
+.form-porcentaje { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 0; }
+.form-porcentaje select { margin: 0; padding: 4px; font-size: 0.85em; }
 .form-porcentaje input { width: 70px; margin: 0; padding: 4px 6px; }
 .form-porcentaje button { margin: 0; }
 
@@ -441,3 +442,6 @@ tr.resaltada td:first-child { box-shadow: inset 4px 0 0 #1c7ed6; }
   background: var(--background-alt);
 }
 .lista-horarios form, .lista-horarios button { margin: 0; }
+
+.form-group-ancho { flex: 1 1 100%; }
+.form-group select[multiple] { width: 100%; }

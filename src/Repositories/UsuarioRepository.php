@@ -88,9 +88,12 @@ final class UsuarioRepository extends Repository
     $this->ejecutar('UPDATE users SET rfid = ? WHERE id_user = ?', [$rfid, $id]);
   }
 
-  public function actualizarPorcentajeLiquidacion(int $id, ?float $porcentaje): void
+  public function actualizarLiquidacion(int $id, ?string $modo, ?float $porcentaje, ?float $montoPorAsistencia): void
   {
-    $this->ejecutar('UPDATE users SET porcentaje_liquidacion = ? WHERE id_user = ?', [$porcentaje, $id]);
+    $this->ejecutar(
+      'UPDATE users SET modo_liquidacion = ?, porcentaje_liquidacion = ?, monto_por_asistencia = ? WHERE id_user = ?',
+      [$modo, $porcentaje, $montoPorAsistencia, $id]
+    );
   }
 
   /** Alumnos activos con email que aceptan avisos. */

@@ -90,6 +90,21 @@ final class FichajeRepository extends Repository
     );
   }
 
+  /**
+   * Ingresos por clase entre dos fechas (fichadas con clase deducida por horario).
+   *
+   * @return array<int, int> id_class => cantidad
+   */
+  public function asistenciasPorClase(DateTimeInterface $desde, DateTimeInterface $hasta): array
+  {
+    $filas = $this->todos(
+      'SELECT id_class, COUNT(*) AS cantidad FROM incomes
+        WHERE id_class IS NOT NULL AND addmission_date BETWEEN ? AND ? GROUP BY id_class',
+      [$desde->format('Y-m-d 00:00:00'), $hasta->format('Y-m-d 23:59:59')]
+    );
+    return array_map('intval', array_column($filas, 'cantidad', 'id_class'));
+  }
+
   /** Cantidad de ingresos a una clase en los últimos N días. */
   public function asistenciasAClase(int $idClase, int $dias = 30): int
   {

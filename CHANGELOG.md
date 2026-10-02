@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.3.0] - 2026-10-02
+
+### Pagos
+- Pagos de varios meses (1 a 12) y promociones configurables: meses pagos, meses bonificados y descuento.
+- Adelanto de pago: si se paga antes del vencimiento, los meses se suman desde el vencimiento actual y no se pierden días.
+- El comprobante muestra el plan y la fecha hasta la que vale la cuota.
+
+### Liquidación de profesores
+- Nuevo modo **por asistencia** ($ por cada ingreso de un alumno a sus clases), además del % de lo cobrado.
+- En el modo %, un pago de varios meses se reparte entre los meses que cubre en lugar de contarse todo en el mes del pago.
+
+### Clases
+- Al crear una clase se pueden elegir sus alumnos, con un buscador para filtrarlos.
+
 ## [3.2.0] - 2026-10-02
 
 ### Horarios y clase en la fichada

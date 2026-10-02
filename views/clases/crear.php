@@ -3,6 +3,7 @@
  * @var App\Core\View $this
  * @var string $titulo
  * @var array $profesores Profesores activos
+ * @var array $alumnos Alumnos activos
  */
 ?>
 <?= $this->renderParcial('partials/cabecera', ['titulo' => $titulo]) ?>
@@ -31,6 +32,21 @@
         <?php endforeach; ?>
       </select>
       <small class="diminuto">Ctrl + clic para elegir más de uno.</small>
+    <?php endif; ?>
+  </div>
+
+  <div class="form-group form-group-ancho">
+    <label for="alumnos">Alumnos (opcional):</label>
+    <?php if (empty($alumnos)): ?>
+      <p class="diminuto">No hay alumnos activos.</p>
+    <?php else: ?>
+      <input type="search" placeholder="Filtrar por nombre o DNI…" data-filtrar-select="alumnos" aria-label="Filtrar alumnos">
+      <select id="alumnos" name="alumnos[]" size="<?= min(count($alumnos), 8) ?>" multiple>
+        <?php foreach ($alumnos as $alumno): ?>
+          <option value="<?= e($alumno['id_user']) ?>"><?= e(trim($alumno['user_name'] . ' ' . $alumno['user_surname'])) ?> — <?= e($alumno['dni']) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <small class="diminuto">Ctrl + clic para elegir varios.</small>
     <?php endif; ?>
   </div>
 

@@ -162,6 +162,40 @@
     },
   };
 
+  // Filtro de opciones en selects múltiples largos: <input data-filtrar-select="idDelSelect">
+  document.querySelectorAll('[data-filtrar-select]').forEach((input) => {
+    const select = document.getElementById(input.dataset.filtrarSelect);
+    if (!select) return;
+    input.addEventListener('input', () => {
+      const texto = input.value.trim().toLowerCase();
+      Array.from(select.options).forEach((op) => {
+        op.hidden = texto !== '' && !op.textContent.toLowerCase().includes(texto) && !op.selected;
+      });
+    });
+  });
+
+  // Formulario de pago: el monto sigue al plan elegido (cuota × meses pagos − descuento).
+  document.querySelectorAll('[data-form-pago]').forEach((form) => {
+    const cuota = parseFloat(form.dataset.cuota) || 0;
+    const plan = form.querySelector('select[name="plan"]');
+    const monto = form.querySelector('input[name="monto"]');
+    const detalle = form.querySelector('[data-detalle-plan]');
+    if (!plan || !monto) return;
+    const actualizar = () => {
+      const op = plan.selectedOptions[0];
+      const pagos = parseInt(op.dataset.pagos, 10) || 1;
+      const bonificados = parseInt(op.dataset.bonificados, 10) || 0;
+      const descuento = parseFloat(op.dataset.descuento) || 0;
+      monto.value = (Math.round(cuota * pagos * (1 - descuento / 100) * 100) / 100).toString();
+      if (detalle) {
+        const total = pagos + bonificados;
+        detalle.textContent = `Cubre ${total} ${total === 1 ? 'mes' : 'meses'}` + (bonificados ? ` (${bonificados} bonificado${bonificados > 1 ? 's' : ''})` : '');
+      }
+    };
+    plan.addEventListener('change', actualizar);
+    actualizar();
+  });
+
   document.querySelectorAll('[data-accion]').forEach((boton) => {
     boton.addEventListener('click', () => ACCIONES[boton.dataset.accion]?.(boton));
   });
