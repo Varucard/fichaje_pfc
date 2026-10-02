@@ -28,6 +28,7 @@
           <th>Nombre de la Clase</th>
           <th>Precio</th>
           <th>Profesores</th>
+          <th>Horarios</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -37,6 +38,7 @@
             <td><?= e($clase['name_class']) ?></td>
             <td><?= e(dinero($clase['price_class'])) ?></td>
             <td class="diminuto"><?= e($clase['profesores'] ?: '—') ?></td>
+            <td class="diminuto"><?= e($clase['horarios'] ?: '—') ?></td>
             <td class="celda-acciones">
               <a class="boton button_small" href="<?= url('/clases/' . $clase['id_class']) ?>"><i class="fas fa-eye"></i> Ver +</a>
               <?= $this->renderParcial('clases/_form_eliminar', ['clase' => $clase, 'chico' => true]) ?>

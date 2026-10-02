@@ -278,10 +278,11 @@ void mostrarRespuesta(const char *json) {
   const char *estado = doc["estado"] | "";
   const char *nombre = doc["nombre"] | "";
   const char *apellido = doc["apellido"] | "";
+  const char *clase = doc["clase"] | ""; // Clase deducida por horario (servidor 3.2+)
 
   if (strcmp(estado, "activo") == 0) {
     leds(true, false, false);
-    pantalla("Bienvenido/a!", nombre, apellido, "Disfrute su clase!");
+    pantalla("Bienvenido/a!", nombre, apellido, clase[0] ? clase : "Disfrute su clase!");
     beep(200);
   } else if (strcmp(estado, "moroso") == 0) {
     leds(false, true, false);

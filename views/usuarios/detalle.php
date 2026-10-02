@@ -187,7 +187,10 @@ $rutaLista = $tipo === TipoUsuario::Profesor ? '/profesores' : '/clientes';
     <?php else: ?>
       <ul class="lista-fichajes">
         <?php foreach ($fichajes as $ingreso): ?>
-          <li><i class="fas fa-clipboard-check"></i> <?= e(fecha_hora($ingreso)) ?></li>
+          <li>
+            <i class="fas fa-clipboard-check"></i> <?= e(fecha_hora($ingreso['addmission_date'])) ?>
+            <span class="<?= $ingreso['clase'] ? 'diminuto' : 'diminuto texto-aviso' ?>">· <?= e($ingreso['clase'] ?: 'Sin clase') ?></span>
+          </li>
         <?php endforeach; ?>
       </ul>
     <?php endif; ?>

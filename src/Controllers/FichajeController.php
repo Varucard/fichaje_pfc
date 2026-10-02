@@ -41,6 +41,7 @@ final class FichajeController extends Controller
       $this->error($e->getMessage(), $volver);
     }
 
-    $this->exito("Fichada registrada: {$usuario['user_name']} {$usuario['user_surname']}.", $volver);
+    $clase = $usuario['clase_fichada'] ? " en {$usuario['clase_fichada']}" : ' (sin clase en horario)';
+    $this->exito("Fichada registrada: {$usuario['user_name']} {$usuario['user_surname']}{$clase}.", $volver);
   }
 }

@@ -428,3 +428,16 @@ tr.resaltada td:first-child { box-shadow: inset 4px 0 0 #1c7ed6; }
 .config-avisos .opcion-valor { display: flex; flex-direction: column; gap: 4px; font-size: 0.9em; }
 .config-avisos .opcion-valor input, .config-avisos .opcion-valor select { margin: 0; }
 .config-avisos .form-botones { grid-column: 1 / -1; padding: 0; }
+
+/* Horarios de clases */
+.texto-aviso { color: var(--pfc-aviso); }
+.lista-horarios { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lista-horarios li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 12px;
+  border-radius: 6px;
+  background: var(--background-alt);
+}
+.lista-horarios form, .lista-horarios button { margin: 0; }

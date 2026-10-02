@@ -4,7 +4,10 @@
  * @var array $clase
  * @var array $profesores
  * @var array $alumnos
+ * @var array $horarios
+ * @var int $asistencias Ingresos a esta clase en los últimos 30 días
  */
+use App\Services\ConfiguracionService;
 $rutaClase = '/clases/' . $clase['id_class'];
 $clase['matriculaciones'] = count($profesores) + count($alumnos);
 ?>
@@ -33,6 +36,37 @@ $clase['matriculaciones'] = count($profesores) + count($alumnos);
     </div>
   </form>
 
+  <h2>Horarios <span class="diminuto">· <?= (int) $asistencias ?> ingreso(s) en los últimos 30 días</span></h2>
+  <?php if (empty($horarios)): ?>
+    <p class="diminuto">Sin horarios. Cargalos para que cada fichada se asigne a esta clase automáticamente.</p>
+  <?php else: ?>
+    <ul class="lista-horarios">
+      <?php foreach ($horarios as $horario): ?>
+        <li>
+          <strong><?= e(ConfiguracionService::DIAS_SEMANA[(int) $horario['dia_semana']]) ?></strong>
+          <?= e(substr($horario['hora_inicio'], 0, 5)) ?> a <?= e(substr($horario['hora_fin'], 0, 5)) ?>
+          <form action="<?= url($rutaClase . '/horarios/' . $horario['id'] . '/quitar') ?>" method="post" data-confirmar="¿Quitar este horario?">
+            <?= csrf_field() ?>
+            <button type="submit" class="button_small peligro" title="Quitar"><i class="fas fa-times"></i></button>
+          </form>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  <?php endif; ?>
+  <form action="<?= url($rutaClase . '/horarios') ?>" method="post" class="form-en-linea">
+    <?= csrf_field() ?>
+    <select name="dia" required aria-label="Día">
+      <option value="">Día…</option>
+      <?php foreach (ConfiguracionService::DIAS_SEMANA as $numero => $nombre): ?>
+        <option value="<?= $numero ?>"><?= e($nombre) ?></option>
+      <?php endforeach; ?>
+    </select>
+    <label>de <input type="time" name="inicio" required></label>
+    <label>a <input type="time" name="fin" required></label>
+    <button type="submit"><i class="fas fa-clock"></i> Agregar horario</button>
+  </form>
+
+  <hr>
   <form action="<?= url($rutaClase . '/miembros') ?>" method="post" class="form-en-linea">
     <?= csrf_field() ?>
     <label for="dni_miembro">Agregar Alumno/ Profesor por DNI:</label>

@@ -14,7 +14,10 @@ final class ClaseRepository extends Repository
     SELECT c.id_class, c.name_class, c.price_class,
       GROUP_CONCAT(DISTINCT CONCAT_WS(' ', u.user_name, u.user_surname) ORDER BY u.user_name SEPARATOR ', ') AS profesores,
       (SELECT COUNT(*) FROM teacher_class t WHERE t.id_class = c.id_class)
-        + (SELECT COUNT(*) FROM user_class a WHERE a.id_class = c.id_class) AS matriculaciones
+        + (SELECT COUNT(*) FROM user_class a WHERE a.id_class = c.id_class) AS matriculaciones,
+      (SELECT GROUP_CONCAT(CONCAT(ELT(h.dia_semana, 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'), ' ', TIME_FORMAT(h.hora_inicio, '%H:%i'))
+          ORDER BY h.dia_semana, h.hora_inicio SEPARATOR ' · ')
+        FROM clase_horarios h WHERE h.id_class = c.id_class) AS horarios
     FROM classes c
     LEFT JOIN teacher_class tc ON tc.id_class = c.id_class
     LEFT JOIN users u ON u.id_user = tc.id_user";

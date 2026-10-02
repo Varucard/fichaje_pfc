@@ -26,7 +26,8 @@
 
 ## Resueltos en 3.2.0
 - [x] Emails a los alumnos: vencimiento, deuda, cumpleaños, inasistencia, bienvenida y comprobante de pago.
+- [x] Mostrar en las fichadas a qué clase corresponden (deducido por horario).
 
 ## Mejoras a futuro (consultar)
 - [ ] Factura electrónica de ARCA (ex AFIP): requiere CUIT, certificado digital y definir el tipo de factura.
-- [ ] Si el alumno está en más de una clase, mostrar en sus fichadas a qué clase corresponden, con pagos por clase.
+- [ ] Liquidar a los profesores por asistencia (ahora que cada fichada tiene clase), como alternativa al % de lo cobrado.

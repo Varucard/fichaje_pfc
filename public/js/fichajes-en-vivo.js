@@ -49,6 +49,7 @@
         celda(f.dni, alerta),
         celda(f.alumno, 'diminuto'),
         celda(formatear(f.addmission_date, true), 'diminuto'),
+        celda(f.clase ?? 'Sin clase', f.clase ? 'diminuto' : 'diminuto texto-aviso'),
         celda(formatear(f.date_of_renovation, false), alerta),
       );
       return fila;

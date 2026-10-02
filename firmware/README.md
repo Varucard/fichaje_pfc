@@ -49,7 +49,7 @@ arduino-cli upload  -b arduino:avr:mega -p /dev/ttyACM0 firmware/pfc
 
 ```
 GET /api/arduino/lectura?uid=3A5CF681&auth=<token>
-→ {"estado": "activo", "nombre": "Jose", "apellido": "Perez"}
+→ {"estado": "activo", "nombre": "Jose", "apellido": "Perez", "clase": "Boxeo"}
 ```
 
 | `estado` | Pantalla | Se registra la fichada |
@@ -62,6 +62,7 @@ GET /api/arduino/lectura?uid=3A5CF681&auth=<token>
 | `desconocido` | Llavero desconocido (aparece un aviso en el panel) | No |
 
 El servidor envía los nombres sin tildes y con 20 caracteres como máximo, porque el LCD no tiene esos caracteres.
+`clase` es la clase deducida por el horario. El lector la muestra en la última línea y, si viene vacía, muestra "Disfrute su clase!".
 
 **Reinicio remoto** (panel → Arduino, puerto 8080):
 

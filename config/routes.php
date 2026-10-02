@@ -89,6 +89,8 @@ return function (Router $r): void {
     $r->post('/clases/{id:\d+}/actualizar', [ClaseController::class, 'actualizar']);
     $r->post('/clases/{id:\d+}/eliminar', [ClaseController::class, 'eliminar']);
     $r->post('/clases/{id:\d+}/miembros', [ClaseController::class, 'agregarMiembro']);
+    $r->post('/clases/{id:\d+}/horarios', [ClaseController::class, 'agregarHorario']);
+    $r->post('/clases/{id:\d+}/horarios/{horario:\d+}/quitar', [ClaseController::class, 'quitarHorario']);
     $r->post('/clases/{id:\d+}/miembros/{usuario:\d+}/quitar', [ClaseController::class, 'quitarMiembro']);
 
     // Fichajes

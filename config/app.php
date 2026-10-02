@@ -18,7 +18,7 @@ $basePath = $urlApp !== ''
 return [
   'app' => [
     'nombre' => Env::get('SITENAME', 'Palillo Fight Club'),
-    'version' => Env::get('APPVERSION', '3.1.1'),
+    'version' => Env::get('APPVERSION', '3.2.0'),
     'url' => $urlApp,
     'base_path' => $basePath,
     'debug' => Env::bool('APP_DEBUG'),
@@ -43,6 +43,8 @@ return [
   'fichajes' => [
     // Si el mismo alumno pasa el llavero de nuevo dentro de estos minutos no se registra otra fichada.
     'minutos_entre_fichadas' => (int) Env::get('MINUTOS_ENTRE_FICHADAS', '5'),
+    // Para deducir la clase: se acepta la fichada desde estos minutos antes del inicio hasta el fin.
+    'minutos_antes_de_clase' => (int) Env::get('MINUTOS_ANTES_DE_CLASE', '30'),
   ],
 
   'liquidaciones' => [

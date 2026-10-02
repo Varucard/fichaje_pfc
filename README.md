@@ -5,7 +5,7 @@ Sistema de control de asistencia, pagos de cuotas y clases para el **Palillo Fig
 - Alta y gestión de clientes (alumnos) y profesores.
 - Clases con profesores y alumnos matriculados.
 - Pagos de cuotas con monto, cálculo automático de vencimiento y control de deuda.
-- Fichadas automáticas con llavero RFID o manuales desde el panel.
+- Fichadas automáticas con llavero RFID o manuales desde el panel, con la clase deducida por horario.
 - Control de deuda y liquidación mensual de profesores.
 - Stock de productos con ventas, entradas y ajustes de inventario.
 - Emails automáticos (vencimiento, deuda, cumpleaños, inactividad, bienvenida, resumen semanal) y comprobante de pago en PDF.
@@ -147,6 +147,19 @@ Panel → *Stock*. El botón muestra un contador rojo cuando hay productos en su
   - *Ajuste de inventario*: se carga el stock real contado y un motivo obligatorio.
 - El stock nunca queda negativo. Cada movimiento bloquea el producto en la base, así dos ventas simultáneas no pueden pasar el límite.
 - El listado muestra las ventas del mes, y cada movimiento queda en el historial del producto y en la auditoría.
+
+---
+
+## 🕒 Horarios y clase de cada fichada
+
+Cada clase puede tener horarios semanales (ficha de la clase → *Horarios*: día, desde, hasta). Al fichar, con el lector o a mano, se deduce a qué clase vino el alumno:
+
+1. Entre las clases en las que está inscripto, se busca la que tiene horario **hoy**, desde `MINUTOS_ANTES_DE_CLASE` (por defecto 30) antes del inicio hasta la hora de fin.
+2. Si coinciden varias (por ejemplo, llegó entre el fin de una clase y el comienzo de otra), gana la que empieza más cerca.
+3. Si el alumno tiene **una sola clase** y esa clase todavía no tiene horarios, se asigna esa.
+4. Si no coincide ninguna, la fichada **se registra igual** como "Sin clase" (marcada en naranja para revisar). El lector no bloquea a nadie por horario.
+
+La clase aparece en *Últimos ingresos*, en las búsquedas y en la ficha del alumno, y el lector la muestra en la pantalla (firmware 3.2). El listado de clases muestra los horarios y la ficha de cada clase cuenta los ingresos de los últimos 30 días.
 
 ---
 

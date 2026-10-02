@@ -39,6 +39,7 @@ final class ArduinoController extends Controller
     $respuesta = $this->fichajes->procesarLectura($uid);
     $respuesta['nombre'] = self::textoLcd($respuesta['nombre']);
     $respuesta['apellido'] = self::textoLcd($respuesta['apellido']);
+    $respuesta['clase'] = self::textoLcd($respuesta['clase'] ?? '');
 
     $this->json($respuesta);
   }

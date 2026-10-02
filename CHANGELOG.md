@@ -1,6 +1,12 @@
 # Changelog
 
-## [3.2.0] - Sin publicar
+## [3.2.0] - 2026-10-02
+
+### Horarios y clase en la fichada
+- Horarios semanales por clase, con validación de superposiciones.
+- Cada fichada (lector o manual) se asigna a la clase en horario. Si no coincide ninguna, se registra igual como "Sin clase".
+- La clase se ve en los ingresos, las búsquedas y la ficha del alumno. El lector la muestra en el LCD.
+- Asistencias de los últimos 30 días en la ficha de cada clase.
 
 ### Emails
 - Avisos automáticos: vencimiento próximo, cuota vencida/deuda, inasistencia ("te extrañamos"), cumpleaños y bienvenida.

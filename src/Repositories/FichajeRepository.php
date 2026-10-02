@@ -14,10 +14,11 @@ final class FichajeRepository extends Repository
 {
   private const SELECT = "
     SELECT i.id_income, i.id_user, i.addmission_date, u.rfid, u.dni,
-      CONCAT_WS(' ', u.user_name, u.user_surname) AS alumno,
+      CONCAT_WS(' ', u.user_name, u.user_surname) AS alumno, c.name_class AS clase,
       (SELECT MAX(p.date_of_renovation) FROM payments p WHERE p.id_user = i.id_user) AS date_of_renovation
     FROM incomes i
-    JOIN users u ON u.id_user = i.id_user";
+    JOIN users u ON u.id_user = i.id_user
+    LEFT JOIN classes c ON c.id_class = i.id_class";
 
   public function ultimos(int $limite = 10): array
   {
@@ -62,11 +63,14 @@ final class FichajeRepository extends Repository
   /** Últimos ingresos de un usuario. */
   public function deUsuario(int $idUsuario, int $limite = 10): array
   {
-    $stmt = $this->pdo->prepare('SELECT addmission_date FROM incomes WHERE id_user = :id ORDER BY addmission_date DESC LIMIT :limite');
+    $stmt = $this->pdo->prepare(
+      'SELECT i.addmission_date, c.name_class AS clase FROM incomes i LEFT JOIN classes c ON c.id_class = i.id_class
+        WHERE i.id_user = :id ORDER BY i.addmission_date DESC LIMIT :limite'
+    );
     $stmt->bindValue('id', $idUsuario, PDO::PARAM_INT);
     $stmt->bindValue('limite', $limite, PDO::PARAM_INT);
     $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    return $stmt->fetchAll();
   }
 
   /** ¿El usuario fichó después de la fecha indicada? */
@@ -78,11 +82,20 @@ final class FichajeRepository extends Repository
     );
   }
 
-  public function registrar(int $idUsuario, DateTimeInterface $fecha): void
+  public function registrar(int $idUsuario, DateTimeInterface $fecha, ?int $idClase = null): void
   {
     $this->ejecutar(
-      'INSERT INTO incomes (id_user, addmission_date) VALUES (?, ?)',
-      [$idUsuario, $fecha->format('Y-m-d H:i:s')]
+      'INSERT INTO incomes (id_user, addmission_date, id_class) VALUES (?, ?, ?)',
+      [$idUsuario, $fecha->format('Y-m-d H:i:s'), $idClase]
+    );
+  }
+
+  /** Cantidad de ingresos a una clase en los últimos N días. */
+  public function asistenciasAClase(int $idClase, int $dias = 30): int
+  {
+    return (int) $this->valor(
+      'SELECT COUNT(*) FROM incomes WHERE id_class = ? AND addmission_date >= NOW() - INTERVAL ? DAY',
+      [$idClase, $dias]
     );
   }
 }

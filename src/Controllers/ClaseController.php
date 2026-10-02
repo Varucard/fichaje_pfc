@@ -109,6 +109,26 @@ final class ClaseController extends Controller
     $this->exito("{$usuario['user_name']} fue agregado/a a la clase.", $volverA);
   }
 
+  public function agregarHorario(Request $request, string $id): void
+  {
+    try {
+      $this->clases->agregarHorario((int) $id, (string) $request->input('dia', ''), (string) $request->input('inicio', ''), (string) $request->input('fin', ''));
+    } catch (ValidacionException $e) {
+      $this->error($e->getMessage(), '/clases/' . $id);
+    }
+    $this->exito('Horario agregado.', '/clases/' . $id);
+  }
+
+  public function quitarHorario(Request $request, string $id, string $idHorario): void
+  {
+    try {
+      $this->clases->quitarHorario((int) $id, (int) $idHorario);
+    } catch (ValidacionException $e) {
+      $this->error($e->getMessage(), '/clases/' . $id);
+    }
+    $this->exito('Horario quitado.', '/clases/' . $id);
+  }
+
   /** Matricula al usuario en la clase elegida desde su ficha. */
   public function matricular(Request $request, string $dni): void
   {
